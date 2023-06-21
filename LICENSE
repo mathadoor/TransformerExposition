@@ -1,6 +1,10 @@
 MIT License
 
-Copyright (c) 2023 Harpreet Matharoo
+Copyright (c) 2022 Polo Club of Data Science, Author of DiffusionExplainer
+
+Copyright (c) 2023 Harpreet Matharoo, Author of TransformerExposition
+
+Changes Made: Updating the visualization and making it work for transformer exposition.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
