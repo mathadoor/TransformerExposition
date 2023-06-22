@@ -2,12 +2,12 @@
 
 [Header
   fullWidth:true
-  title:"Idyll_proj"
-  subtitle:"Welcome to Idyll. Open index.idyll to start writing"
-  author:"Your Name Here"
-  authorLink:"https://idyll-lang.org"
+  title:"Transformer Explainer"
+  subtitle:"An interactive introduction to the transformer architecture"
+  author:"Harpreet Matharoo"
+  authorLink:"https://mathadoor.github.io"
   date:"Jun 21, 2023"
-  background:"#222222"
+  background:"#053061"
   color:"#ffffff"
    /]
 
@@ -129,6 +129,7 @@ join our [chatroom](https://gitter.im/idyll-lang/Lobby), or see the project on [
 ## Developing a post locally
 
 Run `idyll`.
+
 
 ## Building a post for production
 
