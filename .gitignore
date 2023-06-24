@@ -3,3 +3,6 @@ data/
 .idea/
 .env
 *.bkp
+
+.DS_Store
+node_modules
