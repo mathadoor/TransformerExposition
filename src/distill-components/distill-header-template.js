@@ -1,4 +1,5 @@
 import logo from '../assets/distill-logo.svg';
+import github from '../../assets/icons/github.svg';
 
 export const headerTemplate = `
 <style>
@@ -66,14 +67,9 @@ distill-header .nav a {
 }
 </style>
 <div class="content">
-  <a href="/" class="logo">
-    ${logo}
-    Distill
-  </a>
   <nav class="nav">
-    <a href="/about/">About</a>
-    <a href="/prize/">Prize</a>
-    <a href="/journal/">Submit</a>
+    <a href="https://github.com/mathadoor/TransformerExposition" target="_blank">GITHUB</a>
+    <a href="/prize/">VIDEO</a>
   </nav>
 </div>
 `;
