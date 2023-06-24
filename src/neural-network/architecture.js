@@ -1,7 +1,10 @@
 import React  from 'react';
 import EncoderDecoder from './encoder-decoder';
 import EmbeddingLayer from "./embedding-layer";
+import OutputLayer from "./output-layer";
 import Xarrow from 'react-xarrows';
+import customArrow from "./custom-arrow";
+import CustomArrow from "./custom-arrow";
 
 class Architecture extends React.Component {
 
@@ -33,12 +36,20 @@ class Architecture extends React.Component {
 
             ))
           }
+            <OutputLayer id={'output-layer'} width={props.layer_width}
+                            height={props.layer_height} x={props.out_x} y={props.out_y} fill={props.color} rx={r[0]} ry={r[1]}/>
           </svg>
+
           <Xarrow start={"embedding-layer"} end={"encoder-0"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={props.headSize} />
           <Xarrow start={"encoder-0"} end={"encoder-1"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={props.headSize} />
           <Xarrow start={"encoder-1"} end={"encoder-2"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={props.headSize} />
+          <Xarrow start={"encoder-2"} end={"decoder-0"} path={'grid'} startAnchor={'bottom'} endAnchor={'top'} headSize={props.headSize}/>
+          <Xarrow start={"encoder-2"} end={"decoder-1"} path={'grid'} startAnchor={'bottom'} endAnchor={'top'} headSize={props.headSize}/>
+          <Xarrow start={"encoder-2"} end={"decoder-2"} path={'grid'} startAnchor={'bottom'} endAnchor={'top'} headSize={props.headSize}/>
           <Xarrow start={"decoder-0"} end={"decoder-1"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={props.headSize} />
           <Xarrow start={"decoder-1"} end={"decoder-2"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={props.headSize} />
+          <Xarrow start={"decoder-2"} end={"output-layer"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={props.headSize} />
+
         </div>
       );
     }

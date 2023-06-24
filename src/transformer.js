@@ -30,6 +30,11 @@ const emb_x_gap = 2;
 const emb_x = `${x1 - emb_x_gap - layer_width}%`;
 const emb_y = `${50 - (coder_height + layer_height + y_gap) / 2}%`;
 
+// Compute the positioning of the output layer
+const out_x_gap = 2;
+const out_x = `${x3 + out_x_gap + coder_width}%`;
+const out_y = `${y2 + coder_height / 2 - layer_height / 2}%`;
+
 // Define Arrow Properties
 const headSize = 3;
 
@@ -46,5 +51,6 @@ root.render(
                 enc_x={enc_x} enc_y={enc_y} color={color} r={r}
                 layer_width={layer_width} layer_height={layer_height} // Embedding Layer Params
                 emb_x={emb_x} emb_y={emb_y}
+                out_x={out_x} out_y={out_y}                           // Output Layer Params
                 headSize={headSize}/>   // Arrow Properties
 );
