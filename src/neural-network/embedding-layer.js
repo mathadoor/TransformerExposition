@@ -1,6 +1,6 @@
 import React from 'react';
 
-class EncoderDecoder extends React.Component {
+class EmbeddingLayer extends React.Component {
   render() {
     // eslint-disable-next-line no-unused-vars
 
@@ -10,4 +10,4 @@ class EncoderDecoder extends React.Component {
   }
 }
 
-export default EncoderDecoder;
+export default EmbeddingLayer;
