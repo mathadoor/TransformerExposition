@@ -3,9 +3,11 @@ import React from 'react';
 class EncoderDecoder extends React.Component {
   render() {
     // eslint-disable-next-line no-unused-vars
-
     return (
-      <rect {...this.props}/>
+      <svg>
+        <rect {...this.props} style={{ transition: 'width 0.5s, height 0.5s' }}/>
+      </svg>
+
     );
   }
 }
