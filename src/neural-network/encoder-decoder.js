@@ -5,7 +5,7 @@ class EncoderDecoder extends React.Component {
     // eslint-disable-next-line no-unused-vars
     return (
       <svg>
-        <rect {...this.props} style={{ transition: 'width 0.5s, height 0.5s' }}/>
+        <rect {...this.props}/>
       </svg>
 
     );
