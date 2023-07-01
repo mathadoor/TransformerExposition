@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-function OutputLayer(props) {
+function OutputEmbedding(props) {
   const ref = useRef();
   const { id, width, height, x, y, fill, rx, ry, onClick } = props;
   useEffect(() => {
@@ -24,4 +24,4 @@ function OutputLayer(props) {
   );
 }
 
-export default OutputLayer;
+export default OutputEmbedding;

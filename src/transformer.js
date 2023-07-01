@@ -6,5 +6,5 @@ import Architecture from './neural-network/architecture';
 
 const root = ReactDOM.createRoot(document.getElementById('arch'));
 root.render(
-  <Architecture />   // Arrow Properties
+  <Architecture renderElem={"root"}/>   // Arrow Properties
 );

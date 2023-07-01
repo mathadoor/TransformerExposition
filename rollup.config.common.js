@@ -17,6 +17,8 @@ import string from "rollup-plugin-string";
 import commonjs from "rollup-plugin-commonjs";
 import babel from '@rollup/plugin-babel';
 import replace from 'rollup-plugin-replace';
+import react from 'react';
+import reactDom from 'react-dom';
 // uncomment to show dependencies [1/2]
 // import rollupGrapher from 'rollup-plugin-grapher'
 
@@ -76,7 +78,13 @@ const reactConfig={
     resolve({
       extensions: ['.js', 'jsx']
     }),
-    commonjs({ include: /node_modules/ }),
+    commonjs({
+      include: 'node_modules/**',
+      namedExports: {
+        react: Object.keys(react),
+        'react-dom': Object.keys(reactDom)
+      }
+    }),
     babel({
       babelHelpers: 'bundled',
       presets: ['@babel/preset-react'],

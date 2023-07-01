@@ -1,8 +1,27 @@
 import React from 'react';
-import EncoderDecoder from './encoder-decoder';
-import EmbeddingLayer from "./embedding-layer";
+
+import Encoder from './encoder';
+import InputEmbedding from "./input-embedding";
 import OutputLayer from "./output-layer";
-import Xarrow from 'react-xarrows';
+import Decoder from "./decoder";
+import Input from "./input";
+import OutputEmbedding from "./output-embedding";
+import Output from "./output";
+
+import Arrow from "./arrow";
+
+
+
+const baseLayerHeight = 30;
+const baseLayerWidth = 1;
+const baseCoderHeight = 7;
+const baseCoderWidth = 3;
+const baseCoderExpansion = [15, 30];
+const baseLayerExpansion = [20, 50];
+const baseInputHeight = 30;
+const baseInputWidth = 1;
+const baseOutputHeight = 30;
+const baseOutputWidth = 1;
 
 class Architecture extends React.Component {
     constructor(props) {
@@ -16,6 +35,8 @@ class Architecture extends React.Component {
         baseLayerWidth : 1,
         baseCoderExpansion : [15, 30],
         baseLayerExpansion : [20, 50],
+        widths : [1, 1, 1, ...new Array(6).fill(3), 1],
+        heights : [1, 1, 1, ...new Array(6).fill(3), 1],
         layerHeights : new Array(2).fill(30),
         layerWidths : new Array(2).fill(1),
         coderWidths : new Array(6).fill(3),
@@ -24,7 +45,6 @@ class Architecture extends React.Component {
         baseline : [50, 50],
         embeddingViews: 0,
         outputView : 0,
-
       } // <- Need to assign the element id to control which element is active
       this.fixedProps = {
         color : '053061',
@@ -39,6 +59,7 @@ class Architecture extends React.Component {
       this.resetState = this.resetState.bind(this);
       this.computeCoords = this.computeCoords.bind(this);
       this.computeArchDims = this.computeArchDims.bind(this);
+      this.computeArrpoints = this.computeArrpoints.bind(this);
     };
 
     resetState(state){
@@ -93,6 +114,10 @@ class Architecture extends React.Component {
       return {'x' : [x0, x1, x2], 'y' : [y0, y1], 'layer_x' : [layer_x0, layer_x1]}
     }
 
+    computeArrpoints() {
+      const state = this.state;
+
+    }
 
     expandView(type, index){
       index += type === 'dec' ? 3 : 0;
@@ -135,32 +160,38 @@ class Architecture extends React.Component {
       return (
         <div className="d3-component" style={{display: 'flex', justifyContent: 'space-evenly', width: '100%'}}>
           <svg  viewBox={"0 0 " + this.state.vBoxSize[0] + " " + this.state.vBoxSize[1]} width="100%" >
-
-          <EmbeddingLayer id={'embedding-layer'} width={layer_width[0]}
-                          height={layer_height[0]}
-                          x={`${layerx0 - this.state.layerWidths[0] / 2}%`} y={`${enc_y[0] - this.state.layerHeights[0] / 2}%`}
-                          fill={this.fixedProps.color} rx={this.fixedProps.r[0]} ry={this.fixedProps.r[1]}/>
+            <Input id={'input'} width={layer_width[0]}
+                   height={layer_height[0]}
+                   x={`${layerx0 - this.state.layerWidths[0] - this.fixedProps.emb_x_gap}%`} y={`${enc_y[0] - this.state.layerHeights[0] / 2}%`}
+                   fill={this.fixedProps.color} rx={this.fixedProps.r[0]} ry={this.fixedProps.r[1]} />
+            <InputEmbedding id={'output-embedding-layer'} width={layer_width[0]}
+                            height={layer_height[0]}
+                            x={`${layerx0 - this.state.layerWidths[0] / 2}%`} y={`${enc_y[0] - this.state.layerHeights[0] / 2}%`}
+                            fill={this.fixedProps.color} rx={this.fixedProps.r[0]} ry={this.fixedProps.r[1]}/>
 
           {
             enc_x.map((x_item, x_index) => (
-                <EncoderDecoder style={{cursor: 'pointer'}} onClick={() => this.expandView("enc", x_index)}
-                                id={'encoder-' + x_index} key={'encoder-' + x_index}
-                                width={coder_width[x_index]} height={coder_height[x_index]}
-                                x={`${x_item - this.state.coderWidths[x_index] / 2}%`}
-                                y={`${enc_y[0] - this.state.coderHeights[x_index] / 2}%`}
-                                fill={this.fixedProps.color} rx={this.fixedProps.r[0]} ry={this.fixedProps.r[1]}/>
+                <Encoder style={{cursor: 'pointer'}} onClick={() => this.expandView("enc", x_index)}
+                         id={'encoder-' + x_index} key={'encoder-' + x_index}
+                         width={coder_width[x_index]} height={coder_height[x_index]}
+                         x={`${x_item - this.state.coderWidths[x_index] / 2}%`}
+                         y={`${enc_y[0] - this.state.coderHeights[x_index] / 2}%`}
+                         fill={this.fixedProps.color} rx={this.fixedProps.r[0]} ry={this.fixedProps.r[1]}/>
             ))
           }
-
+            <OutputEmbedding id={'output-embedding-layer'} width={layer_width[0]}
+                            height={layer_height[0]}
+                            x={`${layerx0 - this.state.layerWidths[0] / 2}%`} y={`${enc_y[1] - this.state.layerHeights[0] / 2}%`}
+                            fill={this.fixedProps.color} rx={this.fixedProps.r[0]} ry={this.fixedProps.r[1]}/>
           {
             enc_x.map((x_item, x_index) => (
 
-                <EncoderDecoder id={'decoder-' + x_index} key={'decoder-' + x_index}
-                                style={{cursor: 'pointer'}} onClick={() => this.expandView("dec", x_index)}
-                                width={coder_width[3 + x_index]} height={coder_height[3 + x_index]}
-                                x={`${x_item - this.state.coderWidths[3 + x_index] / 2}%`}
-                                y={`${enc_y[1] - this.state.coderHeights[3 + x_index] / 2}%`}
-                                fill={this.fixedProps.color} rx={this.fixedProps.r[0]} ry={this.fixedProps.r[1]}/>
+                <Decoder id={'decoder-' + x_index} key={'decoder-' + x_index}
+                         style={{cursor: 'pointer'}} onClick={() => this.expandView("dec", x_index)}
+                         width={coder_width[3 + x_index]} height={coder_height[3 + x_index]}
+                         x={`${x_item - this.state.coderWidths[3 + x_index] / 2}%`}
+                         y={`${enc_y[1] - this.state.coderHeights[3 + x_index] / 2}%`}
+                         fill={this.fixedProps.color} rx={this.fixedProps.r[0]} ry={this.fixedProps.r[1]}/>
 
             ))
           }
@@ -168,18 +199,31 @@ class Architecture extends React.Component {
                          height={layer_height[1]} x={`${layerx1 - this.state.layerWidths[1] / 2}%`}
                          y={`${enc_y[1] - this.state.layerHeights[1] / 2}%`}
                          fill={this.fixedProps.color} rx={this.fixedProps.r[0]} ry={this.fixedProps.r[1]}/>
+
+            <Output id={'input'} width={layer_width[1]}
+                    height={layer_height[1]} x={`${layerx1 + 10 * this.state.layerWidths[1] / 2}%`}
+                    y={`${enc_y[1] - this.state.layerHeights[1] / 2}%`}
+                    fill={this.fixedProps.color} rx={this.fixedProps.r[0]} ry={this.fixedProps.r[1]}/>
+            // Create the arrows
+            <Arrow id="arrow-0" points={[[(enc_x[0] + this.state.coderWidths[0] / 2) / 100 * this.state.vBoxSize[0], enc_y[0]  / 100 * this.state.vBoxSize[1]],
+                                        [(enc_x[1] - this.state.coderWidths[1] / 2) / 100 * this.state.vBoxSize[0], enc_y[0] / 100 * this.state.vBoxSize[1]]]} />
+
+            <Arrow id="arrow-1" points={[[(enc_x[1] + this.state.coderWidths[1] / 2) / 100 * this.state.vBoxSize[0], enc_y[0]  / 100 * this.state.vBoxSize[1]],
+              [(enc_x[2] - this.state.coderWidths[2] / 2) / 100 * this.state.vBoxSize[0], enc_y[0] / 100 * this.state.vBoxSize[1]]]} />
+
+            <Arrow id="arrow-2" points={[[(enc_x[2] + this.state.coderWidths[2] / 2 )  / 100 * this.state.vBoxSize[0], enc_y[0]  / 100 * this.state.vBoxSize[1]],
+              [(enc_x[2] + this.state.coderWidths[2] / 2 + this.fixedProps.coder_x_gap / 2) / 100 * this.state.vBoxSize[0], enc_y[0] / 100 * this.state.vBoxSize[1]]]} />
           </svg>
 
-          <Xarrow key={1} start={"embedding-layer"} end={"encoder-0"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={this.fixedProps.headSize} />
-          <Xarrow key={2} start={"encoder-0"} end={"encoder-1"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={this.fixedProps.headSize} />
-          <Xarrow key={3} start={"encoder-1"} end={"encoder-2"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={this.fixedProps.headSize} />
-          <Xarrow key={4} start={"encoder-2"} end={"decoder-0"} path={'grid'} startAnchor={'bottom'} endAnchor={'top'} headSize={this.fixedProps.headSize}/>
-          <Xarrow key={5} start={"encoder-2"} end={"decoder-1"} path={'grid'} startAnchor={'bottom'} endAnchor={'top'} headSize={this.fixedProps.headSize}/>
-          <Xarrow key={6} start={"encoder-2"} end={"decoder-2"} path={'grid'} startAnchor={'bottom'} endAnchor={'top'} headSize={this.fixedProps.headSize}/>
-          <Xarrow key={7} start={"decoder-0"} end={"decoder-1"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={this.fixedProps.headSize} />
-          <Xarrow key={8} start={"decoder-1"} end={"decoder-2"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={this.fixedProps.headSize} />
-          <Xarrow key={9} start={"decoder-2"} end={"output-layer"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={this.fixedProps.headSize} />
-
+          {/*<Xarrow start={"embedding-layer"} end={"encoder-0"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={this.fixedProps.headSize} />*/}
+          {/*<Xarrow start={"encoder-0"} end={"encoder-1"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={this.fixedProps.headSize} />*/}
+          {/*<Xarrow start={"encoder-1"} end={"encoder-2"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={this.fixedProps.headSize} />*/}
+          {/*<Xarrow start={"encoder-2"} end={"decoder-0"} path={'grid'} startAnchor={'bottom'} endAnchor={'top'} headSize={this.fixedProps.headSize}/>*/}
+          {/*<Xarrow start={"encoder-2"} end={"decoder-1"} path={'grid'} startAnchor={'bottom'} endAnchor={'top'} headSize={this.fixedProps.headSize}/>*/}
+          {/*<Xarrow start={"encoder-2"} end={"decoder-2"} path={'grid'} startAnchor={'bottom'} endAnchor={'top'} headSize={this.fixedProps.headSize}/>*/}
+          {/*<Xarrow start={"decoder-0"} end={"decoder-1"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={this.fixedProps.headSize} />*/}
+          {/*<Xarrow start={"decoder-1"} end={"decoder-2"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={this.fixedProps.headSize} />*/}
+          {/*<Xarrow start={"decoder-2"} end={"output-layer"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={this.fixedProps.headSize} />*/}
         </div>
       );
     }
