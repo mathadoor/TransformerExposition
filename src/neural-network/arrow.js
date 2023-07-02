@@ -11,10 +11,10 @@ function Arrow({ id, points }) {
     const marker = defs.append("marker")
       .attr("id", `arrowhead-${id}`)
       .attr("viewBox", "-0 -5 10 10")
-      .attr("refX", 10)
+      .attr("refX", 9.5)
       .attr("refY", 0)
       .attr("orient", "auto")
-      .attr("markerWidth", 3)
+      .attr("markerWidth", 4)
       .attr("markerHeight", 3)
       .attr("xoverflow", "visible")
       .append("svg:path")
@@ -29,7 +29,7 @@ function Arrow({ id, points }) {
       .attr("marker-end", `url(#arrowhead-${id})`)
       .style("fill", "none")
       .style("stroke", "#aaa")
-      .style("stroke-width", 1);
+      .style("stroke-width", 0.8);
 
     // Cleanup function
     return () => {

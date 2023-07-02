@@ -7,44 +7,45 @@ import Decoder from "./decoder";
 import Input from "./input";
 import OutputEmbedding from "./output-embedding";
 import Output from "./output";
-
 import Arrow from "./arrow";
 
 
-
 const baseLayerHeight = 30;
-const baseLayerWidth = 1;
-const baseCoderHeight = 7;
-const baseCoderWidth = 3;
-const baseCoderExpansion = [15, 30];
-const baseLayerExpansion = [20, 50];
-const baseInputHeight = 30;
-const baseInputWidth = 1;
-const baseOutputHeight = 30;
-const baseOutputWidth = 1;
+const baseLayerWidth = 2;
 
+const baseCoderHeight = 7;
+const baseCoderWidth = 4;
+
+const baseInputHeight = 15;
+const baseInputWidth = 10;
+
+const baseOutputHeight = 15;
+const baseOutputWidth = 12;
+
+const y_gap = 15;
+const coder_x_gap = 5;
+const emb_x_gap = 2;
+const out_x_gap = 2;
+
+const widthExpansion = [0, 5, 15, 15, 15, 5, 15, 15, 15, 5, 0];
+const heightExpansion = [0, 15, 30, 30, 30, 15, 30, 30, 30, 15, 0];
+
+let first_run = true;
 class Architecture extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
         vBoxSize : ['400', '100'],
+        first_run : true,
         activeElement : -1,
-        baseCoderHeight : 7,
-        baseCoderWidth : 3,
-        baseLayerHeight : 30,
-        baseLayerWidth : 1,
-        baseCoderExpansion : [15, 30],
-        baseLayerExpansion : [20, 50],
-        widths : [1, 1, 1, ...new Array(6).fill(3), 1],
-        heights : [1, 1, 1, ...new Array(6).fill(3), 1],
-        layerHeights : new Array(2).fill(30),
-        layerWidths : new Array(2).fill(1),
-        coderWidths : new Array(6).fill(3),
-        coderHeights : new Array(6).fill(7),
-        coderViews : new Array(6).fill(0),
+        widths : [baseInputWidth, baseLayerWidth, baseCoderWidth, baseCoderWidth, baseCoderWidth, baseLayerWidth,
+          baseCoderWidth, baseCoderWidth, baseCoderWidth, baseLayerWidth, baseOutputWidth],
+        heights : [baseInputHeight, baseLayerHeight, baseCoderHeight, baseCoderHeight, baseCoderHeight, baseLayerHeight,
+          baseCoderHeight, baseCoderHeight, baseCoderHeight, baseLayerHeight, baseOutputHeight],
+        coords : [new Array(11).fill(0), new Array(11).fill(0)],
+        views : new Array(11).fill(0),
         baseline : [50, 50],
-        embeddingViews: 0,
-        outputView : 0,
+        points : null,
       } // <- Need to assign the element id to control which element is active
       this.fixedProps = {
         color : '053061',
@@ -60,18 +61,35 @@ class Architecture extends React.Component {
       this.computeCoords = this.computeCoords.bind(this);
       this.computeArchDims = this.computeArchDims.bind(this);
       this.computeArrpoints = this.computeArrpoints.bind(this);
+      this.computeProps = this.computeProps.bind(this);
+      this.renderArrow = this.renderArrow.bind(this);
     };
 
     resetState(state){
-      state.coderViews = new Array(6).fill(0);
+      state.views = new Array(11).fill(0);
       state.embeddingViews = 0;
       state.outputView = 0;
       state.activeElement = -1;
-      state.coderWidths = new Array(6).fill(state.baseCoderWidth);
-      state.coderHeights = new Array(6).fill(state.baseCoderHeight);
-      state.layerHeights = new Array(2).fill(state.baseLayerHeight);
-      state.layerWidths = new Array(2).fill(state.baseLayerWidth);
+      state.widths = [baseInputWidth, baseLayerWidth, baseCoderWidth, baseCoderWidth, baseCoderWidth, baseLayerWidth,
+        baseCoderWidth, baseCoderWidth, baseCoderWidth, baseLayerWidth, baseOutputWidth];
+      state.heights = [baseInputHeight, baseLayerHeight, baseCoderHeight, baseCoderHeight, baseCoderHeight, baseLayerHeight,
+        baseCoderHeight, baseCoderHeight, baseCoderHeight, baseLayerHeight, baseOutputHeight];
       state.baseline = [50, 50];
+    }
+
+    computeProps(index){
+      return {
+        'id': index,
+        'width': this.state.widths[index] * this.state.vBoxSize[0] / 100,
+        'height': this.state.heights[index] * this.state.vBoxSize[1] / 100,
+        'x': this.state.coords[0][index] * this.state.vBoxSize[0] / 100,
+        'y': this.state.coords[1][index] * this.state.vBoxSize[1] / 100,
+        'fill': this.fixedProps.color,
+        'rx': this.fixedProps.r[0],
+        'ry': this.fixedProps.r[1],
+        'onClick': () => this.expandView(index),
+        'isBlurred': this.state.activeElement !== -1 && this.state.activeElement !== index,
+      };
     }
 
     computeArchDims(){
@@ -92,138 +110,224 @@ class Architecture extends React.Component {
 
     }
 
+    computeCoords(state){
+      let [baselinex, baseliney] = state.baseline;
+      let base_top = Math.max(...state.heights.slice(0, 5));
+      let base_bottom = Math.max(...state.heights.slice(6, 11));
+      if (state.activeElement !== -1){
+        //   If the element active element index is 0, 1, 2, 3, 4 => y offset is positive
+        if (state.activeElement < 5){
+          baseliney += heightExpansion[state.activeElement] / 2;
+          // if active element index is 0, 1, 2 => x offset is positive by half of the elements width expansion
+          if (state.activeElement < 3){
+            baselinex += widthExpansion[state.activeElement] / 2;
+          }
+          // if active element index is 4 => x offset is negative
+          else if (state.activeElement === 4){
+            baselinex -= widthExpansion[state.activeElement] / 2;
+          }
+        }
+        else{
+          // If the element active element index is 5, 6, 7, 8, 9 => y offset is negative
+          baseliney -= heightExpansion[state.activeElement] / 2;
+          // if active element index is 5, 6 => x offset is positive
+          if (state.activeElement < 7){
+            baselinex += widthExpansion[state.activeElement] / 2;
+          }
+          // if active element index is 8, 9, 10 => x offset is negative
+          else if (state.activeElement > 7){
+            baselinex -= widthExpansion[state.activeElement] / 2;
+          }
+        }
+      }
 
-    computeCoords(){
-      const [baselinex, baseliney] = this.state.baseline;
-      const encoderHeightMax = Math.max(...this.state.coderHeights.slice(0, 3));
-      const decoderHeightMax = Math.max(...this.state.coderHeights.slice(3, 6));
+      // Compute all the coordinates
+      // Encoder 1 Coordinates - set as the baseline
+      const x3 = baselinex;
+      const y3 = baseliney - base_top / 2 - y_gap / 2;
 
-      const x1 = baselinex;
-      const x2 = x1 + this.state.coderWidths[1] / 2 + this.state.coderWidths[2] / 2 + this.fixedProps.coder_x_gap;
-      const x0 = x1 - this.state.coderWidths[0] / 2 - this.state.coderWidths[1] / 2 - this.fixedProps.coder_x_gap;
+      // Encoder 2 Coordinates
+      const x4 = x3 + state.widths[4] / 2 + state.widths[3] / 2 + coder_x_gap;
+      const y4 = y3;
 
-      const y0 = baseliney - this.state.baseCoderHeight / 2 - this.fixedProps.y_gap;
-      const y1 = baseliney + this.state.baseCoderHeight / 2 + this.fixedProps.y_gap;
+      // Encoder 0 Coordinates
+      const x2 = x3 - state.widths[2] / 2 - state.widths[3] / 2 - coder_x_gap;
+      const y2 = y3
 
-      // Compute Layer Coordinates
-      const layer_width = this.state.layerWidths;
+      // Input Embedding Coordinates
+      const x1 = x2 - state.widths[1] / 2 - state.widths[2] / 2 - emb_x_gap;
+      const y1 = y2;
 
-      const layer_x0 = x0 - this.state.coderWidths[0] / 2 - layer_width[0] / 2 - this.fixedProps.emb_x_gap;
-      const layer_x1 = x2 + this.state.coderWidths[2] / 2 + layer_width[1] / 2 + this.fixedProps.out_x_gap;
+      // Input Coordinates
+      const x0 = x1 - state.widths[0] / 2 - state.widths[1] / 2 - coder_x_gap;
+      const y0 = y1;
 
-      return {'x' : [x0, x1, x2], 'y' : [y0, y1], 'layer_x' : [layer_x0, layer_x1]}
+      // Decoder 1 Coordinates
+      const x7 = x3;
+      const y7 = y3 + (base_top + base_bottom) / 2 + y_gap;
+
+      // Decoder 2 Coordinates
+      const x8 = x7 + state.widths[7] / 2 + state.widths[8] / 2 + coder_x_gap;
+      const y8 = y7;
+
+      // Decoder 0 Coordinates
+      const x6 = x7 - state.widths[6] / 2 - state.widths[7] / 2 - coder_x_gap;
+      const y6 = y7;
+
+      // Output Embedding Coordinates
+      const x5 = x6 - state.widths[5] / 2 - state.widths[6] / 2 - emb_x_gap;
+      const y5 = y6;
+
+      // Output Layer Coordinates
+      const x9 = x8 + state.widths[8] / 2 + state.widths[9] / 2 + emb_x_gap;
+      const y9 = y8;
+
+      // Output Coordinates
+      const x10 = x9 + state.widths[9] / 2 + state.widths[10] / 2 + out_x_gap;
+
+      // Update coords
+      state.coords = [[x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10],
+                          [y0, y1, y2, y3, y4, y5, y6, y7, y8, y9, y9]];
+
+      // return {'x' : [x2, x3, x4], 'y' : [y0, y1], 'layer_x' : [layer_x0, layer_x1]}
     }
 
-    computeArrpoints() {
-      const state = this.state;
+    computeArrpoints(state) {
+      if (state.points === null){
+        state.points = {};
+      }
+      const [x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10] = state.coords[0].map((x) => x * this.state.vBoxSize[0] / 100);
+      const [y0, y1, y2, y3, y4, y5, y6, y7, y8, y9] = state.coords[1].map((x) => x * this.state.vBoxSize[1] / 100);
+      const [w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, w10] = state.widths.map((x) => x * this.state.vBoxSize[0] / 100);
+      const [h0, h1, h2, h3, h4, h5, h6, h7, h8, h9, h10] = state.heights.map((x) => x * this.state.vBoxSize[1] / 100);
+
+      let og = out_x_gap * this.state.vBoxSize[0] / 100;
+      let lo_line = Math.max(...state.heights.slice(6, 10)) * this.state.vBoxSize[1] / 100;
+
+      // Input to input embedding (0 -> 1)
+      state.points['0-1'] = [[x0 + w0 / 2, y0], [x1 - w1 / 2, y1]];
+
+      // Input embedding to encoder 0 (1 -> 2)
+      state.points['1-2'] = [[x1 + w1 / 2, y1], [x2 - w2 / 2, y2]];
+
+      // Encoder 0 to encoder 1 (2 -> 3)
+      state.points['2-3'] = [[x2 + w2 / 2, y2], [x3 - w3 / 2, y3]];
+
+      // Encoder 1 to encoder 2 (3 -> 4)
+      state.points['3-4'] = [[x3 + w3 / 2, y3], [x4 - w4 / 2, y4]];
+
+      // Encoder 2 to decoder 0 (4 -> 6)
+      state.points['4-6'] = [[x4 + w4 / 2, y4], [x4 + w4 / 2 + 3, y4], [x4 + w4 / 2 + 3, (y4 + y6) / 2], [x6, (y4 + y6) / 2],
+        [x6, y6 - h6 / 2]];
+
+      // Encoder 2 to decoder 1 (4 -> 7)
+      state.points['4-7'] = [[x4 + w4 / 2, y4], [x4 + w4 / 2 + 3, y4], [x4 + w4 / 2 + 3, (y4 + y7) / 2], [x7, (y4 + y7) / 2],
+        [x7, y7 - h7 / 2]];
+
+      // Encoder 2 to decoder 2 (4 -> 8)
+
+      state.points['4-8'] = [[x4 + w4 / 2, y4], [x4 + w4 / 2 + 3, y4], [x4 + w4 / 2 + 3, (y4 + y8) / 2], [x8, (y4 + y8) / 2],
+        [x8, y8 - h8 / 2]];
+
+      // Output embedding to decoder 0 (5 -> 6)
+      state.points['5-6'] = [[x5 + w5 / 2, y5], [x6 - w6 / 2, y6]];
+
+      // Decoder 0 to decoder 1 (6 -> 7)
+      state.points['6-7'] = [[x6 + w6 / 2, y6], [x7 - w7 / 2, y7]];
+
+      // Decoder 1 to decoder 2 (7 -> 8)
+      state.points['7-8'] = [[x7 + w7 / 2, y7], [x8 - w8 / 2, y8]];
+
+      // Decoder 2 to output layer (8 -> 9)
+      state.points['8-9'] = [[x8 + w8 / 2, y8], [x9 - w9 / 2, y9]];
+
+      // Output layer to output (9 -> 10)
+      state.points['9-10'] = [[x9 + w9 / 2, y9], [x10 - w10 / 2, y9]];
+
+      // Middle of output layer - output to output embedding
+      state.points['9-5'] = [[x9 + w9 / 2 + og / 2, y9], [x9 + w9 / 2 + og / 2, y9 + lo_line / 2 + 5],
+        [x5 - w5 / 2 - 5, y9 + lo_line / 2 + 5], [x5 - w5 / 2 - 5, y9], [x5 - w5 / 2, y9]];
 
     }
 
-    expandView(type, index){
-      index += type === 'dec' ? 3 : 0;
+    expandView(index){
       this.setState((prevState) => {
         const newState = {...prevState};
         this.resetState(newState);
-        if (prevState.coderViews[index] === 0){
-          newState.coderWidths[index] = newState.coderWidths[index] + newState.baseCoderExpansion[0];
-          newState.coderHeights[index] = newState.coderHeights[index] + newState.baseCoderExpansion[1];
-          newState.coderViews[index] = 1;
+        if (prevState.views[index] === 0){
+          newState.widths[index] = newState.widths[index] + widthExpansion[index];
+          newState.heights[index] = newState.heights[index] + heightExpansion[index];
+          newState.views[index] = 1;
           newState.activeElement = index;
-
-          console.log(newState.baseline);
         }
-
+        this.computeCoords(newState);
+        this.computeArrpoints(newState);
         return newState;
       })
     }
+    componentDidMount() {
+      if(first_run){
+        this.setState((prevState) => {
+          const newState = {...prevState};
+          this.computeCoords(newState);
+          this.computeArrpoints(newState);
+        return newState;
+        })
+      }
+      first_run = false;
+    }
 
-    render() {
-      // General Properties
-      let layer_height = this.state.layerHeights;
-      let layer_width = this.state.layerWidths;
+    renderArrow(key){
+      return (
+        this.state.activeElement === -1 && <Arrow id={key} points={this.state.points[key]} />
+      )
+    }
 
-      // Compute the positioning of the encoders and the decoders
-      let coder_width = this.state.coderWidths;
-      let coder_height = this.state.coderHeights;
-
-      // Compute the positioning of the embedding and output layers
-      let {x:enc_x, y: enc_y, layer_x :[layerx0, layerx1]} = this.computeCoords();
-
-      // Finalize Properties
-      coder_width = coder_width.map((item) => `${item}%`);
-      coder_height = coder_height.map((item) => `${item}%`);
-      layer_height = layer_height.map((item) => `${item}%`);
-      layer_width =  layer_width.map((item) => `${item}%`);
-
-      // eslint-disable-next-line no-unused-vars
-
+  render() {
+      const render_arrows = this.state.points !== null;
       return (
         <div className="d3-component" style={{display: 'flex', justifyContent: 'space-evenly', width: '100%'}}>
-          <svg  viewBox={"0 0 " + this.state.vBoxSize[0] + " " + this.state.vBoxSize[1]} width="100%" >
-            <Input id={'input'} width={layer_width[0]}
-                   height={layer_height[0]}
-                   x={`${layerx0 - this.state.layerWidths[0] - this.fixedProps.emb_x_gap}%`} y={`${enc_y[0] - this.state.layerHeights[0] / 2}%`}
-                   fill={this.fixedProps.color} rx={this.fixedProps.r[0]} ry={this.fixedProps.r[1]} />
-            <InputEmbedding id={'output-embedding-layer'} width={layer_width[0]}
-                            height={layer_height[0]}
-                            x={`${layerx0 - this.state.layerWidths[0] / 2}%`} y={`${enc_y[0] - this.state.layerHeights[0] / 2}%`}
-                            fill={this.fixedProps.color} rx={this.fixedProps.r[0]} ry={this.fixedProps.r[1]}/>
+          <svg  viewBox={"0 0 " + this.state.vBoxSize[0] + " " + this.state.vBoxSize[1]} width="100%" style={{filter: this.state.activeElement !== -1 ? "url(#blurMe)" : "none"}}>
 
-          {
-            enc_x.map((x_item, x_index) => (
-                <Encoder style={{cursor: 'pointer'}} onClick={() => this.expandView("enc", x_index)}
-                         id={'encoder-' + x_index} key={'encoder-' + x_index}
-                         width={coder_width[x_index]} height={coder_height[x_index]}
-                         x={`${x_item - this.state.coderWidths[x_index] / 2}%`}
-                         y={`${enc_y[0] - this.state.coderHeights[x_index] / 2}%`}
-                         fill={this.fixedProps.color} rx={this.fixedProps.r[0]} ry={this.fixedProps.r[1]}/>
-            ))
-          }
-            <OutputEmbedding id={'output-embedding-layer'} width={layer_width[0]}
-                            height={layer_height[0]}
-                            x={`${layerx0 - this.state.layerWidths[0] / 2}%`} y={`${enc_y[1] - this.state.layerHeights[0] / 2}%`}
-                            fill={this.fixedProps.color} rx={this.fixedProps.r[0]} ry={this.fixedProps.r[1]}/>
-          {
-            enc_x.map((x_item, x_index) => (
 
-                <Decoder id={'decoder-' + x_index} key={'decoder-' + x_index}
-                         style={{cursor: 'pointer'}} onClick={() => this.expandView("dec", x_index)}
-                         width={coder_width[3 + x_index]} height={coder_height[3 + x_index]}
-                         x={`${x_item - this.state.coderWidths[3 + x_index] / 2}%`}
-                         y={`${enc_y[1] - this.state.coderHeights[3 + x_index] / 2}%`}
-                         fill={this.fixedProps.color} rx={this.fixedProps.r[0]} ry={this.fixedProps.r[1]}/>
+            <Input {...this.computeProps(0)} />
+            <InputEmbedding {...this.computeProps(1)}/>
 
-            ))
-          }
-            <OutputLayer id={'output-layer'} width={layer_width[1]}
-                         height={layer_height[1]} x={`${layerx1 - this.state.layerWidths[1] / 2}%`}
-                         y={`${enc_y[1] - this.state.layerHeights[1] / 2}%`}
-                         fill={this.fixedProps.color} rx={this.fixedProps.r[0]} ry={this.fixedProps.r[1]}/>
+            <Encoder {...this.computeProps(2)}/>
 
-            <Output id={'input'} width={layer_width[1]}
-                    height={layer_height[1]} x={`${layerx1 + 10 * this.state.layerWidths[1] / 2}%`}
-                    y={`${enc_y[1] - this.state.layerHeights[1] / 2}%`}
-                    fill={this.fixedProps.color} rx={this.fixedProps.r[0]} ry={this.fixedProps.r[1]}/>
-            // Create the arrows
-            <Arrow id="arrow-0" points={[[(enc_x[0] + this.state.coderWidths[0] / 2) / 100 * this.state.vBoxSize[0], enc_y[0]  / 100 * this.state.vBoxSize[1]],
-                                        [(enc_x[1] - this.state.coderWidths[1] / 2) / 100 * this.state.vBoxSize[0], enc_y[0] / 100 * this.state.vBoxSize[1]]]} />
+            <Encoder {...this.computeProps(3)}/>
 
-            <Arrow id="arrow-1" points={[[(enc_x[1] + this.state.coderWidths[1] / 2) / 100 * this.state.vBoxSize[0], enc_y[0]  / 100 * this.state.vBoxSize[1]],
-              [(enc_x[2] - this.state.coderWidths[2] / 2) / 100 * this.state.vBoxSize[0], enc_y[0] / 100 * this.state.vBoxSize[1]]]} />
+            <Encoder {...this.computeProps(4)}/>
 
-            <Arrow id="arrow-2" points={[[(enc_x[2] + this.state.coderWidths[2] / 2 )  / 100 * this.state.vBoxSize[0], enc_y[0]  / 100 * this.state.vBoxSize[1]],
-              [(enc_x[2] + this.state.coderWidths[2] / 2 + this.fixedProps.coder_x_gap / 2) / 100 * this.state.vBoxSize[0], enc_y[0] / 100 * this.state.vBoxSize[1]]]} />
+            <OutputEmbedding {...this.computeProps(5)}/>
+
+            <Decoder {...this.computeProps(6)}/>
+
+            <Decoder {...this.computeProps(7)}/>
+
+            <Decoder {...this.computeProps(8)}/>
+
+            <OutputLayer {...this.computeProps(9)}/>
+
+            <Output {...this.computeProps(10)}/>
+
+            // Define Arrows if points are not null
+            {render_arrows && this.renderArrow('0-1')}
+            {render_arrows && this.renderArrow('1-2')}
+            {render_arrows && this.renderArrow('2-3')}
+            {render_arrows && this.renderArrow('3-4')}
+            {render_arrows && this.renderArrow('4-6')}
+            {render_arrows && this.renderArrow('4-7')}
+            {render_arrows && this.renderArrow('4-8')}
+            {render_arrows && this.renderArrow('5-6')}
+            {render_arrows && this.renderArrow('6-7')}
+            {render_arrows && this.renderArrow('7-8')}
+            {render_arrows && this.renderArrow('8-9')}
+            {render_arrows && this.renderArrow('9-10')}
+            {render_arrows && this.renderArrow('9-5')}
+
           </svg>
 
-          {/*<Xarrow start={"embedding-layer"} end={"encoder-0"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={this.fixedProps.headSize} />*/}
-          {/*<Xarrow start={"encoder-0"} end={"encoder-1"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={this.fixedProps.headSize} />*/}
-          {/*<Xarrow start={"encoder-1"} end={"encoder-2"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={this.fixedProps.headSize} />*/}
-          {/*<Xarrow start={"encoder-2"} end={"decoder-0"} path={'grid'} startAnchor={'bottom'} endAnchor={'top'} headSize={this.fixedProps.headSize}/>*/}
-          {/*<Xarrow start={"encoder-2"} end={"decoder-1"} path={'grid'} startAnchor={'bottom'} endAnchor={'top'} headSize={this.fixedProps.headSize}/>*/}
-          {/*<Xarrow start={"encoder-2"} end={"decoder-2"} path={'grid'} startAnchor={'bottom'} endAnchor={'top'} headSize={this.fixedProps.headSize}/>*/}
-          {/*<Xarrow start={"decoder-0"} end={"decoder-1"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={this.fixedProps.headSize} />*/}
-          {/*<Xarrow start={"decoder-1"} end={"decoder-2"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={this.fixedProps.headSize} />*/}
-          {/*<Xarrow start={"decoder-2"} end={"output-layer"} path={'grid'} startAnchor={'right'} endAnchor={'left'} headSize={this.fixedProps.headSize} />*/}
         </div>
       );
     }
