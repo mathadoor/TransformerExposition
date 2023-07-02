@@ -100,7 +100,7 @@
     <d-code block language="python">
       # Python 3: Fibonacci series up to n
       def fib(n):
-      a, b = 0, 1
+        a, b = 0, 1
       while a < n: print(a, end=' ' ) a, b=b, a+b </d-code>
         <p>And a table</p>
         <table>
@@ -138,17 +138,14 @@
           figure.addEventListener("ready", function () {
             const initTag = figure.querySelector("span");
             initTag.textContent = "ready"
-            console.log('ready')
           });
           figure.addEventListener("onscreen", function () {
             const initTag = figure.querySelector("span");
             initTag.textContent = "onscreen"
-            console.log('onscreen')
           });
           figure.addEventListener("offscreen", function () {
             const initTag = figure.querySelector("span");
             initTag.textContent = "offscreen!"
-            console.log('offscreen')
           });
         </script>
         <p>That's it for the example article!</p>
