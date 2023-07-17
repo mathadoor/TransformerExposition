@@ -1,40 +1,40 @@
 import React, { useEffect, useRef } from 'react';
-import * as d3 from 'd3';
 
 function Output(props) {
   const ref = useRef();
-  const { id, width, height, x, y, fill, rx, ry, onClick, isBlurred } = props;
-  useEffect(() => {
-    const svg = d3.select(ref.current);
-    svg.selectAll("rect")
-      .data([null]) // single datum
-      .join("rect")
-      .attr("width", width)
-      .attr("height", height)
-      .attr("x", x -width / 2)
-      .attr("y", y -height / 2)
-      .attr("fill", fill)
-      .attr("rx", rx)
-      .attr("ry", ry)
-      .style("opacity", isBlurred ? 0.5 : 1)
-      .style("filter", isBlurred ? "blur(5px)" : "none");
+  const { id, width, height, x, y, fill, rx, ry, onClick, isBlurred, text } = props;
 
-    svg.selectAll("text")
-      .data([null]) // single datum
-      .join("text") // create text element if it doesn't exist
-      .text("les élèves sont intelligents")
-      .attr("x", x)
-      .attr("y", y) // y is flipped
-      .attr("text-anchor", "middle")
-      .attr("alignment-baseline", "middle")
-      .attr("font-size", "3px")
-      .attr("fill", "white")
-      .style("opacity", isBlurred ? 0.2 : 1)
-      .style("filter", isBlurred ? "blur(5px)" : "none");
-  }, [id, width, height, x, y, fill, rx, ry, isBlurred]);
+  useEffect(() => {
+    const div = ref.current;
+    let outputText = (text === null) ? " " : text.join(" ");
+
+    div.style.width = `${width}%`;
+    div.style.height = `${height}%`;
+    div.style.left = `${x - width / 2}%`;
+    div.style.top = `${y - height / 2}%`;
+    div.style.backgroundColor = fill;
+    div.style.borderRadius = `20px`;
+    div.style.opacity = isBlurred ? 0.5 : 1;
+    div.style.filter = isBlurred ? "blur(5px)" : "none";
+    div.textContent = outputText;
+  }, [id, width, height, x, y, fill, rx, ry, isBlurred, text]);
 
   return (
-    <svg ref={ref} id={id} onClick={onClick} style={{ cursor: 'pointer' }}></svg>
+    <div ref={ref}
+         id={id}
+         style={{
+           cursor: 'pointer',
+           position: 'absolute',
+           color: 'white',
+           fontSize: '14px',
+           display: 'flex',
+           lineHeight: '1.5',
+           fontFamily: 'Verdana, Geneva, sans-serif',
+           justifyContent: 'center',
+           alignItems: 'center',
+           padding: '20px'
+         }}>
+    </div>
   );
 }
 

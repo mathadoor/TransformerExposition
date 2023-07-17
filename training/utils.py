@@ -28,9 +28,9 @@ def translate_sentence(model, sentence, german, english, device, max_length=50):
     outputs = [german.vocab.stoi["<sos>"]]
     for i in range(max_length):
         trg_tensor = torch.LongTensor(outputs).unsqueeze(1).to(device)
-
+        target_mask = torch.nn.Transformer.generate_square_subsequent_mask(trg_tensor.shape[0]).to(device)
         with torch.no_grad():
-            output = model(sentence_tensor, trg_tensor)
+            output = model(sentence_tensor, trg_tensor, target_mask)
 
         best_guess = output.argmax(2)[-1, :].item()
         outputs.append(best_guess)

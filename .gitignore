@@ -11,3 +11,5 @@ dist/
 training/opus100-ckpt/
 
 
+/training/archive/
+/training/.data/
