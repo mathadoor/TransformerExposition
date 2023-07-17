@@ -8,6 +8,8 @@ import Input from "./input";
 import OutputEmbedding from "./output-embedding";
 import Output from "./output";
 import Arrow from "./arrow";
+import TargetInput from "./target-input";
+import Controller from "./controller";
 
 
 const baseLayerHeight = 30;
@@ -17,18 +19,37 @@ const baseCoderHeight = 7;
 const baseCoderWidth = 4;
 
 const baseInputHeight = 15;
-const baseInputWidth = 10;
+const baseInputWidth = 15;
 
-const baseOutputHeight = 15;
+const baseTrgInputHeight = 4;
+const baseTrgInputWidth = 15;
+
+const baseOutputHeight = 10;
 const baseOutputWidth = 12;
+
+const controllerWidth = 6;
+const controllerHeight = 10;
 
 const y_gap = 15;
 const coder_x_gap = 5;
 const emb_x_gap = 2;
 const out_x_gap = 2;
 
-const widthExpansion = [0, 5, 15, 15, 15, 5, 15, 15, 15, 5, 0];
-const heightExpansion = [0, 15, 30, 30, 30, 15, 30, 30, 30, 15, 0];
+const widthExpansion = [0, 5, 15, 15, 15, 5, 15, 15, 15, 5, 0, 0, 0];
+const heightExpansion = [0, 15, 30, 30, 30, 15, 30, 30, 30, 15, 0, 0, 0];
+
+const targetPlaceHolderText = ["Target", "sentence", "will", "appear", "here", "..."]
+const translationPlaceHolderText = ["Translation", "will", "appear", "here", "..."]
+const outputPlaceHolderText = ["Translation", "will", "appear", "here", "..."]
+
+const api_url = "http://127.0.0.1:5000/one-predict";
+const api_options = {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body : null
+}
 
 let first_run = true;
 class Architecture extends React.Component {
@@ -39,16 +60,21 @@ class Architecture extends React.Component {
         first_run : true,
         activeElement : -1,
         widths : [baseInputWidth, baseLayerWidth, baseCoderWidth, baseCoderWidth, baseCoderWidth, baseLayerWidth,
-          baseCoderWidth, baseCoderWidth, baseCoderWidth, baseLayerWidth, baseOutputWidth],
+          baseCoderWidth, baseCoderWidth, baseCoderWidth, baseLayerWidth, baseOutputWidth, baseTrgInputWidth, controllerWidth],
         heights : [baseInputHeight, baseLayerHeight, baseCoderHeight, baseCoderHeight, baseCoderHeight, baseLayerHeight,
-          baseCoderHeight, baseCoderHeight, baseCoderHeight, baseLayerHeight, baseOutputHeight],
-        coords : [new Array(11).fill(0), new Array(11).fill(0)],
-        views : new Array(11).fill(0),
+          baseCoderHeight, baseCoderHeight, baseCoderHeight, baseLayerHeight, baseOutputHeight, baseTrgInputHeight, controllerHeight],
+        coords : [new Array(12).fill(0), new Array(12).fill(0)],
+        views : new Array(12).fill(0),
         baseline : [50, 50],
         points : null,
+        selectedText : null,
+        targetText : targetPlaceHolderText,
+        outputText : translationPlaceHolderText,
+        translation : outputPlaceHolderText,
+        counter : 0,
       } // <- Need to assign the element id to control which element is active
       this.fixedProps = {
-        color : '053061',
+        color : '#053061',
         y_gap : 18,
         coder_x_gap : 5,
         r : ['3px', '3px'],
@@ -63,7 +89,44 @@ class Architecture extends React.Component {
       this.computeArrpoints = this.computeArrpoints.bind(this);
       this.computeProps = this.computeProps.bind(this);
       this.renderArrow = this.renderArrow.bind(this);
+      this.setInput = this.setInput.bind(this);
+      this.setCounter = this.setCounter.bind(this);
     };
+
+    setCounter(counter){
+      this.setState((prevState) => {
+        if(prevState.selectedText === null){
+          return prevState;
+        }
+        const newState = {...prevState};
+        newState.counter = counter;
+        newState.outputText = prevState.translation.slice(0, counter + 1);
+        newState.targetText = prevState.translation.slice(0, counter);
+        return newState;
+      });
+    }
+
+  setInput(input){
+    api_options.body = JSON.stringify({sentence: input.label});
+    fetch(api_url, api_options)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json(); // This returns a promise
+      })
+      .then(data => {
+        this.setState((prevState) => {
+          const newState = {...prevState};
+          newState.translation = ["<sos>", ...data.translation]; // set data from API to state
+          newState.selectedText = input.label;
+          return newState;
+        });
+      })
+      .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+      });
+  }
 
     resetState(state){
       state.views = new Array(11).fill(0);
@@ -71,25 +134,46 @@ class Architecture extends React.Component {
       state.outputView = 0;
       state.activeElement = -1;
       state.widths = [baseInputWidth, baseLayerWidth, baseCoderWidth, baseCoderWidth, baseCoderWidth, baseLayerWidth,
-        baseCoderWidth, baseCoderWidth, baseCoderWidth, baseLayerWidth, baseOutputWidth];
+        baseCoderWidth, baseCoderWidth, baseCoderWidth, baseLayerWidth, baseOutputWidth, baseTrgInputWidth, controllerWidth];
       state.heights = [baseInputHeight, baseLayerHeight, baseCoderHeight, baseCoderHeight, baseCoderHeight, baseLayerHeight,
-        baseCoderHeight, baseCoderHeight, baseCoderHeight, baseLayerHeight, baseOutputHeight];
+        baseCoderHeight, baseCoderHeight, baseCoderHeight, baseLayerHeight, baseOutputHeight, baseTrgInputHeight, controllerHeight];
       state.baseline = [50, 50];
     }
 
     computeProps(index){
-      return {
+      let props = {
         'id': index,
-        'width': this.state.widths[index] * this.state.vBoxSize[0] / 100,
-        'height': this.state.heights[index] * this.state.vBoxSize[1] / 100,
-        'x': this.state.coords[0][index] * this.state.vBoxSize[0] / 100,
-        'y': this.state.coords[1][index] * this.state.vBoxSize[1] / 100,
+        'width': this.state.widths[index] ,
+        'height': this.state.heights[index],
+        'x': this.state.coords[0][index],
+        'y': this.state.coords[1][index],
         'fill': this.fixedProps.color,
         'rx': this.fixedProps.r[0],
         'ry': this.fixedProps.r[1],
-        'onClick': () => this.expandView(index),
         'isBlurred': this.state.activeElement !== -1 && this.state.activeElement !== index,
       };
+      if (index === 0){
+        props.selectionCallback = this.setInput;
+      }
+      if (index !== 0 && index !== 10 && index !== 11) {
+        props.width = props.width * this.state.vBoxSize[0] / 100;
+        props.height = props.height * this.state.vBoxSize[1] / 100;
+        props.x = props.x * this.state.vBoxSize[0] / 100;
+        props.y = props.y * this.state.vBoxSize[1] / 100;
+        props.onClick = () => this.expandView(index);
+      }
+      if (index === 10){
+        props.text = this.state.outputText;
+      }
+      if (index === 11){
+        props.text = this.state.targetText;
+      }
+      if(index === 12){
+        let [sos, ...rest] = this.state.translation;
+        props.text = rest;
+        props.counterCallBack = this.setCounter;
+      }
+      return props;
     }
 
     computeArchDims(){
@@ -178,16 +262,24 @@ class Architecture extends React.Component {
       const x5 = x6 - state.widths[5] / 2 - state.widths[6] / 2 - emb_x_gap;
       const y5 = y6;
 
+      // Target Input Coordinates
+      const x11 = x5 - state.widths[11] / 2 - state.widths[5] / 2 - coder_x_gap;
+      const y11 = y5;
+
       // Output Layer Coordinates
       const x9 = x8 + state.widths[8] / 2 + state.widths[9] / 2 + emb_x_gap;
       const y9 = y8;
 
       // Output Coordinates
       const x10 = x9 + state.widths[9] / 2 + state.widths[10] / 2 + out_x_gap;
+      const y10 = y9;
 
+      // Controller Coordinates
+      const x12 = 100 - state.widths[12] / 2 - 20;
+      const y12 = 0 ;
       // Update coords
-      state.coords = [[x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10],
-                          [y0, y1, y2, y3, y4, y5, y6, y7, y8, y9, y9]];
+      state.coords = [[x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12],
+                          [y0, y1, y2, y3, y4, y5, y6, y7, y8, y9, y9, y10, y11, y12]];
 
       // return {'x' : [x2, x3, x4], 'y' : [y0, y1], 'layer_x' : [layer_x0, layer_x1]}
     }
@@ -196,10 +288,10 @@ class Architecture extends React.Component {
       if (state.points === null){
         state.points = {};
       }
-      const [x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10] = state.coords[0].map((x) => x * this.state.vBoxSize[0] / 100);
-      const [y0, y1, y2, y3, y4, y5, y6, y7, y8, y9] = state.coords[1].map((x) => x * this.state.vBoxSize[1] / 100);
-      const [w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, w10] = state.widths.map((x) => x * this.state.vBoxSize[0] / 100);
-      const [h0, h1, h2, h3, h4, h5, h6, h7, h8, h9, h10] = state.heights.map((x) => x * this.state.vBoxSize[1] / 100);
+      const [x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12] = state.coords[0].map((x) => x * this.state.vBoxSize[0] / 100);
+      const [y0, y1, y2, y3, y4, y5, y6, y7, y8, y9, y10, y11, y12] = state.coords[1].map((x) => x * this.state.vBoxSize[1] / 100);
+      const [w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11, w12] = state.widths.map((x) => x * this.state.vBoxSize[0] / 100);
+      const [h0, h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12] = state.heights.map((x) => x * this.state.vBoxSize[1] / 100);
 
       let og = out_x_gap * this.state.vBoxSize[0] / 100;
       let lo_line = Math.max(...state.heights.slice(6, 10)) * this.state.vBoxSize[1] / 100;
@@ -248,6 +340,7 @@ class Architecture extends React.Component {
       state.points['9-5'] = [[x9 + w9 / 2 + og / 2, y9], [x9 + w9 / 2 + og / 2, y9 + lo_line / 2 + 5],
         [x5 - w5 / 2 - 5, y9 + lo_line / 2 + 5], [x5 - w5 / 2 - 5, y9], [x5 - w5 / 2, y9]];
 
+      state.points['11-5'] = [[x11 + w11 / 2, y11], [x5 - w5 / 2, y11]];
     }
 
     expandView(index){
@@ -286,48 +379,54 @@ class Architecture extends React.Component {
   render() {
       const render_arrows = this.state.points !== null;
       return (
-        <div className="d3-component" style={{display: 'flex', justifyContent: 'space-evenly', width: '100%'}}>
-          <svg  viewBox={"0 0 " + this.state.vBoxSize[0] + " " + this.state.vBoxSize[1]} width="100%" style={{filter: this.state.activeElement !== -1 ? "url(#blurMe)" : "none"}}>
+        <div className="d3-component" style={{position: 'relative', display: 'flex', justifyContent: 'space-evenly', width: '100%'}}>
 
+            <svg  viewBox={"0 0 " + this.state.vBoxSize[0] + " " + this.state.vBoxSize[1]} width="100%" style={{filter: this.state.activeElement !== -1 ? "url(#blurMe)" : "none"}}>
+
+              <InputEmbedding {...this.computeProps(1)}/>
+
+              <Encoder {...this.computeProps(2)}/>
+
+              <Encoder {...this.computeProps(3)}/>
+
+              <Encoder {...this.computeProps(4)}/>
+
+              <OutputEmbedding {...this.computeProps(5)}/>
+
+              <Decoder {...this.computeProps(6)}/>
+
+              <Decoder {...this.computeProps(7)}/>
+
+              <Decoder {...this.computeProps(8)}/>
+
+              <OutputLayer {...this.computeProps(9)}/>
+
+              <Controller {...this.computeProps(12)}/>
+
+              // Define Arrows if points are not null
+              {render_arrows && this.renderArrow('0-1')}
+              {render_arrows && this.renderArrow('1-2')}
+              {render_arrows && this.renderArrow('2-3')}
+              {render_arrows && this.renderArrow('3-4')}
+              {render_arrows && this.renderArrow('4-6')}
+              {render_arrows && this.renderArrow('4-7')}
+              {render_arrows && this.renderArrow('4-8')}
+              {render_arrows && this.renderArrow('5-6')}
+              {render_arrows && this.renderArrow('6-7')}
+              {render_arrows && this.renderArrow('7-8')}
+              {render_arrows && this.renderArrow('8-9')}
+              {render_arrows && this.renderArrow('9-10')}
+              {/*{render_arrows && this.renderArrow('9-5')}*/}
+              {render_arrows && this.renderArrow('11-5')}
+            </svg>
+          {/*<div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: '100%'}}>*/}
 
             <Input {...this.computeProps(0)} />
-            <InputEmbedding {...this.computeProps(1)}/>
-
-            <Encoder {...this.computeProps(2)}/>
-
-            <Encoder {...this.computeProps(3)}/>
-
-            <Encoder {...this.computeProps(4)}/>
-
-            <OutputEmbedding {...this.computeProps(5)}/>
-
-            <Decoder {...this.computeProps(6)}/>
-
-            <Decoder {...this.computeProps(7)}/>
-
-            <Decoder {...this.computeProps(8)}/>
-
-            <OutputLayer {...this.computeProps(9)}/>
 
             <Output {...this.computeProps(10)}/>
 
-            // Define Arrows if points are not null
-            {render_arrows && this.renderArrow('0-1')}
-            {render_arrows && this.renderArrow('1-2')}
-            {render_arrows && this.renderArrow('2-3')}
-            {render_arrows && this.renderArrow('3-4')}
-            {render_arrows && this.renderArrow('4-6')}
-            {render_arrows && this.renderArrow('4-7')}
-            {render_arrows && this.renderArrow('4-8')}
-            {render_arrows && this.renderArrow('5-6')}
-            {render_arrows && this.renderArrow('6-7')}
-            {render_arrows && this.renderArrow('7-8')}
-            {render_arrows && this.renderArrow('8-9')}
-            {render_arrows && this.renderArrow('9-10')}
-            {render_arrows && this.renderArrow('9-5')}
-
-          </svg>
-
+            <TargetInput {...this.computeProps(11)}/>
+          {/*</div>*/}
         </div>
       );
     }
