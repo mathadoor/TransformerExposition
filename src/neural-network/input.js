@@ -36,7 +36,8 @@ function Input(props) {
       left:`${x - width / 2}%`,
       top:`${y - height / 4}%`,
       boxSizing: "border-box",
-      fontSize: "14px"
+      fontSize: "14px",
+      filter: isBlurred ? "blur(5px)" : "none"
     }),
     menu: () => ({
         position: "relative",
@@ -48,6 +49,7 @@ function Input(props) {
 
   return (
     <Creatable styles={styles}
+               isDisabled={isBlurred}
       options={options}
       onChange={handleChange}
       menuPortalTarget={document.body}
