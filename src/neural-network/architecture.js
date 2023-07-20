@@ -35,7 +35,7 @@ const coder_x_gap = 5;
 const emb_x_gap = 2;
 const out_x_gap = 2;
 
-const widthExpansion = [0, 5, 15, 15, 15, 5, 15, 15, 15, 5, 0, 0, 0];
+const widthExpansion = [0, 10, 15, 15, 15, 5, 15, 15, 15, 5, 0, 0, 0];
 const heightExpansion = [0, 15, 30, 30, 30, 15, 30, 30, 30, 15, 0, 0, 0];
 
 const targetPlaceHolderText = ["Target", "sentence", "will", "appear", "here", "..."]
@@ -151,6 +151,7 @@ class Architecture extends React.Component {
         'rx': this.fixedProps.r[0],
         'ry': this.fixedProps.r[1],
         'isBlurred': this.state.activeElement !== -1 && this.state.activeElement !== index,
+        'active' : this.state.activeElement === index,
       };
       if (index === 0){
         props.selectionCallback = this.setInput;
@@ -382,6 +383,7 @@ class Architecture extends React.Component {
         <div className="d3-component" style={{position: 'relative', display: 'flex', justifyContent: 'space-evenly', width: '100%'}}>
 
             <svg  viewBox={"0 0 " + this.state.vBoxSize[0] + " " + this.state.vBoxSize[1]} width="100%" style={{filter: this.state.activeElement !== -1 ? "url(#blurMe)" : "none"}}>
+
 
               <InputEmbedding {...this.computeProps(1)}/>
 
