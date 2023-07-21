@@ -19737,35 +19737,416 @@
 	  });
 	}
 
-	function InputEmbedding(props) {
-	  var ref = react_31();
+	function getTextWidth(text, font) {
+	  var canvas = document.createElement("canvas");
+	  var context = canvas.getContext("2d");
+	  context.font = font;
+	  var metrics = context.measureText(text);
+	  return metrics.width;
+	}
+	function LinearLayer(props) {
 	  var id = props.id,
 	    width = props.width,
 	    height = props.height,
 	    x = props.x,
 	    y = props.y,
 	    fill = props.fill,
+	    text = props.text,
+	    textProps = props.textProps,
 	    rx = props.rx,
 	    ry = props.ry,
-	    onClick = props.onClick,
-	    isBlurred = props.isBlurred;
-	  react_24(function () {
-	    var svg = select(ref.current);
-	    svg.selectAll("rect").data([null]) // single datum
-	    .join("rect").attr("width", width).attr("height", height).attr("x", x - width / 2).attr("y", y - height / 2).attr("fill", fill).attr("rx", rx).attr("ry", ry).style("opacity", isBlurred ? 0.5 : 1).style("filter", isBlurred ? "blur(5px)" : "none");
-	    svg.selectAll("text").data([null]) // single datum
-	    .join("text") // create text element if it doesn't exist
-	    .text("Input Embeddings").attr("x", x).attr("y", y) // y is flipped
-	    .attr("text-anchor", "middle").attr("alignment-baseline", "middle").attr("font-size", "3px").attr("fill", "white").attr("transform", "rotate(90 ".concat(x, " ").concat(y, ")")).style("opacity", isBlurred ? 0.2 : 1).style("filter", isBlurred ? "blur(5px)" : "none");
-	  }, [id, width, height, x, y, fill, rx, ry, isBlurred]);
+	    wrapText = props.wrapText,
+	    showText = props.showText,
+	    isBlurred = props.isBlurred,
+	    annotation = props.annotation,
+	    showAnnotation = props.showAnnotation,
+	    _onClick = props.onClick;
+	  var words = text.split(" ");
+	  var lines = [];
+	  var fSize = textProps.fontSize;
+	  var line = "";
+	  words.forEach(function (word, i) {
+	    var testLine = "".concat(line, " ").concat(word);
+	    var testWidth = getTextWidth(testLine, fSize);
+	    if (testWidth > width) {
+	      lines.push(line);
+	      line = word;
+	    } else {
+	      line = testLine;
+	    }
+	    if (i === words.length - 1) {
+	      lines.push(line);
+	    }
+	  });
+	  if (lines[0] === "") lines.shift();
+	  return /*#__PURE__*/react.createElement("g", {
+	    id: id,
+	    onClick: function onClick() {
+	      return _onClick();
+	    }
+	  }, /*#__PURE__*/react.createElement("rect", {
+	    width: width,
+	    height: height,
+	    x: x - width / 2,
+	    y: y - height / 2,
+	    fill: fill,
+	    rx: rx,
+	    ry: ry,
+	    style: {
+	      opacity: isBlurred ? 0.5 : 1,
+	      filter: isBlurred ? "blur(5px)" : "none"
+	    }
+	  }), showText && /*#__PURE__*/react.createElement("g", null, wrapText ? /*#__PURE__*/react.createElement("text", {
+	    width: width,
+	    height: height,
+	    x: x,
+	    y: y,
+	    transform: "rotate(90, ".concat(x, ", ").concat(y, ")"),
+	    style: _objectSpread2$1({}, textProps)
+	  }, lines.map(function (line, i) {
+	    return /*#__PURE__*/react.createElement("tspan", {
+	      x: x,
+	      y: y + i * 3,
+	      key: i
+	    }, line);
+	  })) : /*#__PURE__*/react.createElement("text", {
+	    width: width,
+	    height: height,
+	    x: x,
+	    y: y,
+	    transform: "rotate(90, ".concat(x, ", ").concat(y, ")"),
+	    style: _objectSpread2$1({}, textProps)
+	  }, text)), showAnnotation && annotation);
+	}
+
+	function Minimize(props) {
+	  var id = props.id,
+	    width = props.width,
+	    height = props.height,
+	    x = props.x,
+	    y = props.y,
+	    fill = props.fill,
+	    onClick = props.onClick;
 	  return /*#__PURE__*/react.createElement("svg", {
-	    ref: ref,
 	    id: id,
 	    onClick: onClick,
+	    x: x,
+	    y: y,
+	    fill: "none",
+	    xmlns: "http://www.w3.org/2000/svg"
+	  }, /*#__PURE__*/react.createElement("rect", {
+	    width: width,
+	    height: height,
+	    fill: fill
+	  }), /*#__PURE__*/react.createElement("g", {
+	    transform: "scale(0.2 0.2)"
+	  }, /*#__PURE__*/react.createElement("path", {
+	    d: "M12.9999 21.9994C17.055 21.9921 19.1784 21.8926 20.5354 20.5355C21.9999 19.0711 21.9999 16.714 21.9999 12C21.9999 7.28595 21.9999 4.92893 20.5354 3.46447C19.071 2 16.714 2 11.9999 2C7.28587 2 4.92884 2 3.46438 3.46447C2.10734 4.8215 2.00779 6.94493 2.00049 11",
+	    stroke: "#ffffff",
+	    strokeWidth: "1.5",
+	    strokeLinecap: "round"
+	  }), /*#__PURE__*/react.createElement("path", {
+	    d: "M17 7L12 12M12 12H15.75M12 12V8.25",
+	    stroke: "#ffffff",
+	    strokeWidth: "1.5",
+	    strokeLinecap: "round",
+	    strokeLinejoin: "round"
+	  }), /*#__PURE__*/react.createElement("path", {
+	    d: "M2 18C2 16.1144 2 15.1716 2.58579 14.5858C3.17157 14 4.11438 14 6 14C7.88562 14 8.82843 14 9.41421 14.5858C10 15.1716 10 16.1144 10 18C10 19.8856 10 20.8284 9.41421 21.4142C8.82843 22 7.88562 22 6 22C4.11438 22 3.17157 22 2.58579 21.4142C2 20.8284 2 19.8856 2 18Z",
+	    stroke: "#ffffff",
+	    strokeWidth: "1.5"
+	  })));
+	}
+
+	function Arrow(_ref) {
+	  var id = _ref.id,
+	    points = _ref.points;
+	  var ref = react_31();
+	  react_24(function () {
+	    var svg = select(ref.current);
+	    var defs = svg.append("defs");
+	    defs.append("marker").attr("id", "arrowhead-".concat(id)).attr("viewBox", "-0 -5 10 10").attr("refX", 9.5).attr("refY", 0).attr("orient", "auto").attr("markerWidth", 4).attr("markerHeight", 3).attr("xoverflow", "visible").append("svg:path").attr("d", "M 0,-5 L 10 ,0 L 0,5").attr("fill", "#aaa").style("stroke", "none");
+	    var lineGenerator = line();
+	    var path = svg.append("path").attr("d", lineGenerator(points)).attr("marker-end", "url(#arrowhead-".concat(id, ")")).style("fill", "none").style("stroke", "#aaa").style("stroke-width", 0.8);
+
+	    // Cleanup function
+	    return function () {
+	      path.remove();
+	      defs.remove();
+	    };
+	  }, [id, points]);
+	  return /*#__PURE__*/react.createElement("svg", {
+	    ref: ref
+	  });
+	}
+
+	var x_gap = 20;
+
+	// Baseline
+	var baseline_x = 50;
+
+	// Text Embedding Info
+	var text_width = 17;
+	var text_height = 40;
+
+	// Token Info
+	var token_width = 13;
+	var token_height = 85;
+
+	// Position info
+	var position_width = 17;
+	var position_height = 40;
+
+	// Element Addition Infor
+	var add_x = baseline_x + text_width / 2 + x_gap;
+	function InputEmbedding(props) {
+	  var ref = react_31();
+	  var _React$useState = react.useState(null),
+	    _React$useState2 = _slicedToArray$1(_React$useState, 2),
+	    activeComp = _React$useState2[0],
+	    setActiveComp = _React$useState2[1];
+	  var id = props.id,
+	    width = props.width,
+	    height = props.height,
+	    x = props.x,
+	    y = props.y,
+	    fill = props.fill;
+	    props.rx;
+	    props.ry;
+	    var onClick = props.onClick,
+	    isBlurred = props.isBlurred,
+	    active = props.active;
+	  var tokenizerProps = null;
+	  var embeddingProps = null;
+	  var positionProps = null;
+	  var arrowPoints = {};
+	  var leftDatum = x - width / 2;
+	  var rightbase = x + width / 2;
+	  var topbase = y - height / 2;
+	  var thisProps = _objectSpread2$1({}, props);
+	  thisProps.text = "Input Embedding";
+	  thisProps.wrapText = false;
+	  thisProps.showText = !active;
+	  thisProps.onClick = active ? function () {} : onClick;
+	  thisProps.textProps = {
+	    "textAnchor": "middle",
+	    "alignmentBaseline": "middle",
+	    "fontSize": "3px",
+	    "fill": "white",
+	    "opacity": isBlurred ? 0.2 : 1,
+	    "filter": isBlurred ? "blur(5px)" : "none"
+	  };
+	  function setComps(id) {
+	    if (activeComp === id) {
+	      setActiveComp(null); // hide annotation if the same component is clicked
+	    } else {
+	      setActiveComp(id); // show annotation if another component is clicked
+	    }
+	  }
+
+	  if (active) {
+	    tokenizerProps = {
+	      id: "".concat(id, "-1"),
+	      width: token_width * width / 100,
+	      height: token_height * height / 100,
+	      x: leftDatum + (token_width + x_gap) * width / 200,
+	      y: y,
+	      fill: 'white',
+	      text: 'Source Tokenizer',
+	      rx: props.rx,
+	      ry: props.ry,
+	      wrapText: false,
+	      showText: true,
+	      annotation: /*#__PURE__*/react.createElement(react.Fragment, null, /*#__PURE__*/react.createElement("rect", {
+	        x: rightbase + 10,
+	        y: 0,
+	        width: "125",
+	        height: "100",
+	        fill: "white"
+	      }), /*#__PURE__*/react.createElement("image", {
+	        href: "./assets/source_tokenizer.png",
+	        x: rightbase + 10,
+	        y: 0,
+	        width: "125",
+	        height: "100"
+	      })),
+	      showAnnotation: activeComp === "".concat(id, "-1"),
+	      onClick: function onClick() {
+	        setComps("".concat(id, "-1"));
+	      },
+	      textProps: {
+	        "textAnchor": "middle",
+	        "alignmentBaseline": "middle",
+	        "fontSize": "3px",
+	        "fill": fill,
+	        "transform": "rotate(90, ".concat(leftDatum + token_width * width / 200, ", ").concat(topbase + token_height * height / 200, ")"),
+	        "opacity": isBlurred ? 0.2 : 1,
+	        "filter": isBlurred ? "blur(5px)" : "none"
+	      }
+	    };
+	    embeddingProps = {
+	      id: "".concat(id, "-2"),
+	      width: text_width * width / 100,
+	      height: text_height * height / 100,
+	      x: x,
+	      y: y - height / 4,
+	      fill: 'white',
+	      text: 'Text Embedding',
+	      rx: props.rx,
+	      ry: props.ry,
+	      wrapText: true,
+	      showText: true,
+	      onClick: function onClick() {
+	        setComps("".concat(id, "-2"));
+	      },
+	      annotation: /*#__PURE__*/react.createElement(react.Fragment, null, /*#__PURE__*/react.createElement("rect", {
+	        x: rightbase + 10,
+	        y: 0,
+	        width: "125",
+	        height: "100",
+	        fill: "white"
+	      }), /*#__PURE__*/react.createElement("image", {
+	        href: "./assets/text_embedding.jpg",
+	        x: rightbase + 10,
+	        y: 0,
+	        width: "125",
+	        height: "100"
+	      })),
+	      showAnnotation: activeComp === "".concat(id, "-2"),
+	      textProps: {
+	        "textAnchor": "middle",
+	        "alignmentBaseline": "middle",
+	        "fontSize": "3px",
+	        "fill": fill,
+	        "opacity": isBlurred ? 0.2 : 1,
+	        "filter": isBlurred ? "blur(5px)" : "none"
+	      }
+	    };
+	    positionProps = {
+	      id: "".concat(id, "-3"),
+	      width: position_width * width / 100,
+	      height: position_height * height / 100,
+	      x: x,
+	      y: y + height / 4,
+	      fill: 'white',
+	      text: 'Position Embedding',
+	      rx: props.rx,
+	      ry: props.ry,
+	      wrapText: true,
+	      showText: true,
+	      onClick: function onClick() {
+	        setComps("".concat(id, "-3"));
+	      },
+	      annotation: /*#__PURE__*/react.createElement(react.Fragment, null, /*#__PURE__*/react.createElement("rect", {
+	        x: rightbase + 10,
+	        y: 0,
+	        width: "125",
+	        height: "100",
+	        fill: "white"
+	      }), /*#__PURE__*/react.createElement("image", {
+	        href: "./assets/position_embedding.jpg",
+	        x: rightbase + 10,
+	        y: 0,
+	        width: "125",
+	        height: "100"
+	      })),
+	      showAnnotation: activeComp === "".concat(id, "-3"),
+	      textProps: {
+	        "textAnchor": "middle",
+	        "alignmentBaseline": "middle",
+	        "fontSize": "3px",
+	        "fill": fill,
+	        "transform": "rotate(-90, ".concat(leftDatum + token_width * width / 200, ", ").concat(topbase + token_height * height / 200, ")"),
+	        "opacity": isBlurred ? 0.2 : 1,
+	        "filter": isBlurred ? "blur(5px)" : "none"
+	      }
+	    };
+	    arrowPoints['in-token'] = [[leftDatum - x_gap / 4, y], [tokenizerProps.x - tokenizerProps.width / 2, y]];
+	    arrowPoints['token-text'] = [[tokenizerProps.x + tokenizerProps.width / 2, y], [embeddingProps.x / 2 + tokenizerProps.x / 2 - (embeddingProps.width / 4 - tokenizerProps.width / 4), y], [embeddingProps.x / 2 + tokenizerProps.x / 2 - (embeddingProps.width / 4 - tokenizerProps.width / 4), embeddingProps.y], [embeddingProps.x - embeddingProps.width / 2, embeddingProps.y]];
+	    arrowPoints['token-position'] = [[tokenizerProps.x + tokenizerProps.width / 2, y], [positionProps.x / 2 + tokenizerProps.x / 2 - (positionProps.width / 4 - tokenizerProps.width / 4), y], [positionProps.x / 2 + tokenizerProps.x / 2 - (positionProps.width / 4 - tokenizerProps.width / 4), positionProps.y], [positionProps.x - positionProps.width / 2, positionProps.y]];
+	    arrowPoints['text-add'] = [[embeddingProps.x + embeddingProps.width / 2, embeddingProps.y], [leftDatum + add_x * width / 100, embeddingProps.y], [leftDatum + add_x * width / 100, y - 3]];
+	    arrowPoints['position-add'] = [[positionProps.x + positionProps.width / 2, positionProps.y], [leftDatum + add_x * width / 100, positionProps.y], [leftDatum + add_x * width / 100, y + 3]];
+	    arrowPoints['addOut'] = [[leftDatum + add_x * width / 100 + 3, y], [rightbase + x_gap / 4, y]];
+	  }
+	  react_24(function () {
+	    if (ref.current) {
+	      var bbox = ref.current.getBBox();
+
+	      // calculate the center of the parent SVG
+	      var parentCenterX = leftDatum + add_x * width / 100;
+	      var parentCenterY = y;
+
+	      // calculate the center of the inner SVG
+	      var gCenterX = bbox.x + bbox.width / 2;
+	      var gCenterY = bbox.y + bbox.height / 2;
+
+	      // calculate the translation
+	      var translateX = parentCenterX - gCenterX;
+	      var translateY = parentCenterY - gCenterY;
+
+	      // apply the translation to the inner SVG
+	      ref.current.setAttribute("x", translateX);
+	      ref.current.setAttribute("y", translateY);
+	    }
+	  }, [x, y, active]);
+	  return /*#__PURE__*/react.createElement("svg", {
+	    id: id,
 	    style: {
 	      cursor: 'pointer'
 	    }
-	  });
+	  }, /*#__PURE__*/react.createElement(LinearLayer, thisProps), active && /*#__PURE__*/react.createElement(LinearLayer, tokenizerProps), active && /*#__PURE__*/react.createElement(LinearLayer, embeddingProps), active && /*#__PURE__*/react.createElement(LinearLayer, positionProps), active && /*#__PURE__*/react.createElement("svg", {
+	    id: "1-4",
+	    onClick: function onClick() {
+	      return setComps("".concat(id, "-4"));
+	    },
+	    ref: ref,
+	    fill: "#ffffff",
+	    version: "1.1"
+	  }, /*#__PURE__*/react.createElement("circle", {
+	    cx: 3,
+	    cy: 3,
+	    r: 3,
+	    fill: fill
+	  }), /*#__PURE__*/react.createElement("g", {
+	    transform: "scale(0.012 0.012)"
+	  }, /*#__PURE__*/react.createElement("path", {
+	    d: "M418.5,418.5c95.6-95.6,95.6-251.2,0-346.8s-251.2-95.6-346.8,0s-95.6,251.2,0,346.8S322.9,514.1,418.5,418.5z M89,89 c86.1-86.1,226.1-86.1,312.2,0s86.1,226.1,0,312.2s-226.1,86.1-312.2,0S3,175.1,89,89z",
+	    stroke: "#ffffff"
+	  }), /*#__PURE__*/react.createElement("path", {
+	    d: "M245.1,336.9c3.4,0,6.4-1.4,8.7-3.6c2.2-2.2,3.6-5.3,3.6-8.7v-67.3h67.3c3.4,0,6.4-1.4,8.7-3.6c2.2-2.2,3.6-5.3,3.6-8.7 c0-6.8-5.5-12.3-12.2-12.2h-67.3v-67.3c0-6.8-5.5-12.3-12.2-12.2c-6.8,0-12.3,5.5-12.2,12.2v67.3h-67.3c-6.8,0-12.3,5.5-12.2,12.2 c0,6.8,5.5,12.3,12.2,12.2h67.3v67.3C232.8,331.4,238.3,336.9,245.1,336.9z",
+	    stroke: "#ffffff"
+	  }))), activeComp === "".concat(id, "-4") && /*#__PURE__*/react.createElement("image", {
+	    href: "./assets/element_wise_add_input_embed.jpg",
+	    x: rightbase + 10,
+	    y: 0,
+	    width: "75",
+	    height: "50"
+	  }), active && /*#__PURE__*/react.createElement(Minimize, {
+	    width: 4.5,
+	    height: 4.5,
+	    x: rightbase - 7,
+	    y: topbase + 2,
+	    onClick: onClick,
+	    fill: fill
+	  }), active && /*#__PURE__*/react.createElement(Arrow, {
+	    id: 'in-token',
+	    points: arrowPoints['in-token']
+	  }), active && /*#__PURE__*/react.createElement(Arrow, {
+	    id: 'token-text',
+	    points: arrowPoints['token-text']
+	  }), active && /*#__PURE__*/react.createElement(Arrow, {
+	    id: 'token-position',
+	    points: arrowPoints['token-position']
+	  }), active && /*#__PURE__*/react.createElement(Arrow, {
+	    id: 'text-add',
+	    points: arrowPoints['text-add']
+	  }), active && /*#__PURE__*/react.createElement(Arrow, {
+	    id: 'position-add',
+	    points: arrowPoints['position-add']
+	  }), active && /*#__PURE__*/react.createElement(Arrow, {
+	    id: 'addOut',
+	    points: arrowPoints['addOut']
+	  }));
 	}
 
 	function OutputLayer(props) {
@@ -26905,8 +27286,8 @@
 	    props.fill;
 	    props.rx;
 	    props.ry;
-	    props.isBlurred;
-	    var selectionCallback = props.selectionCallback;
+	    var isBlurred = props.isBlurred,
+	    selectionCallback = props.selectionCallback;
 	  var _useState = react_32(members[0]),
 	    _useState2 = _slicedToArray$1(_useState, 2);
 	    _useState2[0];
@@ -26930,7 +27311,8 @@
 	        left: "".concat(x - width / 2, "%"),
 	        top: "".concat(y - height / 4, "%"),
 	        boxSizing: "border-box",
-	        fontSize: "14px"
+	        fontSize: "14px",
+	        filter: isBlurred ? "blur(5px)" : "none"
 	      };
 	    },
 	    menu: function menu() {
@@ -26943,6 +27325,7 @@
 	  };
 	  return /*#__PURE__*/react.createElement(CreatableSelect$1, {
 	    styles: styles,
+	    isDisabled: isBlurred,
 	    options: options,
 	    onChange: handleChange,
 	    menuPortalTarget: document.body,
@@ -27033,28 +27416,6 @@
 	  });
 	}
 
-	function Arrow(_ref) {
-	  var id = _ref.id,
-	    points = _ref.points;
-	  var ref = react_31();
-	  react_24(function () {
-	    var svg = select(ref.current);
-	    var defs = svg.append("defs");
-	    defs.append("marker").attr("id", "arrowhead-".concat(id)).attr("viewBox", "-0 -5 10 10").attr("refX", 9.5).attr("refY", 0).attr("orient", "auto").attr("markerWidth", 4).attr("markerHeight", 3).attr("xoverflow", "visible").append("svg:path").attr("d", "M 0,-5 L 10 ,0 L 0,5").attr("fill", "#aaa").style("stroke", "none");
-	    var lineGenerator = line();
-	    var path = svg.append("path").attr("d", lineGenerator(points)).attr("marker-end", "url(#arrowhead-".concat(id, ")")).style("fill", "none").style("stroke", "#aaa").style("stroke-width", 0.8);
-
-	    // Cleanup function
-	    return function () {
-	      path.remove();
-	      defs.remove();
-	    };
-	  }, [id, points]);
-	  return /*#__PURE__*/react.createElement("svg", {
-	    ref: ref
-	  });
-	}
-
 	function TargetInput(props) {
 	  var ref = react_31();
 	  var id = props.id,
@@ -27104,29 +27465,13 @@
 	    _useState2 = _slicedToArray$1(_useState, 2),
 	    counter = _useState2[0],
 	    setCounter = _useState2[1];
-	  var _useState3 = react_32(false),
-	    _useState4 = _slicedToArray$1(_useState3, 2);
-	    _useState4[0];
-	    var setIsHovered1 = _useState4[1];
-	  var _useState5 = react_32(false),
-	    _useState6 = _slicedToArray$1(_useState5, 2);
-	    _useState6[0];
-	    _useState6[1];
-	  var _useState7 = react_32(false),
-	    _useState8 = _slicedToArray$1(_useState7, 2);
-	    _useState8[0];
-	    _useState8[1];
 	  var id = props.id,
 	    width = props.width,
 	    height = props.height,
-	    x = props.x;
-	    props.y;
-	    var fill = props.fill;
-	    props.rx;
-	    props.ry;
-	    props.onClick;
-	    props.isBlurred;
-	    var text = props.text,
+	    x = props.x,
+	    fill = props.fill,
+	    isBlurred = props.isBlurred,
+	    text = props.text,
 	    counterCallBack = props.counterCallBack;
 	  var ref = react_31();
 	  select(ref.current);
@@ -27138,12 +27483,16 @@
 	    targetLength = typeof text === 'undefined' ? 0 : text.length;
 	  }, [text]);
 	  function updateCounter(counter) {
+	    if (isBlurred) return;
 	    setCounter(counter);
 	    counterCallBack(counter);
 	  }
 	  return /*#__PURE__*/react.createElement("svg", {
 	    ref: ref,
-	    id: id
+	    id: id,
+	    style: {
+	      "filter": isBlurred ? "blur(5px)" : "none"
+	    }
 	  }, /*#__PURE__*/react.createElement("svg", {
 	    fill: "none",
 	    xmlns: "http://www.w3.org/2000/svg",
@@ -27246,7 +27595,7 @@
 	var coder_x_gap = 5;
 	var emb_x_gap = 2;
 	var out_x_gap = 2;
-	var widthExpansion = [0, 5, 15, 15, 15, 5, 15, 15, 15, 5, 0, 0, 0];
+	var widthExpansion = [0, 10, 15, 15, 15, 5, 15, 15, 15, 5, 0, 0, 0];
 	var heightExpansion = [0, 15, 30, 30, 30, 15, 30, 30, 30, 15, 0, 0, 0];
 	var targetPlaceHolderText = ["Target", "sentence", "will", "appear", "here", "..."];
 	var translationPlaceHolderText = ["Translation", "will", "appear", "here", "..."];
@@ -27364,7 +27713,8 @@
 	        'fill': this.fixedProps.color,
 	        'rx': this.fixedProps.r[0],
 	        'ry': this.fixedProps.r[1],
-	        'isBlurred': this.state.activeElement !== -1 && this.state.activeElement !== index
+	        'isBlurred': this.state.activeElement !== -1 && this.state.activeElement !== index,
+	        'active': this.state.activeElement === index
 	      };
 	      if (index === 0) {
 	        props.selectionCallback = this.setInput;
@@ -27629,6 +27979,7 @@
 	    key: "expandView",
 	    value: function expandView(index) {
 	      var _this5 = this;
+	      // console.log(index)
 	      this.setState(function (prevState) {
 	        var newState = _objectSpread2$1({}, prevState);
 	        _this5.resetState(newState);
@@ -27669,6 +28020,7 @@
 	    key: "render",
 	    value: function render() {
 	      var render_arrows = this.state.points !== null;
+	      // console.log(this.state.activeElement)
 	      return /*#__PURE__*/react.createElement("div", {
 	        className: "d3-component",
 	        style: {
