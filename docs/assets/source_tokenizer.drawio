@@ -1,0 +1,97 @@
+<mxfile host="Electron" modified="2023-07-21T01:17:00.079Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.1 Chrome/112.0.5615.204 Electron/24.6.1 Safari/537.36" etag="hj4hgfpWinnnGYp1-jzn" version="21.6.1" type="device">
+  <diagram name="Page-1" id="44I9hGHchTTdyHQQdCC0">
+    <mxGraphModel dx="819" dy="497" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Sull-ByN69tNy64UvHHk-7" value="" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#000099;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="80" y="60" width="580" height="370" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-8" value="The source tokenizer vectorizes the source sentence as follows:&lt;br&gt;&amp;nbsp;&amp;nbsp;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="100" y="110" width="360" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-9" value="1. The sentence is split into various tokens. These tokens are derived from a predefined vocabulary and can be full or partial words. For example, the sentence&amp;nbsp; &amp;nbsp;&lt;br&gt;&lt;font color=&quot;#000099&quot;&gt;&lt;i style=&quot;&quot;&gt;&lt;br&gt;&amp;lt;sos&amp;gt;&lt;/i&gt;&amp;nbsp;&lt;/font&gt;&lt;i&gt;&lt;font color=&quot;#000099&quot;&gt;A man is walking in the street &amp;lt;eos&amp;gt; &lt;/font&gt;&lt;br&gt;&lt;/i&gt;&lt;br&gt;is split into&lt;br&gt;&lt;font color=&quot;#000099&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;br&gt;&lt;br&gt;Note tokens &amp;lt;sos&amp;gt;, &amp;lt;eos&amp;gt; are added to indicate the start and the end of the sequence. Similarly, &amp;lt;unk&amp;gt; and &amp;lt;pad&amp;gt; tokens are used to indicate unknown tokens and pad the sequence to clamp the list to a certain length." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="100" y="130" width="550" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-12" value="2. Each list item is mapped to a fixed index. The map is also derived from the predefined vocabulary. The resulting indices of the above list may look like the following:&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;The sentence has now been tokenized and is ready for further processing." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="100" y="290" width="550" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-13" value="&lt;font color=&quot;#000099&quot;&gt;Source Tokenizer&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="1">
+          <mxGeometry x="250" y="70" width="240" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-39" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="100" y="230" width="440" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-28" value="&lt;font color=&quot;#000099&quot;&gt;&amp;lt;sos&amp;gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-39">
+          <mxGeometry width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-29" value="&lt;font color=&quot;#000099&quot;&gt;A&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-39">
+          <mxGeometry x="40" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-30" value="&lt;font color=&quot;#000099&quot;&gt;man&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-39">
+          <mxGeometry x="80" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-31" value="&lt;font color=&quot;#000099&quot;&gt;is&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-39">
+          <mxGeometry x="120" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-32" value="&lt;font color=&quot;#000099&quot;&gt;walk&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-39">
+          <mxGeometry x="160" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-33" value="&lt;font color=&quot;#000099&quot;&gt;ing&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-39">
+          <mxGeometry x="200" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-34" value="&lt;font color=&quot;#000099&quot;&gt;in&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-39">
+          <mxGeometry x="240" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-35" value="&lt;font color=&quot;#000099&quot;&gt;the&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-39">
+          <mxGeometry x="280" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-36" value="&lt;font color=&quot;#000099&quot;&gt;street&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-39">
+          <mxGeometry x="320" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-37" value="&lt;font color=&quot;#000099&quot;&gt;.&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-39">
+          <mxGeometry x="360" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-38" value="&lt;font color=&quot;#000099&quot;&gt;&amp;lt;eos&amp;gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-39">
+          <mxGeometry x="400" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-40" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="100" y="350" width="440" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-41" value="&lt;font color=&quot;#000099&quot;&gt;0&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-40">
+          <mxGeometry width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-42" value="&lt;font color=&quot;#000099&quot;&gt;12&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-40">
+          <mxGeometry x="40" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-43" value="&lt;font color=&quot;#000099&quot;&gt;2454&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-40">
+          <mxGeometry x="80" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-44" value="&lt;font color=&quot;#000099&quot;&gt;78&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-40">
+          <mxGeometry x="120" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-45" value="&lt;font color=&quot;#000099&quot;&gt;46&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-40">
+          <mxGeometry x="160" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-46" value="&lt;font color=&quot;#000099&quot;&gt;4756&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-40">
+          <mxGeometry x="200" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-47" value="&lt;font color=&quot;#000099&quot;&gt;123&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-40">
+          <mxGeometry x="240" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-48" value="&lt;font color=&quot;#000099&quot;&gt;462&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-40">
+          <mxGeometry x="280" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-49" value="&lt;font color=&quot;#000099&quot;&gt;23&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-40">
+          <mxGeometry x="320" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-50" value="&lt;font color=&quot;#000099&quot;&gt;45&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-40">
+          <mxGeometry x="360" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-51" value="&lt;font color=&quot;#000099&quot;&gt;1&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#000099;" vertex="1" parent="Sull-ByN69tNy64UvHHk-40">
+          <mxGeometry x="400" width="40" height="20" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

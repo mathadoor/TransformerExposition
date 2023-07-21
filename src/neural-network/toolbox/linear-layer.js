@@ -10,8 +10,8 @@ function getTextWidth(text, font) {
 }
 
 function LinearLayer(props) {
-  const ref = useRef();
-  const { id, width, height, x, y, fill, text, textProps, rx, ry, wrapText, showText, isBlurred} = props;
+  const [showAnnotation, updateShowAnnotation] = React.useState(false);
+  const { id, width, height, x, y, fill, text, textProps, rx, ry, wrapText, showText, isBlurred, annotation} = props;
 
   const words = text.split(" ");
   const lines = [];
@@ -33,11 +33,16 @@ function LinearLayer(props) {
     }
   });
 
+  function onClick() {
+    console.log("clicked")
+    updateShowAnnotation(!showAnnotation);
+  }
+
   if(lines[0] === "") lines.shift();
 
   return (
-    <>
-      <rect width={width} height={height} x={x - width / 2} y={y - height / 2} fill={fill} rx={rx} ry={ry}
+    <g id={id} onClick={() => onClick()}>
+      <rect  width={width} height={height} x={x - width / 2} y={y - height / 2} fill={fill} rx={rx} ry={ry}
              style={{opacity:isBlurred ? 0.5 : 1, filter:isBlurred ? "blur(5px)" : "none"}}></rect>
       { showText && <g>
         {wrapText ?
@@ -53,7 +58,8 @@ function LinearLayer(props) {
           </text>
         }
       </g>}
-    </>
+      {showAnnotation && annotation}
+    </g>
   );
 }
 
