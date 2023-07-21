@@ -31,9 +31,10 @@ const position_y = baseline_y * 3 / 2;
 const add_x = baseline_x + text_width / 2 + x_gap;
 const add_y = baseline_y;
 
+let prevActiveComp = null;
 function InputEmbedding(props) {
   const ref = useRef();
-  const tokenizerContainerRef = useRef();
+  const [activeComp, setActiveComp] = React.useState(null);
   const { id, width, height, x, y, fill, rx, ry, onClick, isBlurred, active} = props;
   let currX = width * x / 100;
   let currY = height * y / 100;
@@ -50,6 +51,7 @@ function InputEmbedding(props) {
   thisProps.text = "Input Embedding";
   thisProps.wrapText = false;
   thisProps.showText = !active;
+  thisProps.onClick = active ? () => {} : onClick;
   thisProps.textProps = {
     "textAnchor": "middle",
     "alignmentBaseline": "middle",
@@ -58,6 +60,15 @@ function InputEmbedding(props) {
     "opacity" : isBlurred ? 0.2 : 1,
     "filter" : isBlurred ? "blur(5px)" : "none",
   }
+
+  function setComps(id){
+    if (activeComp === id) {
+      setActiveComp(null); // hide annotation if the same component is clicked
+    } else {
+      setActiveComp(id); // show annotation if another component is clicked
+    }
+  }
+
   if (active){
     tokenizerProps = {
       id: `${id}-1`,
@@ -75,6 +86,8 @@ function InputEmbedding(props) {
                     <rect x={rightbase + 10} y={0} width="125" height="100" fill="white"/>
                     <image href="./assets/source_tokenizer.png" x={rightbase + 10} y={0} width="125" height="100" />
                   </>,
+      showAnnotation: activeComp === `${id}-1`,
+      onClick: () => {setComps(`${id}-1`)},
       textProps : {
         "textAnchor": "middle",
         "alignmentBaseline": "middle",
@@ -98,10 +111,12 @@ function InputEmbedding(props) {
       ry : props.ry,
       wrapText : true,
       showText : true,
+      onClick: () => {setComps(`${id}-2`)},
       annotation: <>
         <rect x={rightbase + 10} y={0} width="125" height="100" fill="white"/>
         <image href="./assets/text_embedding.jpg" x={rightbase + 10} y={0} width="125" height="100" />
       </>,
+      showAnnotation: activeComp === `${id}-2`,
       textProps : {
         "textAnchor": "middle",
         "alignmentBaseline": "middle",
@@ -124,10 +139,12 @@ function InputEmbedding(props) {
       ry : props.ry,
       wrapText : true,
       showText : true,
+      onClick: () => {setComps(`${id}-3`)},
       annotation: <>
         <rect x={rightbase + 10} y={0} width="125" height="100" fill="white"/>
         <image href="./assets/position_embedding.jpg" x={rightbase + 10} y={0} width="125" height="100" />
       </>,
+      showAnnotation: activeComp === `${id}-3`,
       textProps : {
         "textAnchor": "middle",
         "alignmentBaseline": "middle",
@@ -158,8 +175,9 @@ function InputEmbedding(props) {
       [leftDatum + add_x * width / 100, positionProps.y], [leftDatum + add_x * width / 100, y + 3]];
 
     arrowPoints['addOut'] = [[leftDatum + add_x * width / 100 + 3, y], [rightbase + x_gap / 4, y]];
+
   }
-  console.log(arrowPoints);
+
   useEffect(() => {
     if (ref.current) {
       const bbox = ref.current.getBBox();
@@ -183,15 +201,15 @@ function InputEmbedding(props) {
     }
   }, [x, y, active]);
 
-
   return (
-    <svg id={id} onClick={active ? () => {} : onClick} style={{ cursor: 'pointer' }}>
+    <svg id={id} style={{ cursor: 'pointer' }}>
       <LinearLayer {...thisProps} />
       {active && <LinearLayer {...tokenizerProps} />}
       {active && <LinearLayer {...embeddingProps} />}
       {active && <LinearLayer {...positionProps} />}
       {active &&
-        <svg ref={ref} fill="#ffffff" version="1.1" id="Capa_1">
+        <svg id={"1-4"} onClick={() => setComps(`${id}-4`)} ref={ref} fill="#ffffff" version="1.1" >
+          <circle cx={3} cy={3} r={3} fill={fill}/>
             <g  transform={`scale(0.012 0.012)`}>
               <path d="M418.5,418.5c95.6-95.6,95.6-251.2,0-346.8s-251.2-95.6-346.8,0s-95.6,251.2,0,346.8S322.9,514.1,418.5,418.5z M89,89
                 c86.1-86.1,226.1-86.1,312.2,0s86.1,226.1,0,312.2s-226.1,86.1-312.2,0S3,175.1,89,89z" stroke={"#ffffff"}/>
@@ -200,6 +218,7 @@ function InputEmbedding(props) {
                 c0,6.8,5.5,12.3,12.2,12.2h67.3v67.3C232.8,331.4,238.3,336.9,245.1,336.9z" stroke={"#ffffff"}/>
             </g>
         </svg>}
+      {activeComp === `${id}-4` && <image href="./assets/element_wise_add_input_embed.jpg" x={rightbase + 10} y={0} width="75" height="50" />}
       {active && <Minimize width={4.5} height={4.5} x={rightbase - 7} y = {topbase + 2} onClick={onClick} fill={fill} />}
       {active && <Arrow id={'in-token'} points={arrowPoints['in-token']} />}
       {active && <Arrow id={'token-text'} points={arrowPoints['token-text']} />}

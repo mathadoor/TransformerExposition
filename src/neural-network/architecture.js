@@ -345,6 +345,7 @@ class Architecture extends React.Component {
     }
 
     expandView(index){
+      // console.log(index)
       this.setState((prevState) => {
         const newState = {...prevState};
         this.resetState(newState);
@@ -379,6 +380,7 @@ class Architecture extends React.Component {
 
   render() {
       const render_arrows = this.state.points !== null;
+      // console.log(this.state.activeElement)
       return (
         <div className="d3-component" style={{position: 'relative', display: 'flex', justifyContent: 'space-evenly', width: '100%'}}>
 
