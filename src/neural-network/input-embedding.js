@@ -52,6 +52,7 @@ function InputEmbedding(props) {
   thisProps.wrapText = false;
   thisProps.showText = !active;
   thisProps.onClick = active ? () => {} : onClick;
+  thisProps.transform = `rotate(90, ${x}, ${y})`;
   thisProps.textProps = {
     "textAnchor": "middle",
     "alignmentBaseline": "middle",
@@ -69,6 +70,11 @@ function InputEmbedding(props) {
     }
   }
 
+  function closeComps(){
+    setActiveComp(null);
+    onClick();
+  }
+
   if (active){
     tokenizerProps = {
       id: `${id}-1`,
@@ -82,6 +88,7 @@ function InputEmbedding(props) {
       ry : props.ry,
       wrapText : false,
       showText : true,
+      transform : `rotate(90, ${leftDatum + (token_width + x_gap) * width / 200}, ${y})`,
       annotation: <>
                     <rect x={rightbase + 10} y={0} width="125" height="100" fill="white"/>
                     <image href="./assets/source_tokenizer.png" x={rightbase + 10} y={0} width="125" height="100" />
@@ -93,7 +100,6 @@ function InputEmbedding(props) {
         "alignmentBaseline": "middle",
         "fontSize": "3px",
         "fill": fill,
-        "transform": `rotate(90, ${leftDatum + token_width * width / 200}, ${topbase + token_height * height / 200})`,
         "opacity" : isBlurred ? 0.2 : 1,
         "filter" : isBlurred ? "blur(5px)" : "none"
       }
@@ -112,6 +118,7 @@ function InputEmbedding(props) {
       wrapText : true,
       showText : true,
       onClick: () => {setComps(`${id}-2`)},
+      transform : `rotate(90, ${x}, ${y - height / 4})`,
       annotation: <>
         <rect x={rightbase + 10} y={0} width="125" height="100" fill="white"/>
         <image href="./assets/text_embedding.jpg" x={rightbase + 10} y={0} width="125" height="100" />
@@ -139,6 +146,7 @@ function InputEmbedding(props) {
       ry : props.ry,
       wrapText : true,
       showText : true,
+      transform : `rotate(90, ${x}, ${y + height / 4})`,
       onClick: () => {setComps(`${id}-3`)},
       annotation: <>
         <rect x={rightbase + 10} y={0} width="125" height="100" fill="white"/>
@@ -178,29 +186,6 @@ function InputEmbedding(props) {
 
   }
 
-  useEffect(() => {
-    if (ref.current) {
-      const bbox = ref.current.getBBox();
-
-      // calculate the center of the parent SVG
-      const parentCenterX = leftDatum + add_x * width / 100;
-      const parentCenterY = y;
-
-      // calculate the center of the inner SVG
-      const gCenterX = bbox.x + bbox.width / 2;
-      const gCenterY = bbox.y + bbox.height / 2;
-
-      // calculate the translation
-      const translateX = parentCenterX - gCenterX;
-      const translateY = parentCenterY - gCenterY;
-
-      // apply the translation to the inner SVG
-      ref.current.setAttribute("x", translateX);
-      ref.current.setAttribute("y", translateY);
-
-    }
-  }, [x, y, active]);
-
   return (
     <svg id={id} style={{ cursor: 'pointer' }}>
       <LinearLayer {...thisProps} />
@@ -208,7 +193,7 @@ function InputEmbedding(props) {
       {active && <LinearLayer {...embeddingProps} />}
       {active && <LinearLayer {...positionProps} />}
       {active &&
-        <svg id={"1-4"} onClick={() => setComps(`${id}-4`)} ref={ref} fill="#ffffff" version="1.1" >
+        <svg id={"1-4"} x={leftDatum + add_x * width / 100 - 3} y={y - 3} onClick={() => setComps(`${id}-4`)} ref={ref} fill="#ffffff" version="1.1" >
           <circle cx={3} cy={3} r={3} fill={fill}/>
             <g  transform={`scale(0.012 0.012)`}>
               <path d="M418.5,418.5c95.6-95.6,95.6-251.2,0-346.8s-251.2-95.6-346.8,0s-95.6,251.2,0,346.8S322.9,514.1,418.5,418.5z M89,89
@@ -219,7 +204,7 @@ function InputEmbedding(props) {
             </g>
         </svg>}
       {activeComp === `${id}-4` && <image href="./assets/element_wise_add_input_embed.jpg" x={rightbase + 10} y={0} width="75" height="50" />}
-      {active && <Minimize width={4.5} height={4.5} x={rightbase - 7} y = {topbase + 2} onClick={onClick} fill={fill} />}
+      {active && <Minimize width={4.5} height={4.5} x={rightbase - 7} y = {topbase + 2} onClick={closeComps} fill={fill} />}
       {active && <Arrow id={'in-token'} points={arrowPoints['in-token']} />}
       {active && <Arrow id={'token-text'} points={arrowPoints['token-text']} />}
       {active && <Arrow id={'token-position'} points={arrowPoints['token-position']} />}
