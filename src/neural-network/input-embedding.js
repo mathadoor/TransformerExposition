@@ -98,6 +98,10 @@ function InputEmbedding(props) {
       ry : props.ry,
       wrapText : true,
       showText : true,
+      annotation: <>
+        <rect x={rightbase + 10} y={0} width="125" height="100" fill="white"/>
+        <image href="./assets/text_embedding.jpg" x={rightbase + 10} y={0} width="125" height="100" />
+      </>,
       textProps : {
         "textAnchor": "middle",
         "alignmentBaseline": "middle",
@@ -120,6 +124,10 @@ function InputEmbedding(props) {
       ry : props.ry,
       wrapText : true,
       showText : true,
+      annotation: <>
+        <rect x={rightbase + 10} y={0} width="125" height="100" fill="white"/>
+        <image href="./assets/position_embedding.jpg" x={rightbase + 10} y={0} width="125" height="100" />
+      </>,
       textProps : {
         "textAnchor": "middle",
         "alignmentBaseline": "middle",

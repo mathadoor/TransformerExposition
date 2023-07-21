@@ -3,11 +3,8 @@ import * as d3 from "d3";
 
 function Controller(props){
   const [counter, setCounter] = useState(0);
-  const [isHovered1, setIsHovered1] = useState(false);
-  const [isHovered2, setIsHovered2] = useState(false);
-  const [isHovered3, setIsHovered3] = useState(false);
 
-  const { id, width, height, x, y, fill, rx, ry, onClick, isBlurred, text, counterCallBack } = props;
+  const { id, width, height, x, fill, isBlurred, text, counterCallBack } = props;
 
   const ref = useRef();
   const hoverfill = '#274071'
