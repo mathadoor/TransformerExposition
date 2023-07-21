@@ -42,7 +42,7 @@ function LinearLayer(props) {
         {wrapText ?
           <text width={width} height={height} x={x} y={y} transform={transform} style={{...textProps}}>
             {lines.map((line, i) => (
-              <tspan x={x} y={y + i * 3} key={i}>
+              <tspan x={x} y={y + 1 + (i - (lines.length - 1) / 2)* 3} key={i}>
                 {line}
               </tspan>
             ))}

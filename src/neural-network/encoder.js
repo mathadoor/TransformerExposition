@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import * as d3 from 'd3';
 import LinearLayer from "./toolbox/linear-layer";
 import Minimize from "./toolbox/minimize";
 import Arrow from "./arrow";
