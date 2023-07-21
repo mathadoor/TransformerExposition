@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import LinearLayer from "./toolbox/linear-layer";
+import Minimize from "./toolbox/minimize";
 import Arrow from "./arrow";
 
 const x_gap = 20;
@@ -70,6 +71,10 @@ function InputEmbedding(props) {
       ry : props.ry,
       wrapText : false,
       showText : true,
+      annotation: <>
+                    <rect x={rightbase + 10} y={0} width="125" height="100" fill="white"/>
+                    <image href="./assets/source_tokenizer.png" x={rightbase + 10} y={0} width="125" height="100" />
+                  </>,
       textProps : {
         "textAnchor": "middle",
         "alignmentBaseline": "middle",
@@ -172,7 +177,7 @@ function InputEmbedding(props) {
 
 
   return (
-    <svg id={id} onClick={onClick} style={{ cursor: 'pointer' }}>
+    <svg id={id} onClick={active ? () => {} : onClick} style={{ cursor: 'pointer' }}>
       <LinearLayer {...thisProps} />
       {active && <LinearLayer {...tokenizerProps} />}
       {active && <LinearLayer {...embeddingProps} />}
@@ -187,6 +192,7 @@ function InputEmbedding(props) {
                 c0,6.8,5.5,12.3,12.2,12.2h67.3v67.3C232.8,331.4,238.3,336.9,245.1,336.9z" stroke={"#ffffff"}/>
             </g>
         </svg>}
+      {active && <Minimize width={4.5} height={4.5} x={rightbase - 7} y = {topbase + 2} onClick={onClick} fill={fill} />}
       {active && <Arrow id={'in-token'} points={arrowPoints['in-token']} />}
       {active && <Arrow id={'token-text'} points={arrowPoints['token-text']} />}
       {active && <Arrow id={'token-position'} points={arrowPoints['token-position']} />}

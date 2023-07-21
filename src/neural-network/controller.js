@@ -22,12 +22,13 @@ function Controller(props){
   }, [text])
 
   function updateCounter(counter){
+    if(isBlurred) return;
     setCounter(counter);
     counterCallBack(counter);
   }
 
   return (
-    <svg ref={ref} id={id} >
+    <svg ref={ref} id={id} style={{"filter": isBlurred ? "blur(5px)" : "none"}}>
       <svg fill="none" xmlns="http://www.w3.org/2000/svg" onClick={() => updateCounter(Math.max(counter - 1, 1))} style={{ cursor: 'pointer' }}>
         <g transform={`translate(${x_rewind}, ${10}) scale(0.33 0.33)`} >
           <rect width={width } height={3 * height} fill="transparent" />
@@ -35,7 +36,7 @@ function Controller(props){
           <path d="M7 3.33782C8.47087 2.48697 10.1786 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 10.1786 2.48697 8.47087 3.33782 7" stroke={fill} strokeWidth="1.5" strokeLinecap="round"/>
         </g>
       </svg>
-    <svg fill="none" xmlns="http://www.w3.org/2000/svg" onClick={() => updateCounter(Math.min(counter + 1, targetLength))} style={{ cursor: 'pointer' }}>
+    <svg fill="none" xmlns="http://www.w3.org/2000/svg" onClick={() => updateCounter(Math.min(counter + 1, targetLength))} style={{ cursor: 'pointer'}}>
       <g transform={`translate(${x_forward}, ${10}) scale(0.33 0.33)`}  onMouseEnter={() => setIsHovered1(true)}
          onMouseLeave={() => setIsHovered1(false)} >
         <rect width={width } height={3 * height} fill="transparent" />
