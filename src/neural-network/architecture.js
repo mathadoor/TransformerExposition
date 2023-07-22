@@ -35,7 +35,7 @@ const coder_x_gap = 5;
 const emb_x_gap = 2;
 const out_x_gap = 2;
 
-const widthExpansion = [0, 10, 15, 15, 15, 5, 15, 15, 15, 5, 0, 0, 0];
+const widthExpansion = [0, 10, 15, 15, 15, 10, 22.5, 22.5, 22.5, 7, 0, 0, 0];
 const heightExpansion = [0, 15, 30, 30, 30, 15, 30, 30, 30, 15, 0, 0, 0];
 
 const targetPlaceHolderText = ["Target", "sentence", "will", "appear", "here", "..."]

@@ -10,7 +10,7 @@ function getTextWidth(text, font) {
 }
 
 function LinearLayer(props) {
-  const { id, width, height, x, y, fill, text, textProps, rx, ry, wrapText, showText, isBlurred, annotation, showAnnotation, onClick} = props;
+  const { id, width, height, x, y, fill, text, textProps, rx, ry, wrapText, showText, isBlurred, transform, annotation, showAnnotation, onClick} = props;
 
   const words = text.split(" ");
   const lines = [];
@@ -40,14 +40,14 @@ function LinearLayer(props) {
              style={{opacity:isBlurred ? 0.5 : 1, filter:isBlurred ? "blur(5px)" : "none"}}></rect>
       { showText && <g>
         {wrapText ?
-          <text width={width} height={height} x={x} y={y} transform={`rotate(90, ${x}, ${y})`} style={{...textProps}}>
+          <text width={width} height={height} x={x} y={y} transform={transform} style={{...textProps}}>
             {lines.map((line, i) => (
-              <tspan x={x} y={y + i * 3} key={i}>
+              <tspan x={x} y={y + 1 + (i - (lines.length - 1) / 2)* 3} key={i}>
                 {line}
               </tspan>
             ))}
           </text> :
-          <text width={width} height={height} x={x} y={y} transform={`rotate(90, ${x}, ${y})`}
+          <text width={width} height={height} x={x} y={y} transform={transform}
                 style={{...textProps}}>{text}
           </text>
         }
