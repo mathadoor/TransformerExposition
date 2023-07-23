@@ -83,7 +83,7 @@ function OutputEmbedding(props) {
       transform : `rotate(90, ${leftDatum + (token_width + x_gap) * width / 200}, ${y})`,
       annotation: <>
         <rect x={rightbase + 10} y={0} width="125" height="100" fill="white"/>
-        <image href="./assets/source_tokenizer.png" x={rightbase + 10} y={0} width="125" height="100" />
+        <image href="./assets/target_tokenizer.jpg" x={rightbase + 10} y={0} width="75" height="75" />
       </>,
       showAnnotation: activeComp === `${id}-1`,
       onClick: () => {setComps(`${id}-1`)},
@@ -113,7 +113,7 @@ function OutputEmbedding(props) {
       transform : `rotate(90, ${x}, ${y - height / 4})`,
       annotation: <>
         <rect x={rightbase + 10} y={0} width="125" height="100" fill="white"/>
-        <image href="./assets/text_embedding.jpg" x={rightbase + 10} y={0} width="125" height="100" />
+        <image href="./assets/target_text_embedding.jpg" x={rightbase + 10} y={0} width="75" height="75" />
       </>,
       showAnnotation: activeComp === `${id}-2`,
       textProps : {
@@ -142,7 +142,7 @@ function OutputEmbedding(props) {
       onClick: () => {setComps(`${id}-3`)},
       annotation: <>
         <rect x={rightbase + 10} y={0} width="125" height="100" fill="white"/>
-        <image href="./assets/position_embedding.jpg" x={rightbase + 10} y={0} width="125" height="100" />
+        <image href="./assets/target_position_embedding.jpg" x={rightbase + 10} y={0} width="100" height="100" />
       </>,
       showAnnotation: activeComp === `${id}-3`,
       textProps : {

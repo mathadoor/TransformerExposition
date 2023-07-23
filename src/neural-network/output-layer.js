@@ -27,17 +27,12 @@ function OutputLayer(props) {
   const ref = useRef();
   const [activeComp, setActiveComp] = React.useState(null);
   const { id, width, height, x, y, fill, rx, ry, onClick, isBlurred, active} = props;
-  let currX = width * x / 100;
-  let currY = height * y / 100;
   let MSAProps = null;
   let LN1Props = null;
-  let ffProps = null;
-  let LN2Props = null;
   let arrowPoints = {};
   let leftDatum = x - width / 2;
   let rightDatum = x + width / 2;
   let topDatum = y - height / 2;
-  let bottomDatum = y + height / 2;
 
   let thisProps = {...props};
   thisProps.text = "Output Layer";
@@ -125,9 +120,6 @@ function OutputLayer(props) {
         "filter" : isBlurred ? "blur(5px)" : "none"
       }
     }
-
-
-
 
     arrowPoints['IN-MSA'] = [[leftDatum - x_gap / 4, y], [MSAProps.x - MSAProps.width / 2, y]];
 
