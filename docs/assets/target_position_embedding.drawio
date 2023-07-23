@@ -1,0 +1,19 @@
+<mxfile host="Electron" modified="2023-07-23T16:27:33.875Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.5 Chrome/114.0.5735.243 Electron/25.3.1 Safari/537.36" etag="APb2yFbBSct1jderPVer" version="21.6.5" type="device">
+  <diagram name="Page-1" id="44I9hGHchTTdyHQQdCC0">
+    <mxGraphModel dx="1360" dy="843" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Sull-ByN69tNy64UvHHk-7" value="" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#000099;arcSize=10;" parent="1" vertex="1">
+          <mxGeometry x="80" y="60" width="370" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-8" value="Just like for the source sentence, the position embedding breaks the sequential dependence between tokens to allow parallel processing. It is important to note the position embedding learned for the target sentence&amp;nbsp;is learned with different parameters. This design choice allows the model to support the different range dependencies for words in a sentence for different langauges.&amp;nbsp;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="90" y="100" width="350" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-13" value="&lt;font color=&quot;#000099&quot;&gt;Target Position Embedding&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#000099;" parent="1" vertex="1">
+          <mxGeometry x="184" y="70" width="162" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

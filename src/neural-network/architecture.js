@@ -56,7 +56,7 @@ class Architecture extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
-        vBoxSize : ['400', '100'],
+        vBoxSize : ['400', '120'],
         first_run : true,
         activeElement : -1,
         widths : [baseInputWidth, baseLayerWidth, baseCoderWidth, baseCoderWidth, baseCoderWidth, baseLayerWidth,

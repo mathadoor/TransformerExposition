@@ -1,0 +1,80 @@
+<mxfile host="Electron" modified="2023-07-23T16:28:02.389Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.5 Chrome/114.0.5735.243 Electron/25.3.1 Safari/537.36" etag="45T7HCS6uKdXyO0OeRN2" version="21.6.5" type="device">
+  <diagram name="Page-1" id="44I9hGHchTTdyHQQdCC0">
+    <mxGraphModel dx="938" dy="581" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="1" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Sull-ByN69tNy64UvHHk-7" value="" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#000099;arcSize=10;" parent="1" vertex="1">
+          <mxGeometry x="80" y="60" width="410" height="320" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-8" value="Residual connections work by adding the input of a function to its output. The purpose of such architectural constructs in a computational graph is to condition the network. The conditioning enables adequate gradient flow to the deeper parts of the network.&amp;nbsp;&lt;br&gt;&lt;br&gt;As an example, the presence of residual connections preserves the gradient from the upstream computation in a simple residual graph below. Thus, the network avoids vanishing gradient problem.&amp;nbsp;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="95" y="120" width="385" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="Sull-ByN69tNy64UvHHk-13" value="&lt;font color=&quot;#000099&quot;&gt;Residual Connection&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#000099;" parent="1" vertex="1">
+          <mxGeometry x="200" y="70" width="186" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="pIL3G40Bss2ow2m6bzyJ-25" value="$$\cfrac{\partial L}{\partial X} = \cfrac{\partial L}{\partial g}\cfrac{\partial f(x)}{\partial x} + \cfrac{\partial L}{\partial g}&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;$$" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="100" y="260" width="170" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="pIL3G40Bss2ow2m6bzyJ-37" value="" style="group" parent="1" vertex="1" connectable="0">
+          <mxGeometry x="300" y="210" width="144" height="167" as="geometry" />
+        </mxCell>
+        <mxCell id="pIL3G40Bss2ow2m6bzyJ-15" value="&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(251, 251, 251); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; float: none; display: inline !important;&quot;&gt;$$ L(\cdot) $$&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;" parent="pIL3G40Bss2ow2m6bzyJ-37" vertex="1">
+          <mxGeometry x="56" y="127" width="26" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="pIL3G40Bss2ow2m6bzyJ-17" value="&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(251, 251, 251); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; float: none; display: inline !important;&quot;&gt;$$ X $$&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;" parent="pIL3G40Bss2ow2m6bzyJ-37" vertex="1">
+          <mxGeometry x="62" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="pIL3G40Bss2ow2m6bzyJ-27" value="" style="group" parent="pIL3G40Bss2ow2m6bzyJ-37" vertex="1" connectable="0">
+          <mxGeometry y="32" width="144" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="pIL3G40Bss2ow2m6bzyJ-1" value="" style="rounded=1;whiteSpace=wrap;html=1;" parent="pIL3G40Bss2ow2m6bzyJ-27" vertex="1">
+          <mxGeometry x="10" y="20" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="pIL3G40Bss2ow2m6bzyJ-6" value="" style="endArrow=classic;html=1;rounded=0;endSize=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="pIL3G40Bss2ow2m6bzyJ-27" target="pIL3G40Bss2ow2m6bzyJ-1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="70" as="sourcePoint" />
+            <mxPoint x="100" y="-10" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pIL3G40Bss2ow2m6bzyJ-9" value="" style="endArrow=classic;html=1;rounded=0;endSize=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="pIL3G40Bss2ow2m6bzyJ-27" target="pIL3G40Bss2ow2m6bzyJ-11" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="70" y="10" as="sourcePoint" />
+            <mxPoint x="60" y="70" as="targetPoint" />
+            <Array as="points">
+              <mxPoint y="10" />
+              <mxPoint y="68" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pIL3G40Bss2ow2m6bzyJ-10" value="" style="endArrow=classic;html=1;rounded=0;endSize=1;" parent="pIL3G40Bss2ow2m6bzyJ-27" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="69.80000000000001" y="50" as="sourcePoint" />
+            <mxPoint x="70" y="60" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pIL3G40Bss2ow2m6bzyJ-11" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;shape=mxgraph.flowchart.summing_function;" parent="pIL3G40Bss2ow2m6bzyJ-27" vertex="1">
+          <mxGeometry x="62" y="60" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="pIL3G40Bss2ow2m6bzyJ-12" value="" style="endArrow=classic;html=1;rounded=0;endSize=1;" parent="pIL3G40Bss2ow2m6bzyJ-27" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="69.88" y="76" as="sourcePoint" />
+            <mxPoint x="70.07999999999998" y="86" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pIL3G40Bss2ow2m6bzyJ-14" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;" parent="pIL3G40Bss2ow2m6bzyJ-27" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="70" y="110" as="sourcePoint" />
+            <mxPoint x="70" y="90" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pIL3G40Bss2ow2m6bzyJ-4" value="$$ f(\cdot) $$" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="pIL3G40Bss2ow2m6bzyJ-27" vertex="1">
+          <mxGeometry x="38" y="19" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="pIL3G40Bss2ow2m6bzyJ-19" value="$$g(\cdot) = f(\cdot) + \cdot$$" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="pIL3G40Bss2ow2m6bzyJ-27" vertex="1">
+          <mxGeometry x="90" y="70" width="60" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
