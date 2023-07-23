@@ -158,13 +158,13 @@ function Decoder(props) {
       ry : props.ry,
       wrapText : true,
       showText : true,
-      onClick: () => {setComps(`${id}-3`)},
+      onClick: () => {setComps(`${id}-4`)},
       transform : `rotate(90, ${leftDatum + CSA_x * width / 100}, ${y})`,
       annotation: <>
         <rect x={rightDatum + 10} y={0} width="125" height="100" fill="white"/>
         <image href="./assets/multi_headed_cross_attention.jpg" x={rightDatum + 10} y={0} width="125" height="100" />
       </>,
-      showAnnotation: activeComp === `${id}-3`,
+      showAnnotation: activeComp === `${id}-4`,
       textProps : {
         "textAnchor": "middle",
         "alignmentBaseline": "middle",
@@ -188,13 +188,13 @@ function Decoder(props) {
       ry : props.ry,
       wrapText : true,
       showText : true,
-      onClick: () => {setComps(`${id}-2`)},
+      onClick: () => {setComps(`${id}-5`)},
       transform : `rotate(90, ${leftDatum + LN2_x * width / 100}, ${y})`,
       annotation: <>
         <rect x={rightDatum + 10} y={0} width="125" height="100" fill="white"/>
         <image href="./assets/layer_normalization.jpg" x={rightDatum + 10} y={0} width="125" height="100" />
       </>,
-      showAnnotation: activeComp === `${id}-2`,
+      showAnnotation: activeComp === `${id}-5`,
       textProps : {
         "textAnchor": "middle",
         "alignmentBaseline": "middle",
@@ -217,13 +217,13 @@ function Decoder(props) {
       ry : props.ry,
       wrapText : true,
       showText : true,
-      onClick: () => {setComps(`${id}-5`)},
+      onClick: () => {setComps(`${id}-7`)},
       transform : `rotate(90, ${leftDatum + ff_x * width / 100}, ${y})`,
       annotation: <>
         <rect x={rightDatum + 10} y={0} width="125" height="100" fill="white"/>
         <image href="./assets/feedforward.jpg" x={rightDatum + 10} y={0} width="125" height="100" />
       </>,
-      showAnnotation: activeComp === `${id}-2`,
+      showAnnotation: activeComp === `${id}-7`,
       textProps : {
         "textAnchor": "middle",
         "alignmentBaseline": "middle",
@@ -246,13 +246,13 @@ function Decoder(props) {
       ry : props.ry,
       wrapText : true,
       showText : true,
-      onClick: () => {setComps(`${id}-6`)},
+      onClick: () => {setComps(`${id}-8`)},
       transform : `rotate(90, ${leftDatum + LN3_x * width / 100}, ${y})`,
       annotation: <>
         <rect x={rightDatum + 10} y={0} width="125" height="100" fill="white"/>
         <image href="./assets/layer_normalization.jpg" x={rightDatum + 10} y={0} width="125" height="100" />
       </>,
-      showAnnotation: activeComp === `${id}-2`,
+      showAnnotation: activeComp === `${id}-8`,
       textProps : {
         "textAnchor": "middle",
         "alignmentBaseline": "middle",
@@ -327,7 +327,7 @@ function Decoder(props) {
         </svg>}
 
       {active &&
-        <svg id={`${id}-9`} x={leftDatum + add3_x * width / 100 - 3} y={y - 3} onClick={() => setComps(`${id}-6`)} ref={ref} fill="#ffffff" version="1.1" >
+        <svg id={`${id}-9`} x={leftDatum + add3_x * width / 100 - 3} y={y - 3} onClick={() => setComps(`${id}-9`)} ref={ref} fill="#ffffff" version="1.1" >
           <circle cx={3} cy={3} r={3} fill={fill}/>
           <g  transform={`scale(0.012 0.012)`}>
             <path d="M418.5,418.5c95.6-95.6,95.6-251.2,0-346.8s-251.2-95.6-346.8,0s-95.6,251.2,0,346.8S322.9,514.1,418.5,418.5z M89,89
@@ -337,7 +337,7 @@ function Decoder(props) {
                 c0,6.8,5.5,12.3,12.2,12.2h67.3v67.3C232.8,331.4,238.3,336.9,245.1,336.9z" stroke={"#ffffff"}/>
           </g>
         </svg>}
-      {(activeComp === `${id}-3` || activeComp === `${id}-6` || activeComp === `${id}-9`)  && <image href="./assets/.jpg" x={rightDatum + 10} y={0} width="75" height="50" />}
+      {(activeComp === `${id}-3` || activeComp === `${id}-6` || activeComp === `${id}-9`)  && <image href="./assets/residual_connection.jpg" x={rightDatum + 10} y={0} width="75" height="50" />}
 
 
       {active && <Minimize width={4.5} height={4.5} x={rightDatum - 7} y = {topDatum + 2} onClick={closeComps} fill={fill} />}

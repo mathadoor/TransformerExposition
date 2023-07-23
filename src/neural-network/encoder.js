@@ -146,13 +146,13 @@ function Encoder(props) {
       ry : props.ry,
       wrapText : true,
       showText : true,
-      onClick: () => {setComps(`${id}-3`)},
+      onClick: () => {setComps(`${id}-4`)},
       transform : `rotate(90, ${leftDatum + ff_x * width / 100}, ${y})`,
       annotation: <>
         <rect x={rightDatum + 10} y={0} width="125" height="100" fill="white"/>
         <image href="./assets/feedforward.jpg" x={rightDatum + 10} y={0} width="125" height="100" />
       </>,
-      showAnnotation: activeComp === `${id}-3`,
+      showAnnotation: activeComp === `${id}-4`,
       textProps : {
         "textAnchor": "middle",
         "alignmentBaseline": "middle",
@@ -176,13 +176,13 @@ function Encoder(props) {
       ry : props.ry,
       wrapText : true,
       showText : true,
-      onClick: () => {setComps(`${id}-2`)},
+      onClick: () => {setComps(`${id}-5`)},
       transform : `rotate(90, ${leftDatum + LN2_x * width / 100}, ${y})`,
       annotation: <>
         <rect x={rightDatum + 10} y={0} width="125" height="100" fill="white"/>
         <image href="./assets/layer_normalization.jpg" x={rightDatum + 10} y={0} width="125" height="100" />
       </>,
-      showAnnotation: activeComp === `${id}-2`,
+      showAnnotation: activeComp === `${id}-5`,
       textProps : {
         "textAnchor": "middle",
         "alignmentBaseline": "middle",
