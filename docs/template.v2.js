@@ -1,10 +1,10710 @@
-!function(t){"function"==typeof define&&define.amd?define(t):t()}((function(){"use strict";const t=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],e=["Jan.","Feb.","March","April","May","June","July","Aug.","Sept.","Oct.","Nov.","Dec."],n=t=>t<10?"0"+t:t,i=function(i){return`${t[i.getDay()].substring(0,3)}, ${n(i.getDate())} ${e[i.getMonth()].substring(0,3)} ${i.getFullYear().toString()} ${i.getUTCHours().toString()}:${i.getUTCMinutes().toString()}:${i.getUTCSeconds().toString()} Z`};class r{constructor(t){this.name=t.author,this.personalURL=t.authorURL,this.affiliation=t.affiliation,this.affiliationURL=t.affiliationURL,this.affiliations=t.affiliations||[]}get firstName(){const t=this.name.split(" ");return t.slice(0,t.length-1).join(" ")}get lastName(){const t=this.name.split(" ");return t[t.length-1]}}class o{constructor(){this.title="unnamed article",this.description="",this.authors=[],this.bibliography=new Map,this.bibliographyParsed=!1,this.citations=[],this.citationsCollected=!1,this.journal={},this.katex={},this.doi=void 0,this.publishedDate=void 0}set url(t){this._url=t}get url(){return this._url?this._url:this.distillPath&&this.journal.url?this.journal.url+"/"+this.distillPath:this.journal.url?this.journal.url:void 0}get githubUrl(){return this.githubPath?"https://github.com/"+this.githubPath:void 0}set previewURL(t){this._previewURL=t}get previewURL(){return this._previewURL?this._previewURL:this.url+"/thumbnail.jpg"}get publishedDateRFC(){return i(this.publishedDate)}get updatedDateRFC(){return i(this.updatedDate)}get publishedYear(){return this.publishedDate.getFullYear()}get publishedMonth(){return e[this.publishedDate.getMonth()]}get publishedDay(){return this.publishedDate.getDate()}get publishedMonthPadded(){return n(this.publishedDate.getMonth()+1)}get publishedDayPadded(){return n(this.publishedDate.getDate())}get publishedISODateOnly(){return this.publishedDate.toISOString().split("T")[0]}get volume(){const t=this.publishedYear-2015;if(t<1)throw new Error("Invalid publish date detected during computing volume");return t}get issue(){return this.publishedDate.getMonth()+1}get concatenatedAuthors(){return this.authors.length>2?this.authors[0].lastName+", et al.":2===this.authors.length?this.authors[0].lastName+" & "+this.authors[1].lastName:1===this.authors.length?this.authors[0].lastName:void 0}get bibtexAuthors(){return this.authors.map((t=>t.lastName+", "+t.firstName)).join(" and ")}get slug(){let t="";return this.authors.length&&(t+=this.authors[0].lastName.toLowerCase(),t+=this.publishedYear,t+=this.title.split(" ")[0].toLowerCase()),t||"Untitled"}get bibliographyEntries(){return new Map(this.citations.map((t=>[t,this.bibliography.get(t)])))}set bibliography(t){t instanceof Map?this._bibliography=t:"object"==typeof t&&(this._bibliography=function(t){const e=new Map;for(var n in t)t.hasOwnProperty(n)&&e.set(n,t[n]);return e}(t))}get bibliography(){return this._bibliography}static fromObject(t){const e=new o;return Object.assign(e,t),e}assignToObject(t){Object.assign(t,this),t.bibliography=function(t){return Array.from(t).reduce(((t,[e,n])=>Object.assign(t,{[e]:n})),{})}(this.bibliographyEntries),t.url=this.url,t.doi=this.doi,t.githubUrl=this.githubUrl,t.previewURL=this.previewURL,this.publishedDate&&(t.volume=this.volume,t.issue=this.issue,t.publishedDateRFC=this.publishedDateRFC,t.publishedYear=this.publishedYear,t.publishedMonth=this.publishedMonth,t.publishedDay=this.publishedDay,t.publishedMonthPadded=this.publishedMonthPadded,t.publishedDayPadded=this.publishedDayPadded),this.updatedDate&&(t.updatedDateRFC=this.updatedDateRFC),t.concatenatedAuthors=this.concatenatedAuthors,t.bibtexAuthors=this.bibtexAuthors,t.slug=this.slug}}const a=t=>class extends t{constructor(){super();const t={childList:!0,characterData:!0,subtree:!0},e=new MutationObserver((()=>{e.disconnect(),this.renderIfPossible(),e.observe(this,t)}));e.observe(this,t)}connectedCallback(){super.connectedCallback(),this.renderIfPossible()}renderIfPossible(){this.textContent&&this.root&&this.renderContent()}renderContent(){console.error(`Your class ${this.constructor.name} must provide a custom renderContent() method!`)}},s=(t,e,n=!0)=>i=>{const r=document.createElement("template");return r.innerHTML=e,n&&"ShadyCSS"in window&&ShadyCSS.prepareTemplate(r,t),class extends i{static get is(){return t}constructor(){super(),this.clone=document.importNode(r.content,!0),n&&(this.attachShadow({mode:"open"}),this.shadowRoot.appendChild(this.clone))}connectedCallback(){this.hasAttribute("distill-prerendered")||(n?"ShadyCSS"in window&&ShadyCSS.styleElement(this):this.insertBefore(this.clone,this.firstChild))}get root(){return n?this.shadowRoot:this}$(t){return this.root.querySelector(t)}$$(t){return this.root.querySelectorAll(t)}}};var l='/*\n * Copyright 2018 The Distill Template Authors\n *\n * Licensed under the Apache License, Version 2.0 (the "License");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an "AS IS" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\n\nspan.katex-display {\n  text-align: left;\n  padding: 8px 0 8px 0;\n  margin: 0.5em 0 0.5em 1em;\n}\n\nspan.katex {\n  -webkit-font-smoothing: antialiased;\n  color: rgba(0, 0, 0, 0.8);\n  font-size: 1.18em;\n}\n';const u=function(t,e,n){let i=n,r=0;const o=t.length;for(;i<e.length;){const n=e[i];if(r<=0&&e.slice(i,i+o)===t)return i;"\\"===n?i++:"{"===n?r++:"}"===n&&r--,i++}return-1},c=function(t,e,n,i){const r=[];for(let o=0;o<t.length;o++)if("text"===t[o].type){const a=t[o].data;let s,l=!0,c=0;for(s=a.indexOf(e),-1!==s&&(c=s,r.push({type:"text",data:a.slice(0,c)}),l=!1);;){if(l){if(s=a.indexOf(e,c),-1===s)break;r.push({type:"text",data:a.slice(c,s)}),c=s}else{if(s=u(n,a,c+e.length),-1===s)break;r.push({type:"math",data:a.slice(c+e.length,s),rawData:a.slice(c,s+n.length),display:i}),c=s+n.length}l=!l}r.push({type:"text",data:a.slice(c)})}else r.push(t[o]);return r},d=function(t,e){const n=function(t,e){let n=[{type:"text",data:t}];for(let t=0;t<e.length;t++){const i=e[t];n=c(n,i.left,i.right,i.display||!1)}return n}(t,e.delimiters),i=document.createDocumentFragment();for(let t=0;t<n.length;t++)if("text"===n[t].type)i.appendChild(document.createTextNode(n[t].data));else{const r=document.createElement("d-math"),o=n[t].data;e.displayMode=n[t].display;try{r.textContent=o,e.displayMode&&r.setAttribute("block","")}catch(r){if(!(r instanceof katex.ParseError))throw r;e.errorCallback("KaTeX auto-render: Failed to parse `"+n[t].data+"` with ",r),i.appendChild(document.createTextNode(n[t].rawData));continue}i.appendChild(r)}return i},h=function(t,e){for(let n=0;n<t.childNodes.length;n++){const i=t.childNodes[n];if(3===i.nodeType){const r=i.textContent;if(e.mightHaveMath(r)){const o=d(r,e);n+=o.childNodes.length-1,t.replaceChild(o,i)}}else 1===i.nodeType&&-1===e.ignoredTags.indexOf(i.nodeName.toLowerCase())&&h(i,e)}},p={delimiters:[{left:"$$",right:"$$",display:!0},{left:"\\[",right:"\\]",display:!0},{left:"\\(",right:"\\)",display:!1}],ignoredTags:["script","noscript","style","textarea","pre","code","svg"],errorCallback:function(t,e){console.error(t,e)}},g='<link rel="stylesheet" href="https://distill.pub/third-party/katex/katex.min.css" crossorigin="anonymous">',f=s("d-math",`\n${g}\n<style>\n\n:host {\n  display: inline-block;\n  contain: style;\n}\n\n:host([block]) {\n  display: block;\n}\n\n${l}\n</style>\n<span id='katex-container'></span>\n`);class m extends(a(f(HTMLElement))){static set katexOptions(t){m._katexOptions=t,m.katexOptions.delimiters&&(m.katexAdded?m.katexLoadedCallback():m.addKatex())}static get katexOptions(){return m._katexOptions||(m._katexOptions={delimiters:[{left:"$$",right:"$$",display:!1}]}),m._katexOptions}static katexLoadedCallback(){const t=document.querySelectorAll("d-math");for(const e of t)e.renderContent();m.katexOptions.delimiters&&function(t,e){if(!t)throw new Error("No element provided to render");const n=Object.assign({},p,e),i=n.delimiters.flatMap((t=>[t.left,t.right]));n.mightHaveMath=t=>i.some((e=>-1!==t.indexOf(e))),h(t,n)}(document.body,m.katexOptions)}static addKatex(){document.head.insertAdjacentHTML("beforeend",g);const t=document.createElement("script");t.src="https://distill.pub/third-party/katex/katex.min.js",t.async=!0,t.onload=m.katexLoadedCallback,t.crossorigin="anonymous",document.head.appendChild(t),m.katexAdded=!0}get options(){const t={displayMode:this.hasAttribute("block")};return Object.assign(t,m.katexOptions)}connectedCallback(){super.connectedCallback(),m.katexAdded||m.addKatex()}renderContent(){if("undefined"!=typeof katex){const t=this.root.querySelector("#katex-container");katex.render(this.textContent,t,this.options)}}}function b(t=document){const e=new Set,n=t.querySelectorAll("d-cite");for(const t of n){const n=(t.getAttribute("key")||t.getAttribute("bibtex-key")).split(",").map((t=>t.trim()));for(const t of n)e.add(t)}return[...e]}function y(t,e,n,i){if(null==t.author)return"";var r=t.author.split(" and ");let o=r.map((t=>{if(-1!=(t=t.trim()).indexOf(","))var n=t.split(",")[0].trim(),i=t.split(",")[1];else-1!=t.indexOf(" ")?(n=t.split(" ").slice(-1)[0].trim(),i=t.split(" ").slice(0,-1).join(" ")):n=t.trim();var r="";return null!=i&&(r=(r=i.trim().split(" ").map((t=>t.trim()[0]))).join(".")+"."),e.replace("${F}",i).replace("${L}",n).replace("${I}",r).trim()}));return r.length>1?o.slice(0,r.length-1).join(n)+((i||n)+o[r.length-1]):o[0]}function v(t){var e=t.journal||t.booktitle||"";if("volume"in t){var n=t.issue||t.number;n=null!=n?"("+n+")":"",e+=", Vol "+t.volume+n}return"pages"in t&&(e+=", pp. "+t.pages),""!=e&&(e+=". "),"publisher"in t&&"."!=(e+=t.publisher)[e.length-1]&&(e+="."),e}function w(t){if("url"in t){var e=t.url,n=/arxiv\.org\/abs\/([0-9\.]*)/.exec(e);if(null!=n&&(e=`http://arxiv.org/pdf/${n[1]}.pdf`),".pdf"==e.slice(-4))var i="PDF";else".html"==e.slice(-5)&&(i="HTML");return` &ensp;<a href="${e}">[${i||"link"}]</a>`}return""}function x(t,e){return"doi"in t?`${e?"<br>":""} <a href="https://doi.org/${t.doi}" style="text-decoration:inherit;">DOI: ${t.doi}</a>`:""}function k(t,e){if(t){var n=function(t){return'<span class="title">'+t.title+"</span> "}(t);return n+=w(t)+"<br>",t.author&&(n+=y(t,"${L}, ${I}",", "," and "),(t.year||t.date)&&(n+=", ")),t.year||t.date?n+=(t.year||t.date)+". ":n+=". ",(n+=v(t))+x(t)}return"?"}function S(t){if(t){var e="";e+="<strong>"+t.title+"</strong>",e+=w(t),e+="<br>";var n=y(t,"${I} ${L}",", ")+".",i=v(t).trim()+" "+t.year+". "+x(t,!0);return(n+i).length<Math.min(40,t.title.length)?e+=n+" "+i:e+=n+"<br>"+i,e}return"?"}function T(){return-1!==["interactive","complete"].indexOf(document.readyState)}function M(t){const e=t.firstElementChild;if(e){if("json"==e.getAttribute("type").split("/")[1]){const t=e.textContent;return function(t){for(let e of t.authors){const t=Boolean(e.affiliation),n=Boolean(e.affiliations);if(t)if(n)console.warn(`Author ${e.author} has both old-style ("affiliation" & "affiliationURL") and new style ("affiliations") affiliation information!`);else{let t={name:e.affiliation};e.affiliationURL&&(t.url=e.affiliationURL),e.affiliations=[t]}}return t}(JSON.parse(t))}console.error("Distill only supports JSON frontmatter tags anymore; no more YAML.")}else console.error("You added a frontmatter tag but did not provide a script tag with front matter data in it. Please take a look at our templates.");return{}}m.katexAdded=!1,m.inlineMathRendered=!1,window.DMath=m;class C extends HTMLElement{static get is(){return"d-front-matter"}constructor(){super(),new MutationObserver((t=>{for(const e of t)if("SCRIPT"===e.target.nodeName||"characterData"===e.type){const t=M(this);this.notify(t)}})).observe(this,{childList:!0,characterData:!0,subtree:!0})}notify(t){const e=new CustomEvent("onFrontMatterChanged",{detail:t,bubbles:!0});document.dispatchEvent(e)}}const _=new o,A={frontMatter:_,waitingOn:{bibliography:[],citations:[]},listeners:{onCiteKeyCreated(t){const[e,n]=t.detail;if(!_.citationsCollected)return void A.waitingOn.citations.push((()=>A.listeners.onCiteKeyCreated(t)));if(!_.bibliographyParsed)return void A.waitingOn.bibliography.push((()=>A.listeners.onCiteKeyCreated(t)));const i=n.map((t=>_.citations.indexOf(t)));e.numbers=i;const r=n.map((t=>_.bibliography.get(t)));e.entries=r},onCiteKeyChanged(){_.citations=b(),_.citationsCollected=!0;for(const t of A.waitingOn.citations.slice())t();const t=document.querySelector("d-citation-list"),e=new Map(_.citations.map((t=>[t,_.bibliography.get(t)])));t.citations=e;const n=document.querySelectorAll("d-cite");for(const t of n){console.log(t);const e=t.keys,n=e.map((t=>_.citations.indexOf(t)));t.numbers=n;const i=e.map((t=>_.bibliography.get(t)));t.entries=i}},onCiteKeyRemoved(t){A.listeners.onCiteKeyChanged(t)},onBibliographyChanged(t){const e=document.querySelector("d-citation-list"),n=t.detail;_.bibliography=n,_.bibliographyParsed=!0;for(const t of A.waitingOn.bibliography.slice())t();if(_.citationsCollected)if(e.hasAttribute("distill-prerendered"))console.debug("Citation list was prerendered; not updating it.");else{const t=new Map(_.citations.map((t=>[t,_.bibliography.get(t)])));e.citations=t}else A.waitingOn.citations.push((function(){A.listeners.onBibliographyChanged({target:t.target,detail:t.detail})}))},onFootnoteChanged(){const t=document.querySelector("d-footnote-list");if(t){const e=document.querySelectorAll("d-footnote");t.footnotes=e}},onFrontMatterChanged(t){const e=t.detail;var n,i;i=e,(n=_).title=i.title,i.published&&(i.published instanceof Date?n.publishedDate=i.published:i.published.constructor===String&&(n.publishedDate=new Date(i.published))),i.publishedDate&&(i.publishedDate instanceof Date?n.publishedDate=i.publishedDate:i.publishedDate.constructor===String?n.publishedDate=new Date(i.publishedDate):console.error("Don't know what to do with published date: "+i.publishedDate)),n.description=i.description,n.authors=i.authors.map((t=>new r(t))),n.katex=i.katex,n.password=i.password,i.doi&&(n.doi=i.doi);const o=document.querySelector("d-interstitial");if(o&&(void 0!==_.password?o.password=_.password:o.parentElement.removeChild(o)),!document.body.hasAttribute("distill-prerendered")&&T()){!function(t,e){const n=t.body,i=n.querySelector("d-article");if(!i)return void console.warn("No d-article tag found; skipping adding optional components!");let r=t.querySelector("d-byline");r||(e.authors?(r=t.createElement("d-byline"),n.insertBefore(r,i)):console.warn("No authors found in front matter; please add them before submission!"));let o=t.querySelector("d-title");o||(o=t.createElement("d-title"),n.insertBefore(o,r));let a=o.querySelector("h1");a||(a=t.createElement("h1"),a.textContent=e.title,o.insertBefore(a,o.firstChild));const s=void 0!==e.password;let l=n.querySelector("d-interstitial");if(s&&!l){const i="undefined"!=typeof window,r=i&&window.location.hostname.includes("localhost");i&&r||(l=t.createElement("d-interstitial"),l.password=e.password,n.insertBefore(l,n.firstChild))}else!s&&l&&l.parentElement.removeChild(this);let u=t.querySelector("d-appendix");u||(u=t.createElement("d-appendix"),t.body.appendChild(u));let c=t.querySelector("d-footnote-list");c||(c=t.createElement("d-footnote-list"),u.appendChild(c));let d=t.querySelector("d-citation-list");d||(d=t.createElement("d-citation-list"),u.appendChild(d))}(document,_);const t=document.querySelector("distill-appendix");t&&(t.frontMatter=_);const n=document.querySelector("d-byline");n&&(n.frontMatter=_),e.katex&&(m.katexOptions=e.katex)}},DOMContentLoaded(){if(A.loaded)return void console.warn("Controller received DOMContentLoaded but was already loaded!");if(!T())return void console.warn("Controller received DOMContentLoaded at document.readyState: "+document.readyState+"!");A.loaded=!0,console.debug("Runlevel 4: Controller running DOMContentLoaded");const t=document.querySelector("d-front-matter");if(t){const e=M(t);A.listeners.onFrontMatterChanged({detail:e})}_.citations=b(),_.citationsCollected=!0;for(const t of A.waitingOn.citations.slice())t();if(_.bibliographyParsed)for(const t of A.waitingOn.bibliography.slice())t();const e=document.querySelector("d-footnote-list");if(e){const t=document.querySelectorAll("d-footnote");e.footnotes=t}}}},E='/*\n * Copyright 2018 The Distill Template Authors\n *\n * Licensed under the Apache License, Version 2.0 (the "License");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an "AS IS" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\n\nhtml {\n  font-size: 14px;\n\tline-height: 1.6em;\n  /* font-family: "Libre Franklin", "Helvetica Neue", sans-serif; */\n  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;\n  /*, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";*/\n  text-size-adjust: 100%;\n  -ms-text-size-adjust: 100%;\n  -webkit-text-size-adjust: 100%;\n}\n\n@media(min-width: 768px) {\n  html {\n    font-size: 16px;\n  }\n}\n\nbody {\n  margin: 0;\n}\n\na {\n  color: #004276;\n}\n\nfigure {\n  margin: 0;\n}\n\ntable {\n\tborder-collapse: collapse;\n\tborder-spacing: 0;\n}\n\ntable th {\n\ttext-align: left;\n}\n\ntable thead {\n  border-bottom: 1px solid rgba(0, 0, 0, 0.05);\n}\n\ntable thead th {\n  padding-bottom: 0.5em;\n}\n\ntable tbody :first-child td {\n  padding-top: 0.5em;\n}\n\npre {\n  overflow: auto;\n  max-width: 100%;\n}\n\np {\n  margin-top: 0;\n  margin-bottom: 1em;\n}\n\nsup, sub {\n  vertical-align: baseline;\n  position: relative;\n  top: -0.4em;\n  line-height: 1em;\n}\n\nsub {\n  top: 0.4em;\n}\n\n.kicker,\n.marker {\n  font-size: 15px;\n  font-weight: 600;\n  color: rgba(0, 0, 0, 0.5);\n}\n\n\n/* Headline */\n\n@media(min-width: 1024px) {\n  d-title h1 span {\n    display: block;\n  }\n}\n\n/* Figure */\n\nfigure {\n  position: relative;\n  margin-bottom: 2.5em;\n  margin-top: 1.5em;\n}\n\nfigcaption+figure {\n\n}\n\nfigure img {\n  width: 100%;\n}\n\nfigure svg text,\nfigure svg tspan {\n}\n\nfigcaption,\n.figcaption {\n  color: rgba(0, 0, 0, 0.6);\n  font-size: 12px;\n  line-height: 1.5em;\n}\n\n@media(min-width: 1024px) {\nfigcaption,\n.figcaption {\n    font-size: 13px;\n  }\n}\n\nfigure.external img {\n  background: white;\n  border: 1px solid rgba(0, 0, 0, 0.1);\n  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);\n  padding: 18px;\n  box-sizing: border-box;\n}\n\nfigcaption a {\n  color: rgba(0, 0, 0, 0.6);\n}\n\nfigcaption b,\nfigcaption strong, {\n  font-weight: 600;\n  color: rgba(0, 0, 0, 1.0);\n}\n/*\n * Copyright 2018 The Distill Template Authors\n *\n * Licensed under the Apache License, Version 2.0 (the "License");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an "AS IS" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\n\n@supports not (display: grid) {\n  .base-grid,\n  distill-header,\n  d-title,\n  d-abstract,\n  d-article,\n  d-appendix,\n  distill-appendix,\n  d-byline,\n  d-footnote-list,\n  d-citation-list,\n  distill-footer {\n    display: block;\n    padding: 8px;\n  }\n}\n\n.base-grid,\ndistill-header,\nd-title,\nd-abstract,\nd-article,\nd-appendix,\ndistill-appendix,\nd-byline,\nd-footnote-list,\nd-citation-list,\ndistill-footer {\n  display: grid;\n  justify-items: stretch;\n  grid-template-columns: [screen-start] 8px [page-start kicker-start text-start gutter-start middle-start] 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr [text-end page-end gutter-end kicker-end middle-end] 8px [screen-end];\n  grid-column-gap: 8px;\n}\n\n.grid {\n  display: grid;\n  grid-column-gap: 8px;\n}\n\n@media(min-width: 768px) {\n  .base-grid,\n  distill-header,\n  d-title,\n  d-abstract,\n  d-article,\n  d-appendix,\n  distill-appendix,\n  d-byline,\n  d-footnote-list,\n  d-citation-list,\n  distill-footer {\n    grid-template-columns: [screen-start] 1fr [page-start kicker-start middle-start text-start] 45px 45px 45px 45px 45px 45px 45px 45px [ kicker-end text-end gutter-start] 45px [middle-end] 45px [page-end gutter-end] 1fr [screen-end];\n    grid-column-gap: 16px;\n  }\n\n  .grid {\n    grid-column-gap: 16px;\n  }\n}\n\n@media(min-width: 1000px) {\n  .base-grid,\n  distill-header,\n  d-title,\n  d-abstract,\n  d-article,\n  d-appendix,\n  distill-appendix,\n  d-byline,\n  d-footnote-list,\n  d-citation-list,\n  distill-footer {\n    grid-template-columns: [screen-start] 1fr [page-start kicker-start] 50px [middle-start] 50px [text-start kicker-end] 50px 50px 50px 50px 50px 50px 50px 50px [text-end gutter-start] 50px [middle-end] 50px [page-end gutter-end] 1fr [screen-end];\n    grid-column-gap: 16px;\n  }\n\n  .grid {\n    grid-column-gap: 16px;\n  }\n}\n\n@media(min-width: 1180px) {\n  .base-grid,\n  distill-header,\n  d-title,\n  d-abstract,\n  d-article,\n  d-appendix,\n  distill-appendix,\n  d-byline,\n  d-footnote-list,\n  d-citation-list,\n  distill-footer {\n    grid-template-columns: [screen-start] 1fr [page-start kicker-start] 60px [middle-start] 60px [text-start kicker-end] 60px 60px 60px 60px 60px 60px 60px 60px [text-end gutter-start] 60px [middle-end] 60px [page-end gutter-end] 1fr [screen-end];\n    grid-column-gap: 32px;\n  }\n\n  .grid {\n    grid-column-gap: 32px;\n  }\n}\n\n\n\n\n.base-grid {\n  grid-column: screen;\n}\n\n/* .l-body,\nd-article > *  {\n  grid-column: text;\n}\n\n.l-page,\nd-title > *,\nd-figure {\n  grid-column: page;\n} */\n\n.l-gutter {\n  grid-column: gutter;\n}\n\n.l-text,\n.l-body {\n  grid-column: text;\n}\n\n.l-page {\n  grid-column: page;\n}\n\n.l-body-outset {\n  grid-column: middle;\n}\n\n.l-page-outset {\n  grid-column: page;\n}\n\n.l-screen {\n  grid-column: screen;\n}\n\n.l-screen-inset {\n  grid-column: screen;\n  padding-left: 16px;\n  padding-left: 16px;\n}\n\n\n/* Aside */\n\nd-article aside {\n  grid-column: gutter;\n  font-size: 12px;\n  line-height: 1.6em;\n  color: rgba(0, 0, 0, 0.6)\n}\n\n@media(min-width: 768px) {\n  aside {\n    grid-column: gutter;\n  }\n\n  .side {\n    grid-column: gutter;\n  }\n}\n/*\n * Copyright 2018 The Distill Template Authors\n *\n * Licensed under the Apache License, Version 2.0 (the "License");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an "AS IS" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\n\nd-title {\n  padding: 2rem 0 1.5rem;\n  contain: layout style;\n  overflow-x: hidden;\n}\n\n@media(min-width: 768px) {\n  d-title {\n    padding: 4rem 0 1.5rem;\n  }\n}\n\nd-title h1 {\n  grid-column: text;\n  font-size: 40px;\n  font-weight: 700;\n  line-height: 1.1em;\n  margin: 0 0 0.5rem;\n}\n\n@media(min-width: 768px) {\n  d-title h1 {\n    font-size: 50px;\n  }\n}\n\nd-title p {\n  font-weight: 300;\n  font-size: 1.2rem;\n  line-height: 1.55em;\n  grid-column: text;\n}\n\nd-title .status {\n  margin-top: 0px;\n  font-size: 12px;\n  color: #009688;\n  opacity: 0.8;\n  grid-column: kicker;\n}\n\nd-title .status span {\n  line-height: 1;\n  display: inline-block;\n  padding: 6px 0;\n  border-bottom: 1px solid #80cbc4;\n  font-size: 11px;\n  text-transform: uppercase;\n}\n/*\n * Copyright 2018 The Distill Template Authors\n *\n * Licensed under the Apache License, Version 2.0 (the "License");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an "AS IS" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\n\nd-byline {\n  contain: style;\n  overflow: hidden;\n  border-top: 1px solid rgba(0, 0, 0, 0.1);\n  font-size: 0.8rem;\n  line-height: 1.8em;\n  padding: 1.5rem 0;\n  min-height: 1.8em;\n}\n\n\nd-byline .byline {\n  grid-template-columns: 1fr 1fr;\n  grid-column: text;\n}\n\n@media(min-width: 768px) {\n  d-byline .byline {\n    grid-template-columns: 1fr 1fr 1fr 1fr;\n  }\n}\n\nd-byline .authors-affiliations {\n  grid-column-end: span 2;\n  grid-template-columns: 1fr 1fr;\n  margin-bottom: 1em;\n}\n\n@media(min-width: 768px) {\n  d-byline .authors-affiliations {\n    margin-bottom: 0;\n  }\n}\n\nd-byline h3 {\n  font-size: 0.6rem;\n  font-weight: 400;\n  color: rgba(0, 0, 0, 0.5);\n  margin: 0;\n  text-transform: uppercase;\n}\n\nd-byline p {\n  margin: 0;\n}\n\nd-byline a,\nd-article d-byline a {\n  color: rgba(0, 0, 0, 0.8);\n  text-decoration: none;\n  border-bottom: none;\n}\n\nd-article d-byline a:hover {\n  text-decoration: underline;\n  border-bottom: none;\n}\n\nd-byline p.author {\n  font-weight: 500;\n}\n\nd-byline .affiliations {\n\n}\n/*\n * Copyright 2018 The Distill Template Authors\n *\n * Licensed under the Apache License, Version 2.0 (the "License");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an "AS IS" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\n\nd-article {\n  contain: layout style;\n  overflow-x: hidden;\n  border-top: 1px solid rgba(0, 0, 0, 0.1);\n  padding-top: 2rem;\n  color: rgba(0, 0, 0, 0.8);\n}\n\nd-article > * {\n  grid-column: text;\n}\n\n@media(min-width: 768px) {\n  d-article {\n    font-size: 16px;\n  }\n}\n\n@media(min-width: 1024px) {\n  d-article {\n    font-size: 1.06rem;\n    line-height: 1.7em;\n  }\n}\n\n\n/* H2 */\n\n\nd-article .marker {\n  text-decoration: none;\n  border: none;\n  counter-reset: section;\n  grid-column: kicker;\n  line-height: 1.7em;\n}\n\nd-article .marker:hover {\n  border: none;\n}\n\nd-article .marker span {\n  padding: 0 3px 4px;\n  border-bottom: 1px solid rgba(0, 0, 0, 0.2);\n  position: relative;\n  top: 4px;\n}\n\nd-article .marker:hover span {\n  color: rgba(0, 0, 0, 0.7);\n  border-bottom: 1px solid rgba(0, 0, 0, 0.7);\n}\n\nd-article h2 {\n  font-weight: 600;\n  font-size: 24px;\n  line-height: 1.25em;\n  margin: 2rem 0 1.5rem 0;\n  border-bottom: 1px solid rgba(0, 0, 0, 0.1);\n  padding-bottom: 1rem;\n}\n\n@media(min-width: 1024px) {\n  d-article h2 {\n    font-size: 36px;\n  }\n}\n\n/* H3 */\n\nd-article h3 {\n  font-weight: 700;\n  font-size: 18px;\n  line-height: 1.4em;\n  margin-bottom: 1em;\n  margin-top: 2em;\n}\n\n@media(min-width: 1024px) {\n  d-article h3 {\n    font-size: 20px;\n  }\n}\n\n/* H4 */\n\nd-article h4 {\n  font-weight: 600;\n  text-transform: uppercase;\n  font-size: 14px;\n  line-height: 1.4em;\n}\n\nd-article a {\n  color: inherit;\n}\n\nd-article p,\nd-article ul,\nd-article ol,\nd-article blockquote {\n  margin-top: 0;\n  margin-bottom: 1em;\n  margin-left: 0;\n  margin-right: 0;\n}\n\nd-article blockquote {\n  border-left: 2px solid rgba(0, 0, 0, 0.2);\n  padding-left: 2em;\n  font-style: italic;\n  color: rgba(0, 0, 0, 0.6);\n}\n\nd-article a {\n  border-bottom: 1px solid rgba(0, 0, 0, 0.4);\n  text-decoration: none;\n}\n\nd-article a:hover {\n  border-bottom: 1px solid rgba(0, 0, 0, 0.8);\n}\n\nd-article .link {\n  text-decoration: underline;\n  cursor: pointer;\n}\n\nd-article ul,\nd-article ol {\n  padding-left: 24px;\n}\n\nd-article li {\n  margin-bottom: 1em;\n  margin-left: 0;\n  padding-left: 0;\n}\n\nd-article li:last-child {\n  margin-bottom: 0;\n}\n\nd-article pre {\n  font-size: 14px;\n  margin-bottom: 20px;\n}\n\nd-article hr {\n  grid-column: screen;\n  width: 100%;\n  border: none;\n  border-bottom: 1px solid rgba(0, 0, 0, 0.1);\n  margin-top: 60px;\n  margin-bottom: 60px;\n}\n\nd-article section {\n  margin-top: 60px;\n  margin-bottom: 60px;\n}\n\nd-article span.equation-mimic {\n  font-family: georgia;\n  font-size: 115%;\n  font-style: italic;\n}\n\nd-article > d-code,\nd-article section > d-code  {\n  display: block;\n}\n\nd-article > d-math[block],\nd-article section > d-math[block]  {\n  display: block;\n}\n\n@media (max-width: 768px) {\n  d-article > d-code,\n  d-article section > d-code,\n  d-article > d-math[block],\n  d-article section > d-math[block] {\n      overflow-x: scroll;\n      -ms-overflow-style: none;  // IE 10+\n      overflow: -moz-scrollbars-none;  // Firefox\n  }\n\n  d-article > d-code::-webkit-scrollbar,\n  d-article section > d-code::-webkit-scrollbar,\n  d-article > d-math[block]::-webkit-scrollbar,\n  d-article section > d-math[block]::-webkit-scrollbar {\n    display: none;  // Safari and Chrome\n  }\n}\n\nd-article .citation {\n  color: #668;\n  cursor: pointer;\n}\n\nd-include {\n  width: auto;\n  display: block;\n}\n\nd-figure {\n  contain: layout style;\n}\n\n/* KaTeX */\n\n.katex, .katex-prerendered {\n  contain: style;\n  display: inline-block;\n}\n\n/* Tables */\n\nd-article table {\n  border-collapse: collapse;\n  margin-bottom: 1.5rem;\n  border-bottom: 1px solid rgba(0, 0, 0, 0.2);\n}\n\nd-article table th {\n  border-bottom: 1px solid rgba(0, 0, 0, 0.2);\n}\n\nd-article table td {\n  border-bottom: 1px solid rgba(0, 0, 0, 0.05);\n}\n\nd-article table tr:last-of-type td {\n  border-bottom: none;\n}\n\nd-article table th,\nd-article table td {\n  font-size: 15px;\n  padding: 2px 8px;\n}\n\nd-article table tbody :first-child td {\n  padding-top: 2px;\n}\n'+l+'/*\n * Copyright 2018 The Distill Template Authors\n *\n * Licensed under the Apache License, Version 2.0 (the "License");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an "AS IS" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\n\n@media print {\n\n  @page {\n    size: 8in 11in;\n    @bottom-right {\n      content: counter(page) " of " counter(pages);\n    }\n  }\n\n  html {\n    /* no general margins -- CSS Grid takes care of those */\n  }\n\n  p, code {\n    page-break-inside: avoid;\n  }\n\n  h2, h3 {\n    page-break-after: avoid;\n  }\n\n  d-header {\n    visibility: hidden;\n  }\n\n  d-footer {\n    display: none!important;\n  }\n\n}\n';function D(t,e){console.debug("Runlevel 0: Polyfill required: "+t.name);const n=document.createElement("script");n.src=t.url,n.async=!1,e&&(n.onload=function(){e(t)}),n.onerror=function(){new Error("Runlevel 0: Polyfills failed to load script "+t.name)},document.head.appendChild(n)}const L=[{name:"WebComponents",support:function(){return"customElements"in window&&"attachShadow"in Element.prototype&&"getRootNode"in Element.prototype&&"content"in document.createElement("template")&&"Promise"in window&&"from"in Array},url:"https://distill.pub/third-party/polyfills/webcomponents-lite.js"},{name:"IntersectionObserver",support:function(){return"IntersectionObserver"in window&&"IntersectionObserverEntry"in window},url:"https://distill.pub/third-party/polyfills/intersection-observer.js"}];class N{static browserSupportsAllFeatures(){return L.every((t=>t.support()))}static load(t){const e=function(e){e.loaded=!0,console.debug("Runlevel 0: Polyfill has finished loading: "+e.name),N.neededPolyfills.every((t=>t.loaded))&&(console.debug("Runlevel 0: All required polyfills have finished loading."),console.debug("Runlevel 0->1."),window.distillRunlevel=1,t())};for(const t of N.neededPolyfills)D(t,e)}static get neededPolyfills(){return N._neededPolyfills||(N._neededPolyfills=L.filter((t=>!t.support()))),N._neededPolyfills}}const F=s("d-abstract","\n<style>\n  :host {\n    font-size: 1.25rem;\n    line-height: 1.6em;\n    color: rgba(0, 0, 0, 0.7);\n    -webkit-font-smoothing: antialiased;\n  }\n\n  ::slotted(p) {\n    margin-top: 0;\n    margin-bottom: 1em;\n    grid-column: text-start / middle-end;\n  }\n  d-abstract {\n      grid-column: left / text;\n    }\n  \n</style>\n\n<slot></slot>\n");class O extends(F(HTMLElement)){}const I=s("d-appendix","\n<style>\n\nd-appendix {\n  contain: layout style;\n  font-size: 0.8em;\n  line-height: 1.7em;\n  margin-top: 60px;\n  margin-bottom: 0;\n  border-top: 1px solid rgba(0, 0, 0, 0.1);\n  color: rgba(0,0,0,0.5);\n  padding-top: 60px;\n  padding-bottom: 48px;\n}\n\nd-appendix h3 {\n  grid-column: page-start / text-start;\n  font-size: 15px;\n  font-weight: 500;\n  margin-top: 1em;\n  margin-bottom: 0;\n  color: rgba(0,0,0,0.65);\n}\n\nd-appendix h3 + * {\n  margin-top: 1em;\n}\n\nd-appendix ol {\n  padding: 0 0 0 15px;\n}\n\n@media (min-width: 768px) {\n  d-appendix ol {\n    padding: 0 0 0 30px;\n    margin-left: -30px;\n  }\n}\n\nd-appendix li {\n  margin-bottom: 1em;\n}\n\nd-appendix a {\n  color: rgba(0, 0, 0, 0.6);\n}\n\nd-appendix > * {\n  grid-column: text;\n}\n\nd-appendix > d-footnote-list,\nd-appendix > d-citation-list,\nd-appendix > distill-appendix {\n  grid-column: screen;\n}\n\n</style>\n\n",!1);class U extends(I(HTMLElement)){}const R=/^\s*$/;class $ extends HTMLElement{static get is(){return"d-article"}constructor(){super(),new MutationObserver((t=>{for(const e of t)for(const t of e.addedNodes)if("#text"===t.nodeName){const e=t.nodeValue;if(!R.test(e)){console.warn("Use of unwrapped text in distill articles is discouraged as it breaks layout! Please wrap any text in a <span> or <p> tag. We found the following text: "+e);const n=document.createElement("span");n.innerHTML=t.nodeValue,t.parentNode.insertBefore(n,t),t.parentNode.removeChild(t)}}})).observe(this,{childList:!0})}}var H="undefined"!=typeof globalThis?globalThis:"undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{};function P(t,e){return t(e={exports:{}},e.exports),e.exports}var z=P((function(t,e){!function(t){function e(){this.months=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"],this.notKey=[",","{","}"," ","="],this.pos=0,this.input="",this.entries=new Array,this.currentEntry="",this.setInput=function(t){this.input=t},this.getEntries=function(){return this.entries},this.isWhitespace=function(t){return" "==t||"\r"==t||"\t"==t||"\n"==t},this.match=function(t,e){if(null!=e&&null!=e||(e=!0),this.skipWhitespace(e),this.input.substring(this.pos,this.pos+t.length)!=t)throw"Token mismatch, expected "+t+", found "+this.input.substring(this.pos);this.pos+=t.length,this.skipWhitespace(e)},this.tryMatch=function(t,e){return null!=e&&null!=e||(e=!0),this.skipWhitespace(e),this.input.substring(this.pos,this.pos+t.length)==t},this.matchAt=function(){for(;this.input.length>this.pos&&"@"!=this.input[this.pos];)this.pos++;return"@"==this.input[this.pos]},this.skipWhitespace=function(t){for(;this.isWhitespace(this.input[this.pos]);)this.pos++;if("%"==this.input[this.pos]&&1==t){for(;"\n"!=this.input[this.pos];)this.pos++;this.skipWhitespace(t)}},this.value_braces=function(){var t=0;this.match("{",!1);for(var e=this.pos,n=!1;;){if(!n)if("}"==this.input[this.pos]){if(!(t>0)){var i=this.pos;return this.match("}",!1),this.input.substring(e,i)}t--}else if("{"==this.input[this.pos])t++;else if(this.pos>=this.input.length-1)throw"Unterminated value";n="\\"==this.input[this.pos]&&0==n,this.pos++}},this.value_comment=function(){for(var t="",e=0;!this.tryMatch("}",!1)||0!=e;){if(t+=this.input[this.pos],"{"==this.input[this.pos]&&e++,"}"==this.input[this.pos]&&e--,this.pos>=this.input.length-1)throw"Unterminated value:"+this.input.substring(start);this.pos++}return t},this.value_quotes=function(){this.match('"',!1);for(var t=this.pos,e=!1;;){if(!e){if('"'==this.input[this.pos]){var n=this.pos;return this.match('"',!1),this.input.substring(t,n)}if(this.pos>=this.input.length-1)throw"Unterminated value:"+this.input.substring(t)}e="\\"==this.input[this.pos]&&0==e,this.pos++}},this.single_value=function(){var t=this.pos;if(this.tryMatch("{"))return this.value_braces();if(this.tryMatch('"'))return this.value_quotes();var e=this.key();if(e.match("^[0-9]+$"))return e;if(this.months.indexOf(e.toLowerCase())>=0)return e.toLowerCase();throw"Value expected:"+this.input.substring(t)+" for key: "+e},this.value=function(){var t=[];for(t.push(this.single_value());this.tryMatch("#");)this.match("#"),t.push(this.single_value());return t.join("")},this.key=function(){for(var t=this.pos;;){if(this.pos>=this.input.length)throw"Runaway key";if(this.notKey.indexOf(this.input[this.pos])>=0)return this.input.substring(t,this.pos);this.pos++}},this.key_equals_value=function(){var t=this.key();if(this.tryMatch("="))return this.match("="),[t,this.value()];throw"... = value expected, equals sign missing:"+this.input.substring(this.pos)},this.key_value_list=function(){var t=this.key_equals_value();for(this.currentEntry.entryTags={},this.currentEntry.entryTags[t[0]]=t[1];this.tryMatch(",")&&(this.match(","),!this.tryMatch("}"));)t=this.key_equals_value(),this.currentEntry.entryTags[t[0]]=t[1]},this.entry_body=function(t){this.currentEntry={},this.currentEntry.citationKey=this.key(),this.currentEntry.entryType=t.substring(1),this.match(","),this.key_value_list(),this.entries.push(this.currentEntry)},this.directive=function(){return this.match("@"),"@"+this.key()},this.preamble=function(){this.currentEntry={},this.currentEntry.entryType="PREAMBLE",this.currentEntry.entry=this.value_comment(),this.entries.push(this.currentEntry)},this.comment=function(){this.currentEntry={},this.currentEntry.entryType="COMMENT",this.currentEntry.entry=this.value_comment(),this.entries.push(this.currentEntry)},this.entry=function(t){this.entry_body(t)},this.bibtex=function(){for(;this.matchAt();){var t=this.directive();this.match("{"),"@STRING"==t?this.string():"@PREAMBLE"==t?this.preamble():"@COMMENT"==t?this.comment():this.entry(t),this.match("}")}}}t.toJSON=function(t){var n=new e;return n.setInput(t),n.bibtex(),n.entries},t.toBibtex=function(t){var e="";for(var n in t){if(e+="@"+t[n].entryType,e+="{",t[n].citationKey&&(e+=t[n].citationKey+", "),t[n].entry&&(e+=t[n].entry),t[n].entryTags){var i="";for(var r in t[n].entryTags)0!=i.length&&(i+=", "),i+=r+"= {"+t[n].entryTags[r]+"}";e+=i}e+="}\n\n"}return e}}(e)}));function q(t){return t.replace(/[\t\n ]+/g," ").replace(/{\\["^`.'acu~Hvs]( )?([a-zA-Z])}/g,((t,e,n)=>n)).replace(/{\\([a-zA-Z])}/g,((t,e)=>e)).replace(/[{}]/gi,"")}function Y(t){const e=new Map,n=z.toJSON(t);for(const t of n){for(const[e,n]of Object.entries(t.entryTags))t.entryTags[e.toLowerCase()]=q(n);t.entryTags.type=t.entryType,e.set(t.citationKey,t.entryTags)}return e}class j extends HTMLElement{static get is(){return"d-bibliography"}constructor(){super(),new MutationObserver((t=>{for(const e of t)"SCRIPT"!==e.target.nodeName&&"characterData"!==e.type||this.parseIfPossible()})).observe(this,{childList:!0,characterData:!0,subtree:!0})}connectedCallback(){requestAnimationFrame((()=>{this.parseIfPossible()}))}parseIfPossible(){const t=this.querySelector("script");if(t)if("text/bibtex"==t.type){const e=t.textContent;if(this.bibtex!==e){this.bibtex=e;const t=Y(this.bibtex);this.notify(t)}}else if("text/json"==t.type){const e=new Map(JSON.parse(t.textContent));this.notify(e)}else console.warn("Unsupported bibliography script tag type: "+t.type)}notify(t){const e=new CustomEvent("onBibliographyChanged",{detail:t,bubbles:!0});this.dispatchEvent(e)}static get observedAttributes(){return["src"]}receivedBibtex(t){const e=Y(t.target.response);this.notify(e)}attributeChangedCallback(t,e,n){var i=new XMLHttpRequest;i.onload=t=>this.receivedBibtex(t),i.onerror=()=>console.warn(`Could not load Bibtex! (tried ${n})`),i.responseType="text",i.open("GET",n,!0),i.send()}}class B extends HTMLElement{static get is(){return"d-byline"}set frontMatter(t){this.innerHTML=function(t){return`\n  <div class="byline grid">\n    <div class="authors-affiliations grid">\n      <h3>Authors</h3>\n      <h3>Affiliations</h3>\n      ${t.authors.map((t=>`\n        <p class="author">\n          ${t.personalURL?`\n            <a class="name" href="${t.personalURL}">${t.name}</a>`:`\n            <span class="name">${t.name}</span>`}\n        </p>\n        <p class="affiliation">\n        ${t.affiliations.map((t=>t.url?`<a class="affiliation" href="${t.url}">${t.name}</a>`:`<span class="affiliation">${t.name}</span>`)).join(", ")}\n        </p>\n      `)).join("")}\n    </div>\n    <div>\n      <h3>Published</h3>\n      ${t.publishedDate?`\n        <p>${t.publishedMonth} ${t.publishedDay}, ${t.publishedYear}</p> `:"\n        <p><em>Not published yet.</em></p>"}\n    </div>\n    <div>\n      <h3>DOI</h3>\n      ${t.doi?`\n        <p><a href="https://doi.org/${t.doi}">${t.doi}</a></p>`:"\n        <p><em>No DOI yet.</em></p>"}\n    </div>\n  </div>\n`}(t)}}const G=s("d-cite",'\n<style>\n\n:host {\n  display: inline-block;\n}\n\n.citation {\n  color: hsla(206, 90%, 20%, 0.7);\n}\n\n.citation-number {\n  cursor: default;\n  white-space: nowrap;\n  font-family: -apple-system, BlinkMacSystemFont, "Roboto", Helvetica, sans-serif;\n  font-size: 75%;\n  color: hsla(206, 90%, 20%, 0.7);\n  display: inline-block;\n  line-height: 1.1em;\n  text-align: center;\n  position: relative;\n  top: -2px;\n  margin: 0 2px;\n}\n\nfigcaption .citation-number {\n  font-size: 11px;\n  font-weight: normal;\n  top: -2px;\n  line-height: 1em;\n}\n\nul {\n  margin: 0;\n  padding: 0;\n  list-style-type: none;\n}\n\nul li {\n  padding: 15px 10px 15px 10px;\n  border-bottom: 1px solid rgba(0,0,0,0.1)\n}\n\nul li:last-of-type {\n  border-bottom: none;\n}\n\n</style>\n\n<d-hover-box id="hover-box"></d-hover-box>\n\n<div id="citation-" class="citation">\n  <span class="citation-number"></span>\n</div>\n');class W extends(G(HTMLElement)){constructor(){super(),this._numbers=[],this._entries=[]}connectedCallback(){this.outerSpan=this.root.querySelector("#citation-"),this.innerSpan=this.root.querySelector(".citation-number"),this.hoverBox=this.root.querySelector("d-hover-box"),window.customElements.whenDefined("d-hover-box").then((()=>{this.hoverBox.listen(this)})),this.numbers&&this.displayNumbers(this.numbers),this.entries&&this.displayEntries(this.entries)}static get observedAttributes(){return["key","bibtex-key"]}attributeChangedCallback(t,e,n){const i=e?"onCiteKeyChanged":"onCiteKeyCreated",r=n.split(",").map((t=>t.trim())),o=new CustomEvent(i,{detail:[this,r],bubbles:!0});document.dispatchEvent(o)}set key(t){this.setAttribute("key",t)}get key(){return this.getAttribute("key")||this.getAttribute("bibtex-key")}get keys(){const t=this.key.split(",");return console.log(t),t}set numbers(t){this._numbers=t,this.displayNumbers(t)}get numbers(){return this._numbers}displayNumbers(t){if(!this.innerSpan)return;const e="["+t.map((t=>-1==t?"?":t+1+"")).join(", ")+"]";this.innerSpan.textContent=e}set entries(t){this._entries=t,this.displayEntries(t)}get entries(){return this._entries}displayEntries(t){this.hoverBox&&(this.hoverBox.innerHTML=`<ul>\n      ${t.map(S).map((t=>`<li>${t}</li>`)).join("\n")}\n    </ul>`)}}class V extends HTMLElement{static get is(){return"d-citation-list"}connectedCallback(){this.hasAttribute("distill-prerendered")||(this.style.display="none")}set citations(t){!function(t,e,n=document){if(e.size>0){t.style.display="";let i=t.querySelector(".references");if(i)i.innerHTML="";else{const e=n.createElement("style");e.innerHTML="\nd-citation-list {\n  contain: style;\n}\n\nd-citation-list .references {\n  grid-column: text;\n}\n\nd-citation-list .references .title {\n  font-weight: 500;\n}\n",t.appendChild(e);const r=n.createElement("h3");r.id="references",r.textContent="References",t.appendChild(r),i=n.createElement("ol"),i.id="references-list",i.className="references",t.appendChild(i)}for(const[t,r]of e){const e=n.createElement("li");e.id=t,e.innerHTML=k(r),i.appendChild(e)}}else t.style.display="none"}(this,t)}}var K=P((function(t){var e=function(t){var e=/(?:^|\s)lang(?:uage)?-([\w-]+)(?=\s|$)/i,n=0,i={},r={manual:t.Prism&&t.Prism.manual,disableWorkerMessageHandler:t.Prism&&t.Prism.disableWorkerMessageHandler,util:{encode:function t(e){return e instanceof o?new o(e.type,t(e.content),e.alias):Array.isArray(e)?e.map(t):e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/\u00a0/g," ")},type:function(t){return Object.prototype.toString.call(t).slice(8,-1)},objId:function(t){return t.__id||Object.defineProperty(t,"__id",{value:++n}),t.__id},clone:function t(e,n){var i,o;switch(n=n||{},r.util.type(e)){case"Object":if(o=r.util.objId(e),n[o])return n[o];for(var a in i={},n[o]=i,e)e.hasOwnProperty(a)&&(i[a]=t(e[a],n));return i;case"Array":return o=r.util.objId(e),n[o]?n[o]:(i=[],n[o]=i,e.forEach((function(e,r){i[r]=t(e,n)})),i);default:return e}},getLanguage:function(t){for(;t;){var n=e.exec(t.className);if(n)return n[1].toLowerCase();t=t.parentElement}return"none"},setLanguage:function(t,n){t.className=t.className.replace(RegExp(e,"gi"),""),t.classList.add("language-"+n)},currentScript:function(){if("undefined"==typeof document)return null;if("currentScript"in document)return document.currentScript;try{throw new Error}catch(i){var t=(/at [^(\r\n]*\((.*):[^:]+:[^:]+\)$/i.exec(i.stack)||[])[1];if(t){var e=document.getElementsByTagName("script");for(var n in e)if(e[n].src==t)return e[n]}return null}},isActive:function(t,e,n){for(var i="no-"+e;t;){var r=t.classList;if(r.contains(e))return!0;if(r.contains(i))return!1;t=t.parentElement}return!!n}},languages:{plain:i,plaintext:i,text:i,txt:i,extend:function(t,e){var n=r.util.clone(r.languages[t]);for(var i in e)n[i]=e[i];return n},insertBefore:function(t,e,n,i){var o=(i=i||r.languages)[t],a={};for(var s in o)if(o.hasOwnProperty(s)){if(s==e)for(var l in n)n.hasOwnProperty(l)&&(a[l]=n[l]);n.hasOwnProperty(s)||(a[s]=o[s])}var u=i[t];return i[t]=a,r.languages.DFS(r.languages,(function(e,n){n===u&&e!=t&&(this[e]=a)})),a},DFS:function t(e,n,i,o){o=o||{};var a=r.util.objId;for(var s in e)if(e.hasOwnProperty(s)){n.call(e,s,e[s],i||s);var l=e[s],u=r.util.type(l);"Object"!==u||o[a(l)]?"Array"!==u||o[a(l)]||(o[a(l)]=!0,t(l,n,s,o)):(o[a(l)]=!0,t(l,n,null,o))}}},plugins:{},highlightAll:function(t,e){r.highlightAllUnder(document,t,e)},highlightAllUnder:function(t,e,n){var i={callback:n,container:t,selector:'code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code'};r.hooks.run("before-highlightall",i),i.elements=Array.prototype.slice.apply(i.container.querySelectorAll(i.selector)),r.hooks.run("before-all-elements-highlight",i);for(var o,a=0;o=i.elements[a++];)r.highlightElement(o,!0===e,i.callback)},highlightElement:function(e,n,i){var o=r.util.getLanguage(e),a=r.languages[o];r.util.setLanguage(e,o);var s=e.parentElement;s&&"pre"===s.nodeName.toLowerCase()&&r.util.setLanguage(s,o);var l={element:e,language:o,grammar:a,code:e.textContent};function u(t){l.highlightedCode=t,r.hooks.run("before-insert",l),l.element.innerHTML=l.highlightedCode,r.hooks.run("after-highlight",l),r.hooks.run("complete",l),i&&i.call(l.element)}if(r.hooks.run("before-sanity-check",l),(s=l.element.parentElement)&&"pre"===s.nodeName.toLowerCase()&&!s.hasAttribute("tabindex")&&s.setAttribute("tabindex","0"),!l.code)return r.hooks.run("complete",l),void(i&&i.call(l.element));if(r.hooks.run("before-highlight",l),l.grammar)if(n&&t.Worker){var c=new Worker(r.filename);c.onmessage=function(t){u(t.data)},c.postMessage(JSON.stringify({language:l.language,code:l.code,immediateClose:!0}))}else u(r.highlight(l.code,l.grammar,l.language));else u(r.util.encode(l.code))},highlight:function(t,e,n){var i={code:t,grammar:e,language:n};if(r.hooks.run("before-tokenize",i),!i.grammar)throw new Error('The language "'+i.language+'" has no grammar.');return i.tokens=r.tokenize(i.code,i.grammar),r.hooks.run("after-tokenize",i),o.stringify(r.util.encode(i.tokens),i.language)},tokenize:function(t,e){var n=e.rest;if(n){for(var i in n)e[i]=n[i];delete e.rest}var r=new l;return u(r,r.head,t),s(t,r,e,r.head,0),function(t){for(var e=[],n=t.head.next;n!==t.tail;)e.push(n.value),n=n.next;return e}(r)},hooks:{all:{},add:function(t,e){var n=r.hooks.all;n[t]=n[t]||[],n[t].push(e)},run:function(t,e){var n=r.hooks.all[t];if(n&&n.length)for(var i,o=0;i=n[o++];)i(e)}},Token:o};function o(t,e,n,i){this.type=t,this.content=e,this.alias=n,this.length=0|(i||"").length}function a(t,e,n,i){t.lastIndex=e;var r=t.exec(n);if(r&&i&&r[1]){var o=r[1].length;r.index+=o,r[0]=r[0].slice(o)}return r}function s(t,e,n,i,l,d){for(var h in n)if(n.hasOwnProperty(h)&&n[h]){var p=n[h];p=Array.isArray(p)?p:[p];for(var g=0;g<p.length;++g){if(d&&d.cause==h+","+g)return;var f=p[g],m=f.inside,b=!!f.lookbehind,y=!!f.greedy,v=f.alias;if(y&&!f.pattern.global){var w=f.pattern.toString().match(/[imsuy]*$/)[0];f.pattern=RegExp(f.pattern.source,w+"g")}for(var x=f.pattern||f,k=i.next,S=l;k!==e.tail&&!(d&&S>=d.reach);S+=k.value.length,k=k.next){var T=k.value;if(e.length>t.length)return;if(!(T instanceof o)){var M,C=1;if(y){if(!(M=a(x,S,t,b))||M.index>=t.length)break;var _=M.index,A=M.index+M[0].length,E=S;for(E+=k.value.length;_>=E;)E+=(k=k.next).value.length;if(S=E-=k.value.length,k.value instanceof o)continue;for(var D=k;D!==e.tail&&(E<A||"string"==typeof D.value);D=D.next)C++,E+=D.value.length;C--,T=t.slice(S,E),M.index-=S}else if(!(M=a(x,0,T,b)))continue;_=M.index;var L=M[0],N=T.slice(0,_),F=T.slice(_+L.length),O=S+T.length;d&&O>d.reach&&(d.reach=O);var I=k.prev;if(N&&(I=u(e,I,N),S+=N.length),c(e,I,C),k=u(e,I,new o(h,m?r.tokenize(L,m):L,v,L)),F&&u(e,k,F),C>1){var U={cause:h+","+g,reach:O};s(t,e,n,k.prev,S,U),d&&U.reach>d.reach&&(d.reach=U.reach)}}}}}}function l(){var t={value:null,prev:null,next:null},e={value:null,prev:t,next:null};t.next=e,this.head=t,this.tail=e,this.length=0}function u(t,e,n){var i=e.next,r={value:n,prev:e,next:i};return e.next=r,i.prev=r,t.length++,r}function c(t,e,n){for(var i=e.next,r=0;r<n&&i!==t.tail;r++)i=i.next;e.next=i,i.prev=e,t.length-=r}if(t.Prism=r,o.stringify=function t(e,n){if("string"==typeof e)return e;if(Array.isArray(e)){var i="";return e.forEach((function(e){i+=t(e,n)})),i}var o={type:e.type,content:t(e.content,n),tag:"span",classes:["token",e.type],attributes:{},language:n},a=e.alias;a&&(Array.isArray(a)?Array.prototype.push.apply(o.classes,a):o.classes.push(a)),r.hooks.run("wrap",o);var s="";for(var l in o.attributes)s+=" "+l+'="'+(o.attributes[l]||"").replace(/"/g,"&quot;")+'"';return"<"+o.tag+' class="'+o.classes.join(" ")+'"'+s+">"+o.content+"</"+o.tag+">"},!t.document)return t.addEventListener?(r.disableWorkerMessageHandler||t.addEventListener("message",(function(e){var n=JSON.parse(e.data),i=n.language,o=n.code,a=n.immediateClose;t.postMessage(r.highlight(o,r.languages[i],i)),a&&t.close()}),!1),r):r;var d=r.util.currentScript();function h(){r.manual||r.highlightAll()}if(d&&(r.filename=d.src,d.hasAttribute("data-manual")&&(r.manual=!0)),!r.manual){var p=document.readyState;"loading"===p||"interactive"===p&&d&&d.defer?document.addEventListener("DOMContentLoaded",h):window.requestAnimationFrame?window.requestAnimationFrame(h):window.setTimeout(h,16)}return r}("undefined"!=typeof window?window:"undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?self:{});
-/**
+(function (factory) {
+  typeof define === 'function' && define.amd ? define(factory) :
+  factory();
+})((function () { 'use strict';
+
+  // Copyright 2018 The Distill Template Authors
+  //
+  // Licensed under the Apache License, Version 2.0 (the "License");
+  // you may not use this file except in compliance with the License.
+  // You may obtain a copy of the License at
+  //
+  //      http://www.apache.org/licenses/LICENSE-2.0
+  //
+  // Unless required by applicable law or agreed to in writing, software
+  // distributed under the License is distributed on an "AS IS" BASIS,
+  // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  // See the License for the specific language governing permissions and
+  // limitations under the License.
+
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const months = ['Jan.', 'Feb.', 'March', 'April', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.'];
+  const zeroPad = n => n < 10 ? '0' + n : n;
+
+  const RFC = function(date) {
+    const day = days[date.getDay()].substring(0, 3);
+    const paddedDate = zeroPad(date.getDate());
+    const month = months[date.getMonth()].substring(0,3);
+    const year = date.getFullYear().toString();
+    const hours = date.getUTCHours().toString();
+    const minutes = date.getUTCMinutes().toString();
+    const seconds = date.getUTCSeconds().toString();
+    return `${day}, ${paddedDate} ${month} ${year} ${hours}:${minutes}:${seconds} Z`;
+  };
+
+  const objectFromMap = function(map) {
+    const object = Array.from(map).reduce((object, [key, value]) => (
+      Object.assign(object, { [key]: value }) // Be careful! Maps can have non-String keys; object literals can't.
+    ), {});
+    return object;
+  };
+
+  const mapFromObject = function(object) {
+    const map = new Map();
+    for (var property in object) {
+      if (object.hasOwnProperty(property)) {
+        map.set(property, object[property]);
+      }
+    }
+    return map;
+  };
+
+  class Author {
+
+    // constructor(name='', personalURL='', affiliation='', affiliationURL='') {
+    //   this.name = name; // 'Chris Olah'
+    //   this.personalURL = personalURL; // 'https://colah.github.io'
+    //   this.affiliation = affiliation; // 'Google Brain'
+    //   this.affiliationURL = affiliationURL; // 'https://g.co/brain'
+    // }
+
+    constructor(object) {
+      this.name = object.author; // 'Chris Olah'
+      this.personalURL = object.authorURL; // 'https://colah.github.io'
+      this.affiliation = object.affiliation; // 'Google Brain'
+      this.affiliationURL = object.affiliationURL; // 'https://g.co/brain'
+      this.affiliations = object.affiliations || []; // new-style affiliations
+    }
+
+    // 'Chris'
+    get firstName() {
+      const names = this.name.split(' ');
+      return names.slice(0, names.length - 1).join(' ');
+    }
+
+    // 'Olah'
+    get lastName() {
+      const names = this.name.split(' ');
+      return names[names.length -1];
+    }
+  }
+
+  function mergeFromYMLFrontmatter(target, source) {
+    target.title = source.title;
+    if (source.published) {
+      if (source.published instanceof Date) {
+        target.publishedDate = source.published;
+      } else if (source.published.constructor === String) {
+        target.publishedDate = new Date(source.published);
+      }
+    }
+    if (source.publishedDate) {
+      if (source.publishedDate instanceof Date) {
+        target.publishedDate = source.publishedDate;
+      } else if (source.publishedDate.constructor === String) {
+        target.publishedDate = new Date(source.publishedDate);
+      } else {
+        console.error('Don\'t know what to do with published date: ' + source.publishedDate);
+      }
+    }
+    target.description = source.description;
+    target.authors = source.authors.map( (authorObject) => new Author(authorObject));
+    target.katex = source.katex;
+    target.password = source.password;
+    if (source.doi) {
+      target.doi = source.doi;
+    }
+  }
+
+  class FrontMatter$1 {
+    constructor() {
+      this.title = 'unnamed article'; // 'Attention and Augmented Recurrent Neural Networks'
+      this.description = ''; // 'A visual overview of neural attention...'
+      this.authors = []; // Array of Author(s)
+
+      this.bibliography = new Map();
+      this.bibliographyParsed = false;
+      //  {
+      //    'gregor2015draw': {
+      //      'title': 'DRAW: A recurrent neural network for image generation',
+      //      'author': 'Gregor, Karol and Danihelka, Ivo and Graves, Alex and Rezende, Danilo Jimenez and Wierstra, Daan',
+      //      'journal': 'arXiv preprint arXiv:1502.04623',
+      //      'year': '2015',
+      //      'url': 'https://arxiv.org/pdf/1502.04623.pdf',
+      //      'type': 'article'
+      //    },
+      //  }
+
+      // Citation keys should be listed in the order that they are appear in the document.
+      // Each key refers to a key in the bibliography dictionary.
+      this.citations = []; // [ 'gregor2015draw', 'mercier2011humans' ]
+      this.citationsCollected = false;
+
+      //
+      // Assigned from posts.csv
+      //
+
+      //  publishedDate: 2016-09-08T07:00:00.000Z,
+      //  tags: [ 'rnn' ],
+      //  distillPath: '2016/augmented-rnns',
+      //  githubPath: 'distillpub/post--augmented-rnns',
+      //  doiSuffix: 1,
+
+      //
+      // Assigned from journal
+      //
+      this.journal = {};
+      //  journal: {
+      //    'title': 'Distill',
+      //    'full_title': 'Distill',
+      //    'abbrev_title': 'Distill',
+      //    'url': 'http://distill.pub',
+      //    'doi': '10.23915/distill',
+      //    'publisherName': 'Distill Working Group',
+      //    'publisherEmail': 'admin@distill.pub',
+      //    'issn': '2476-0757',
+      //    'editors': [...],
+      //    'committee': [...]
+      //  }
+      //  volume: 1,
+      //  issue: 9,
+
+      this.katex = {};
+
+      //
+      // Assigned from publishing process
+      //
+
+      //  githubCompareUpdatesUrl: 'https://github.com/distillpub/post--augmented-rnns/compare/1596e094d8943d2dc0ea445d92071129c6419c59...3bd9209e0c24d020f87cf6152dcecc6017cbc193',
+      //  updatedDate: 2017-03-21T07:13:16.000Z,
+      //  doi: '10.23915/distill.00001',
+      this.doi = undefined;
+      this.publishedDate = undefined;
+    }
+
+    // Example:
+    // title: Demo Title Attention and Augmented Recurrent Neural Networks
+    // published: Jan 10, 2017
+    // authors:
+    // - Chris Olah:
+    // - Shan Carter: http://shancarter.com
+    // affiliations:
+    // - Google Brain:
+    // - Google Brain: http://g.co/brain
+
+    //
+    // Computed Properties
+    //
+
+    // 'http://distill.pub/2016/augmented-rnns',
+    set url(value) {
+      this._url = value;
+    }
+    get url() {
+      if (this._url) {
+        return this._url;
+      } else if (this.distillPath && this.journal.url) {
+        return this.journal.url + '/' + this.distillPath;
+      } else if (this.journal.url) {
+        return this.journal.url;
+      }
+    }
+
+    // 'https://github.com/distillpub/post--augmented-rnns',
+    get githubUrl() {
+      if (this.githubPath) {
+        return 'https://github.com/' + this.githubPath;
+      } else {
+        return undefined;
+      }
+    }
+
+    // TODO resolve differences in naming of URL/Url/url.
+    // 'http://distill.pub/2016/augmented-rnns/thumbnail.jpg',
+    set previewURL(value) {
+      this._previewURL = value;
+    }
+    get previewURL() {
+      return this._previewURL ? this._previewURL : this.url + '/thumbnail.jpg';
+    }
+
+    // 'Thu, 08 Sep 2016 00:00:00 -0700',
+    get publishedDateRFC() {
+      return RFC(this.publishedDate);
+    }
+
+    // 'Thu, 08 Sep 2016 00:00:00 -0700',
+    get updatedDateRFC() {
+      return RFC(this.updatedDate);
+    }
+
+    // 2016,
+    get publishedYear() {
+      return this.publishedDate.getFullYear();
+    }
+
+    // 'Sept',
+    get publishedMonth() {
+      return months[this.publishedDate.getMonth()];
+    }
+
+    // 8,
+    get publishedDay() {
+      return this.publishedDate.getDate();
+    }
+
+    // '09',
+    get publishedMonthPadded() {
+      return zeroPad(this.publishedDate.getMonth() + 1);
+    }
+
+    // '08',
+    get publishedDayPadded() {
+      return zeroPad(this.publishedDate.getDate());
+    }
+
+    get publishedISODateOnly() {
+      return this.publishedDate.toISOString().split('T')[0];
+    }
+
+    get volume() {
+      const volume = this.publishedYear - 2015;
+      if (volume < 1) {
+        throw new Error('Invalid publish date detected during computing volume');
+      }
+      return volume;
+    }
+
+    get issue() {
+      return this.publishedDate.getMonth() + 1;
+    }
+
+    // 'Olah & Carter',
+    get concatenatedAuthors() {
+      if (this.authors.length > 2) {
+        return this.authors[0].lastName + ', et al.';
+      } else if (this.authors.length === 2) {
+        return this.authors[0].lastName + ' & ' + this.authors[1].lastName;
+      } else if (this.authors.length === 1) {
+        return this.authors[0].lastName;
+      }
+    }
+
+    // 'Olah, Chris and Carter, Shan',
+    get bibtexAuthors() {
+      return this.authors.map(author => {
+        return author.lastName + ', ' + author.firstName;
+      }).join(' and ');
+    }
+
+    // 'olah2016attention'
+    get slug() {
+      let slug = '';
+      if (this.authors.length) {
+        slug += this.authors[0].lastName.toLowerCase();
+        slug += this.publishedYear;
+        slug += this.title.split(' ')[0].toLowerCase();
+      }
+      return slug || 'Untitled';
+    }
+
+    get bibliographyEntries() {
+      return new Map(this.citations.map( citationKey => {
+        const entry = this.bibliography.get(citationKey);
+        return [citationKey, entry];
+      }));
+    }
+
+    set bibliography(bibliography) {
+      if (bibliography instanceof Map) {
+        this._bibliography = bibliography;
+      } else if (typeof bibliography === 'object') {
+        this._bibliography = mapFromObject(bibliography);
+      }
+    }
+
+    get bibliography() {
+      return this._bibliography;
+    }
+
+    static fromObject(source) {
+      const frontMatter = new FrontMatter$1();
+      Object.assign(frontMatter, source);
+      return frontMatter;
+    }
+
+    assignToObject(target) {
+      Object.assign(target, this);
+      target.bibliography = objectFromMap(this.bibliographyEntries);
+      target.url = this.url;
+      target.doi = this.doi;
+      target.githubUrl = this.githubUrl;
+      target.previewURL = this.previewURL;
+      if (this.publishedDate) {
+        target.volume = this.volume;
+        target.issue = this.issue;
+        target.publishedDateRFC = this.publishedDateRFC;
+        target.publishedYear = this.publishedYear;
+        target.publishedMonth = this.publishedMonth;
+        target.publishedDay = this.publishedDay;
+        target.publishedMonthPadded = this.publishedMonthPadded;
+        target.publishedDayPadded = this.publishedDayPadded;
+      }
+      if (this.updatedDate) {
+        target.updatedDateRFC = this.updatedDateRFC;
+      }
+      target.concatenatedAuthors = this.concatenatedAuthors;
+      target.bibtexAuthors = this.bibtexAuthors;
+      target.slug = this.slug;
+    }
+
+  }
+
+  // Copyright 2018 The Distill Template Authors
+  //
+  // Licensed under the Apache License, Version 2.0 (the "License");
+  // you may not use this file except in compliance with the License.
+  // You may obtain a copy of the License at
+  //
+  //      http://www.apache.org/licenses/LICENSE-2.0
+  //
+  // Unless required by applicable law or agreed to in writing, software
+  // distributed under the License is distributed on an "AS IS" BASIS,
+  // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  // See the License for the specific language governing permissions and
+  // limitations under the License.
+
+  const Mutating = (superclass) => {
+    return class extends superclass {
+
+      constructor() {
+        super();
+
+        // set up mutation observer
+        const options = {childList: true, characterData: true, subtree: true};
+        const observer = new MutationObserver( () => {
+          observer.disconnect();
+          this.renderIfPossible();
+          observer.observe(this, options);
+        });
+
+        // ...and listen for changes
+        observer.observe(this, options);
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+
+        this.renderIfPossible();
+      }
+
+      // potential TODO: check if this is enough for all our usecases
+      // maybe provide a custom function to tell if we have enough information to render
+      renderIfPossible() {
+        if (this.textContent && this.root) {
+          this.renderContent();
+        }
+      }
+
+      renderContent() {
+        console.error(`Your class ${this.constructor.name} must provide a custom renderContent() method!` );
+      }
+
+    }; // end class
+  }; // end mixin function
+
+  // Copyright 2018 The Distill Template Authors
+  //
+  // Licensed under the Apache License, Version 2.0 (the "License");
+  // you may not use this file except in compliance with the License.
+  // You may obtain a copy of the License at
+  //
+  //      http://www.apache.org/licenses/LICENSE-2.0
+  //
+  // Unless required by applicable law or agreed to in writing, software
+  // distributed under the License is distributed on an "AS IS" BASIS,
+  // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  // See the License for the specific language governing permissions and
+  // limitations under the License.
+
+  /*global ShadyCSS*/
+
+  const Template = (name, templateString, useShadow = true) => {
+
+    return (superclass) => {
+
+      const template = document.createElement('template');
+      template.innerHTML = templateString;
+
+      if (useShadow && 'ShadyCSS' in window) {
+        ShadyCSS.prepareTemplate(template, name);
+      }
+
+      return class extends superclass {
+
+        static get is() { return name; }
+
+        constructor() {
+          super();
+
+          this.clone = document.importNode(template.content, true);
+          if (useShadow) {
+            this.attachShadow({mode: 'open'});
+            this.shadowRoot.appendChild(this.clone);
+          }
+        }
+
+        connectedCallback() {
+          if (this.hasAttribute('distill-prerendered')) {
+            return;
+          }
+          if (useShadow) {
+            if ('ShadyCSS' in window) {
+              ShadyCSS.styleElement(this);
+            }
+          } else {
+            this.insertBefore(this.clone, this.firstChild);
+          }
+        }
+
+        get root() {
+          if (useShadow) {
+            return this.shadowRoot;
+          } else {
+            return this;
+          }
+        }
+
+        /* TODO: Are we using these? Should we even? */
+        $(query) {
+          return this.root.querySelector(query);
+        }
+
+        $$(query) {
+          return this.root.querySelectorAll(query);
+        }
+      };
+    };
+  };
+
+  var math = "/*\n * Copyright 2018 The Distill Template Authors\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\n\nspan.katex-display {\n  text-align: left;\n  padding: 8px 0 8px 0;\n  margin: 0.5em 0 0.5em 1em;\n}\n\nspan.katex {\n  -webkit-font-smoothing: antialiased;\n  color: rgba(0, 0, 0, 0.8);\n  font-size: 1.18em;\n}\n";
+
+  // Copyright 2018 The Distill Template Authors
+  //
+  // Licensed under the Apache License, Version 2.0 (the "License");
+  // you may not use this file except in compliance with the License.
+  // You may obtain a copy of the License at
+  //
+  //      http://www.apache.org/licenses/LICENSE-2.0
+  //
+  // Unless required by applicable law or agreed to in writing, software
+  // distributed under the License is distributed on an "AS IS" BASIS,
+  // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  // See the License for the specific language governing permissions and
+  // limitations under the License.
+
+  // This is a straight concatenation of code from KaTeX's contrib folder,
+  // but we aren't using some of their helpers that don't work well outside a browser environment.
+
+  /*global katex */
+
+  const findEndOfMath = function(delimiter, text, startIndex) {
+    // Adapted from
+    // https://github.com/Khan/perseus/blob/master/src/perseus-markdown.jsx
+    let index = startIndex;
+    let braceLevel = 0;
+
+    const delimLength = delimiter.length;
+
+    while (index < text.length) {
+      const character = text[index];
+
+      if (
+        braceLevel <= 0 &&
+        text.slice(index, index + delimLength) === delimiter
+      ) {
+        return index;
+      } else if (character === "\\") {
+        index++;
+      } else if (character === "{") {
+        braceLevel++;
+      } else if (character === "}") {
+        braceLevel--;
+      }
+
+      index++;
+    }
+
+    return -1;
+  };
+
+  const splitAtDelimiters = function(startData, leftDelim, rightDelim, display) {
+    const finalData = [];
+
+    for (let i = 0; i < startData.length; i++) {
+      if (startData[i].type === "text") {
+        const text = startData[i].data;
+
+        let lookingForLeft = true;
+        let currIndex = 0;
+        let nextIndex;
+
+        nextIndex = text.indexOf(leftDelim);
+        if (nextIndex !== -1) {
+          currIndex = nextIndex;
+          finalData.push({
+            type: "text",
+            data: text.slice(0, currIndex)
+          });
+          lookingForLeft = false;
+        }
+
+        while (true) {
+          // eslint-disable-line no-constant-condition
+          if (lookingForLeft) {
+            nextIndex = text.indexOf(leftDelim, currIndex);
+            if (nextIndex === -1) {
+              break;
+            }
+
+            finalData.push({
+              type: "text",
+              data: text.slice(currIndex, nextIndex)
+            });
+
+            currIndex = nextIndex;
+          } else {
+            nextIndex = findEndOfMath(
+              rightDelim,
+              text,
+              currIndex + leftDelim.length
+            );
+            if (nextIndex === -1) {
+              break;
+            }
+
+            finalData.push({
+              type: "math",
+              data: text.slice(currIndex + leftDelim.length, nextIndex),
+              rawData: text.slice(currIndex, nextIndex + rightDelim.length),
+              display: display
+            });
+
+            currIndex = nextIndex + rightDelim.length;
+          }
+
+          lookingForLeft = !lookingForLeft;
+        }
+
+        finalData.push({
+          type: "text",
+          data: text.slice(currIndex)
+        });
+      } else {
+        finalData.push(startData[i]);
+      }
+    }
+
+    return finalData;
+  };
+
+  const splitWithDelimiters = function(text, delimiters) {
+    let data = [{ type: "text", data: text }];
+    for (let i = 0; i < delimiters.length; i++) {
+      const delimiter = delimiters[i];
+      data = splitAtDelimiters(
+        data,
+        delimiter.left,
+        delimiter.right,
+        delimiter.display || false
+      );
+    }
+    return data;
+  };
+
+  /* Note: optionsCopy is mutated by this method. If it is ever exposed in the
+   * API, we should copy it before mutating.
+   */
+  const renderMathInText = function(text, optionsCopy) {
+    const data = splitWithDelimiters(text, optionsCopy.delimiters);
+    const fragment = document.createDocumentFragment();
+
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].type === "text") {
+        fragment.appendChild(document.createTextNode(data[i].data));
+      } else {
+        const tag = document.createElement("d-math");
+        const math = data[i].data;
+        // Override any display mode defined in the settings with that
+        // defined by the text itself
+        optionsCopy.displayMode = data[i].display;
+        try {
+          tag.textContent = math;
+          if (optionsCopy.displayMode) {
+            tag.setAttribute("block", "");
+          }
+        } catch (e) {
+          if (!(e instanceof katex.ParseError)) {
+            throw e;
+          }
+          optionsCopy.errorCallback(
+            "KaTeX auto-render: Failed to parse `" + data[i].data + "` with ",
+            e
+          );
+          fragment.appendChild(document.createTextNode(data[i].rawData));
+          continue;
+        }
+        fragment.appendChild(tag);
+      }
+    }
+
+    return fragment;
+  };
+
+  const renderElem = function(elem, optionsCopy) {
+    for (let i = 0; i < elem.childNodes.length; i++) {
+      const childNode = elem.childNodes[i];
+      if (childNode.nodeType === 3) {
+        // Text node
+        const text = childNode.textContent;
+        if (optionsCopy.mightHaveMath(text)) {
+          const frag = renderMathInText(text, optionsCopy);
+          i += frag.childNodes.length - 1;
+          elem.replaceChild(frag, childNode);
+        }
+      } else if (childNode.nodeType === 1) {
+        // Element node
+        const shouldRender =
+          optionsCopy.ignoredTags.indexOf(childNode.nodeName.toLowerCase()) ===
+          -1;
+
+        if (shouldRender) {
+          renderElem(childNode, optionsCopy);
+        }
+      }
+      // Otherwise, it's something else, and ignore it.
+    }
+  };
+
+  const defaultAutoRenderOptions = {
+    delimiters: [
+      { left: "$$", right: "$$", display: true },
+      { left: "\\[", right: "\\]", display: true },
+      { left: "\\(", right: "\\)", display: false }
+      // LaTeX uses this, but it ruins the display of normal `$` in text:
+      // {left: '$', right: '$', display: false},
+    ],
+
+    ignoredTags: [
+      "script",
+      "noscript",
+      "style",
+      "textarea",
+      "pre",
+      "code",
+      "svg"
+    ],
+
+    errorCallback: function(msg, err) {
+      console.error(msg, err);
+    }
+  };
+
+  const renderMathInElement = function(elem, options) {
+    if (!elem) {
+      throw new Error("No element provided to render");
+    }
+
+    const optionsCopy = Object.assign({}, defaultAutoRenderOptions, options);
+    const delimiterStrings = optionsCopy.delimiters.flatMap(d => [
+      d.left,
+      d.right
+    ]);
+    const mightHaveMath = text =>
+      delimiterStrings.some(d => text.indexOf(d) !== -1);
+    optionsCopy.mightHaveMath = mightHaveMath;
+    renderElem(elem, optionsCopy);
+  };
+
+  // Copyright 2018 The Distill Template Authors
+
+  const katexJSURL = 'https://distill.pub/third-party/katex/katex.min.js';
+  const katexCSSTag = '<link rel="stylesheet" href="https://distill.pub/third-party/katex/katex.min.css" crossorigin="anonymous">';
+
+  const T$c = Template('d-math', `
+${katexCSSTag}
+<style>
+
+:host {
+  display: inline-block;
+  contain: style;
+}
+
+:host([block]) {
+  display: block;
+}
+
+${math}
+</style>
+<span id='katex-container'></span>
+`);
+
+  // DMath, not Math, because that would conflict with the JS built-in
+  class DMath extends Mutating(T$c(HTMLElement)) {
+
+    static set katexOptions(options) {
+      DMath._katexOptions = options;
+      if (DMath.katexOptions.delimiters) {
+        if (!DMath.katexAdded) {
+          DMath.addKatex();
+        } else {
+          DMath.katexLoadedCallback();
+        }
+      }
+    }
+
+    static get katexOptions() {
+      if (!DMath._katexOptions) {
+        DMath._katexOptions = {
+          delimiters: [ { 'left':'$$', 'right':'$$', 'display': false } ]
+        };
+      }
+      return DMath._katexOptions;
+    }
+
+    static katexLoadedCallback() {
+      // render all d-math tags
+      const mathTags = document.querySelectorAll('d-math');
+      for (const mathTag of mathTags) {
+        mathTag.renderContent();
+      }
+      // transform inline delimited math to d-math tags
+      if (DMath.katexOptions.delimiters) {
+        renderMathInElement(document.body, DMath.katexOptions);
+      }
+    }
+
+    static addKatex() {
+      // css tag can use this convenience function
+      document.head.insertAdjacentHTML('beforeend', katexCSSTag);
+      // script tag has to be created to work properly
+      const scriptTag = document.createElement('script');
+      scriptTag.src = katexJSURL;
+      scriptTag.async = true;
+      scriptTag.onload = DMath.katexLoadedCallback;
+      scriptTag.crossorigin = 'anonymous';
+      document.head.appendChild(scriptTag);
+
+      DMath.katexAdded = true;
+    }
+
+    get options() {
+      const localOptions = { displayMode: this.hasAttribute('block') };
+      return Object.assign(localOptions, DMath.katexOptions);
+    }
+
+    connectedCallback() {
+      super.connectedCallback();
+      if (!DMath.katexAdded) {
+        DMath.addKatex();
+      }
+    }
+
+    renderContent() {
+      if (typeof katex !== 'undefined') {
+        const container = this.root.querySelector('#katex-container');
+        katex.render(this.textContent, container, this.options);
+      }
+    }
+
+  }
+
+  DMath.katexAdded = false;
+  DMath.inlineMathRendered = false;
+  window.DMath = DMath; // TODO: check if this can be removed, or if we should expose a distill global
+
+  // Copyright 2018 The Distill Template Authors
+  //
+  // Licensed under the Apache License, Version 2.0 (the "License");
+  // you may not use this file except in compliance with the License.
+  // You may obtain a copy of the License at
+  //
+  //      http://www.apache.org/licenses/LICENSE-2.0
+  //
+  // Unless required by applicable law or agreed to in writing, software
+  // distributed under the License is distributed on an "AS IS" BASIS,
+  // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  // See the License for the specific language governing permissions and
+  // limitations under the License.
+
+  function collect_citations(dom = document) {
+    const citations = new Set();
+    const citeTags = dom.querySelectorAll("d-cite");
+    for (const tag of citeTags) {
+      const keyString = tag.getAttribute("key") || tag.getAttribute("bibtex-key");
+      const keys = keyString.split(",").map(k => k.trim());
+      for (const key of keys) {
+        citations.add(key);
+      }
+    }
+    return [...citations];
+  }
+
+  function author_string(ent, template, sep, finalSep) {
+    if (ent.author == null) {
+      return "";
+    }
+    var names = ent.author.split(" and ");
+    let name_strings = names.map(name => {
+      name = name.trim();
+      if (name.indexOf(",") != -1) {
+        var last = name.split(",")[0].trim();
+        var firsts = name.split(",")[1];
+      } else if (name.indexOf(" ") != -1) {
+        var last = name
+          .split(" ")
+          .slice(-1)[0]
+          .trim();
+        var firsts = name
+          .split(" ")
+          .slice(0, -1)
+          .join(" ");
+      } else {
+        var last = name.trim();
+      }
+      var initials = "";
+      if (firsts != undefined) {
+        initials = firsts
+          .trim()
+          .split(" ")
+          .map(s => s.trim()[0]);
+        initials = initials.join(".") + ".";
+      }
+      return template
+        .replace("${F}", firsts)
+        .replace("${L}", last)
+        .replace("${I}", initials)
+        .trim(); // in case one of first or last was empty
+    });
+    if (names.length > 1) {
+      var str = name_strings.slice(0, names.length - 1).join(sep);
+      str += (finalSep || sep) + name_strings[names.length - 1];
+      return str;
+    } else {
+      return name_strings[0];
+    }
+  }
+
+  function venue_string(ent) {
+    var cite = ent.journal || ent.booktitle || "";
+    if ("volume" in ent) {
+      var issue = ent.issue || ent.number;
+      issue = issue != undefined ? "(" + issue + ")" : "";
+      cite += ", Vol " + ent.volume + issue;
+    }
+    if ("pages" in ent) {
+      cite += ", pp. " + ent.pages;
+    }
+    if (cite != "") cite += ". ";
+    if ("publisher" in ent) {
+      cite += ent.publisher;
+      if (cite[cite.length - 1] != ".") cite += ".";
+    }
+    return cite;
+  }
+
+  function link_string(ent) {
+    if ("url" in ent) {
+      var url = ent.url;
+      var arxiv_match = /arxiv\.org\/abs\/([0-9\.]*)/.exec(url);
+      if (arxiv_match != null) {
+        url = `http://arxiv.org/pdf/${arxiv_match[1]}.pdf`;
+      }
+
+      if (url.slice(-4) == ".pdf") {
+        var label = "PDF";
+      } else if (url.slice(-5) == ".html") {
+        var label = "HTML";
+      }
+      return ` &ensp;<a href="${url}">[${label || "link"}]</a>`;
+    } /* else if ("doi" in ent){
+      return ` &ensp;<a href="https://doi.org/${ent.doi}" >[DOI]</a>`;
+    }*/ else {
+      return "";
+    }
+  }
+  function doi_string(ent, new_line) {
+    if ("doi" in ent) {
+      return `${new_line ? "<br>" : ""} <a href="https://doi.org/${
+      ent.doi
+    }" style="text-decoration:inherit;">DOI: ${ent.doi}</a>`;
+    } else {
+      return "";
+    }
+  }
+
+  function title_string(ent) {
+    return '<span class="title">' + ent.title + "</span> ";
+  }
+
+  function bibliography_cite(ent, fancy) {
+    if (ent) {
+      var cite = title_string(ent);
+      cite += link_string(ent) + "<br>";
+      if (ent.author) {
+        cite += author_string(ent, "${L}, ${I}", ", ", " and ");
+        if (ent.year || ent.date) {
+          cite += ", ";
+        }
+      }
+      if (ent.year || ent.date) {
+        cite += (ent.year || ent.date) + ". ";
+      } else {
+        cite += ". ";
+      }
+      cite += venue_string(ent);
+      cite += doi_string(ent);
+      return cite;
+      /*var cite =  author_string(ent, "${L}, ${I}", ", ", " and ");
+      if (ent.year || ent.date){
+        cite += ", " + (ent.year || ent.date) + ". "
+      } else {
+        cite += ". "
+      }
+      cite += "<b>" + ent.title + "</b>. ";
+      cite += venue_string(ent);
+      cite += doi_string(ent);
+      cite += link_string(ent);
+      return cite*/
+    } else {
+      return "?";
+    }
+  }
+
+  function hover_cite(ent) {
+    if (ent) {
+      var cite = "";
+      cite += "<strong>" + ent.title + "</strong>";
+      cite += link_string(ent);
+      cite += "<br>";
+
+      var a_str = author_string(ent, "${I} ${L}", ", ") + ".";
+      var v_str =
+        venue_string(ent).trim() + " " + ent.year + ". " + doi_string(ent, true);
+
+      if ((a_str + v_str).length < Math.min(40, ent.title.length)) {
+        cite += a_str + " " + v_str;
+      } else {
+        cite += a_str + "<br>" + v_str;
+      }
+      return cite;
+    } else {
+      return "?";
+    }
+  }
+
+  function domContentLoaded() {
+    return ['interactive', 'complete'].indexOf(document.readyState) !== -1;
+  }
+
+  // Copyright 2018 The Distill Template Authors
+  //
+  // Licensed under the Apache License, Version 2.0 (the "License");
+  // you may not use this file except in compliance with the License.
+  // You may obtain a copy of the License at
+  //
+  //      http://www.apache.org/licenses/LICENSE-2.0
+  //
+  // Unless required by applicable law or agreed to in writing, software
+  // distributed under the License is distributed on an "AS IS" BASIS,
+  // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  // See the License for the specific language governing permissions and
+  // limitations under the License.
+
+  function _moveLegacyAffiliationFormatIntoArray(frontMatter) {
+    // authors used to have propoerties "affiliation" and "affiliationURL".
+    // We now encourage using an array for affiliations containing objects with
+    // properties "name" and "url".
+    for (let author of frontMatter.authors) {
+      const hasOldStyle = Boolean(author.affiliation);
+      const hasNewStyle = Boolean(author.affiliations);
+      if (!hasOldStyle) continue;
+      if (hasNewStyle) {
+        console.warn(`Author ${author.author} has both old-style ("affiliation" & "affiliationURL") and new style ("affiliations") affiliation information!`);
+      } else {
+        let newAffiliation = {
+          "name": author.affiliation
+        };
+        if (author.affiliationURL) newAffiliation.url = author.affiliationURL;
+        author.affiliations = [newAffiliation];
+      }
+    }
+    return frontMatter
+  }
+
+  function parseFrontmatter(element) {
+    const scriptTag = element.firstElementChild;
+    if (scriptTag) {
+      const type = scriptTag.getAttribute('type');
+      if (type.split('/')[1] == 'json') {
+        const content = scriptTag.textContent;
+        const parsed = JSON.parse(content);
+        return _moveLegacyAffiliationFormatIntoArray(parsed);
+      } else {
+        console.error('Distill only supports JSON frontmatter tags anymore; no more YAML.');
+      }
+    } else {
+      console.error('You added a frontmatter tag but did not provide a script tag with front matter data in it. Please take a look at our templates.');
+    }
+    return {};
+  }
+
+  class FrontMatter extends HTMLElement {
+
+    static get is() { return 'd-front-matter'; }
+
+    constructor() {
+      super();
+
+      const options = {childList: true, characterData: true, subtree: true};
+      const observer = new MutationObserver( (entries) => {
+        for (const entry of entries) {
+          if (entry.target.nodeName === 'SCRIPT' || entry.type === 'characterData') {
+            const data = parseFrontmatter(this);
+            this.notify(data);
+          }
+        }
+      });
+      observer.observe(this, options);
+    }
+
+    notify(data) {
+      const options = { detail: data, bubbles: true };
+      const event = new CustomEvent('onFrontMatterChanged', options);
+      document.dispatchEvent(event);
+    }
+
+  }
+
+  // Copyright 2018 The Distill Template Authors
+  //
+  // Licensed under the Apache License, Version 2.0 (the "License");
+  // you may not use this file except in compliance with the License.
+  // You may obtain a copy of the License at
+  //
+  //      http://www.apache.org/licenses/LICENSE-2.0
+  //
+  // Unless required by applicable law or agreed to in writing, software
+  // distributed under the License is distributed on an "AS IS" BASIS,
+  // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  // See the License for the specific language governing permissions and
+  // limitations under the License.
+
+  // no appendix -> add appendix
+  // title in front, no h1 -> add it
+  // no title in front, h1 -> read and put into frontMatter
+  // footnote -> footnote list
+  // break up bib
+  // if citation, no bib-list -> add citation-list
+
+  // if authors, no byline -> add byline
+
+  function optionalComponents(dom, data) {
+    const body = dom.body;
+    const article = body.querySelector('d-article');
+
+    // If we don't have an article tag, something weird is going on—giving up.
+    if (!article) {
+      console.warn('No d-article tag found; skipping adding optional components!');
+      return;
+    }
+
+    let byline = dom.querySelector('d-byline');
+    if (!byline) {
+      if (data.authors) {
+        byline = dom.createElement('d-byline');
+        body.insertBefore(byline, article);
+      } else {
+        console.warn('No authors found in front matter; please add them before submission!');
+      }
+    }
+
+    let title = dom.querySelector('d-title');
+    if (!title) {
+      title = dom.createElement('d-title');
+      body.insertBefore(title, byline);
+    }
+
+    let h1 = title.querySelector('h1');
+    if (!h1) {
+      h1 = dom.createElement('h1');
+      h1.textContent = data.title;
+      title.insertBefore(h1, title.firstChild);
+    }
+
+    const hasPassword = typeof data.password !== 'undefined';
+    let interstitial = body.querySelector('d-interstitial');
+    if (hasPassword && !interstitial) {
+      const inBrowser = typeof window !== 'undefined';
+      const onLocalhost = inBrowser && window.location.hostname.includes('localhost');
+      if (!inBrowser || !onLocalhost) {
+        interstitial = dom.createElement('d-interstitial');
+        interstitial.password = data.password;
+        body.insertBefore(interstitial, body.firstChild);
+      }
+    } else if (!hasPassword && interstitial) {
+      interstitial.parentElement.removeChild(this);
+    }
+
+    let appendix = dom.querySelector('d-appendix');
+    if (!appendix) {
+      appendix = dom.createElement('d-appendix');
+      dom.body.appendChild(appendix);
+    }
+
+    let footnoteList = dom.querySelector('d-footnote-list');
+    if (!footnoteList) {
+      footnoteList = dom.createElement('d-footnote-list');
+      appendix.appendChild(footnoteList);
+    }
+
+    let citationList = dom.querySelector('d-citation-list');
+    if (!citationList) {
+      citationList = dom.createElement('d-citation-list');
+      appendix.appendChild(citationList);
+    }
+
+  }
+
+  // Copyright 2018 The Distill Template Authors
+
+  const frontMatter = new FrontMatter$1();
+
+  const Controller = {
+    frontMatter: frontMatter,
+    waitingOn: {
+      bibliography: [],
+      citations: []
+    },
+    listeners: {
+      onCiteKeyCreated(event) {
+        const [citeTag, keys] = event.detail;
+
+        // ensure we have citations
+        if (!frontMatter.citationsCollected) {
+          // console.debug('onCiteKeyCreated, but unresolved dependency ("citations"). Enqueing.');
+          Controller.waitingOn.citations.push(() =>
+            Controller.listeners.onCiteKeyCreated(event)
+          );
+          return;
+        }
+
+        // ensure we have a loaded bibliography
+        if (!frontMatter.bibliographyParsed) {
+          // console.debug('onCiteKeyCreated, but unresolved dependency ("bibliography"). Enqueing.');
+          Controller.waitingOn.bibliography.push(() =>
+            Controller.listeners.onCiteKeyCreated(event)
+          );
+          return;
+        }
+
+        const numbers = keys.map(key => frontMatter.citations.indexOf(key));
+        citeTag.numbers = numbers;
+        const entries = keys.map(key => frontMatter.bibliography.get(key));
+        citeTag.entries = entries;
+      },
+
+      onCiteKeyChanged() {
+        // const [citeTag, keys] = event.detail;
+
+        // update citations
+        frontMatter.citations = collect_citations();
+        frontMatter.citationsCollected = true;
+        for (const waitingCallback of Controller.waitingOn.citations.slice()) {
+          waitingCallback();
+        }
+
+        // update bibliography
+        const citationListTag = document.querySelector("d-citation-list");
+        const bibliographyEntries = new Map(
+          frontMatter.citations.map(citationKey => {
+            return [citationKey, frontMatter.bibliography.get(citationKey)];
+          })
+        );
+        citationListTag.citations = bibliographyEntries;
+
+        const citeTags = document.querySelectorAll("d-cite");
+        for (const citeTag of citeTags) {
+          console.log(citeTag);
+          const keys = citeTag.keys;
+          const numbers = keys.map(key => frontMatter.citations.indexOf(key));
+          citeTag.numbers = numbers;
+          const entries = keys.map(key => frontMatter.bibliography.get(key));
+          citeTag.entries = entries;
+        }
+      },
+
+      onCiteKeyRemoved(event) {
+        Controller.listeners.onCiteKeyChanged(event);
+      },
+
+      onBibliographyChanged(event) {
+        const citationListTag = document.querySelector("d-citation-list");
+
+        const bibliography = event.detail;
+
+        frontMatter.bibliography = bibliography;
+        frontMatter.bibliographyParsed = true;
+        for (const waitingCallback of Controller.waitingOn.bibliography.slice()) {
+          waitingCallback();
+        }
+
+        // ensure we have citations
+        if (!frontMatter.citationsCollected) {
+          Controller.waitingOn.citations.push(function() {
+            Controller.listeners.onBibliographyChanged({
+              target: event.target,
+              detail: event.detail
+            });
+          });
+          return;
+        }
+
+        if (citationListTag.hasAttribute("distill-prerendered")) {
+          console.debug("Citation list was prerendered; not updating it.");
+        } else {
+          const entries = new Map(
+            frontMatter.citations.map(citationKey => {
+              return [citationKey, frontMatter.bibliography.get(citationKey)];
+            })
+          );
+          citationListTag.citations = entries;
+        }
+      },
+
+      onFootnoteChanged() {
+        // const footnote = event.detail;
+        //TODO: optimize to only update current footnote
+        const footnotesList = document.querySelector("d-footnote-list");
+        if (footnotesList) {
+          const footnotes = document.querySelectorAll("d-footnote");
+          footnotesList.footnotes = footnotes;
+        }
+      },
+
+      onFrontMatterChanged(event) {
+        const data = event.detail;
+        mergeFromYMLFrontmatter(frontMatter, data);
+
+        const interstitial = document.querySelector("d-interstitial");
+        if (interstitial) {
+          if (typeof frontMatter.password !== "undefined") {
+            interstitial.password = frontMatter.password;
+          } else {
+            interstitial.parentElement.removeChild(interstitial);
+          }
+        }
+
+        const prerendered = document.body.hasAttribute("distill-prerendered");
+        if (!prerendered && domContentLoaded()) {
+          optionalComponents(document, frontMatter);
+
+          const appendix = document.querySelector("distill-appendix");
+          if (appendix) {
+            appendix.frontMatter = frontMatter;
+          }
+
+          const byline = document.querySelector("d-byline");
+          if (byline) {
+            byline.frontMatter = frontMatter;
+          }
+
+          if (data.katex) {
+            DMath.katexOptions = data.katex;
+          }
+        }
+      },
+
+      DOMContentLoaded() {
+        if (Controller.loaded) {
+          console.warn(
+            "Controller received DOMContentLoaded but was already loaded!"
+          );
+          return;
+        } else if (!domContentLoaded()) {
+          console.warn(
+            "Controller received DOMContentLoaded at document.readyState: " +
+              document.readyState +
+              "!"
+          );
+          return;
+        } else {
+          Controller.loaded = true;
+          console.debug("Runlevel 4: Controller running DOMContentLoaded");
+        }
+
+        const frontMatterTag = document.querySelector("d-front-matter");
+        if (frontMatterTag) {
+          const data = parseFrontmatter(frontMatterTag);
+          Controller.listeners.onFrontMatterChanged({ detail: data });
+        }
+
+        // Resolving "citations" dependency due to initial DOM load
+        frontMatter.citations = collect_citations();
+        frontMatter.citationsCollected = true;
+        for (const waitingCallback of Controller.waitingOn.citations.slice()) {
+          waitingCallback();
+        }
+
+        if (frontMatter.bibliographyParsed) {
+          for (const waitingCallback of Controller.waitingOn.bibliography.slice()) {
+            waitingCallback();
+          }
+        }
+
+        const footnotesList = document.querySelector("d-footnote-list");
+        if (footnotesList) {
+          const footnotes = document.querySelectorAll("d-footnote");
+          footnotesList.footnotes = footnotes;
+        }
+      }
+    } // listeners
+  }; // Controller
+
+  var base = "/*\n * Copyright 2018 The Distill Template Authors\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\n\nhtml {\n  font-size: 14px;\n\tline-height: 1.6em;\n  /* font-family: \"Libre Franklin\", \"Helvetica Neue\", sans-serif; */\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Oxygen, Ubuntu, Cantarell, \"Fira Sans\", \"Droid Sans\", \"Helvetica Neue\", Arial, sans-serif;\n  /*, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";*/\n  text-size-adjust: 100%;\n  -ms-text-size-adjust: 100%;\n  -webkit-text-size-adjust: 100%;\n}\n\n@media(min-width: 768px) {\n  html {\n    font-size: 16px;\n  }\n}\n\nbody {\n  margin: 0;\n}\n\na {\n  color: #004276;\n}\n\nfigure {\n  margin: 0;\n}\n\ntable {\n\tborder-collapse: collapse;\n\tborder-spacing: 0;\n}\n\ntable th {\n\ttext-align: left;\n}\n\ntable thead {\n  border-bottom: 1px solid rgba(0, 0, 0, 0.05);\n}\n\ntable thead th {\n  padding-bottom: 0.5em;\n}\n\ntable tbody :first-child td {\n  padding-top: 0.5em;\n}\n\npre {\n  overflow: auto;\n  max-width: 100%;\n}\n\np {\n  margin-top: 0;\n  margin-bottom: 1em;\n}\n\nsup, sub {\n  vertical-align: baseline;\n  position: relative;\n  top: -0.4em;\n  line-height: 1em;\n}\n\nsub {\n  top: 0.4em;\n}\n\n.kicker,\n.marker {\n  font-size: 15px;\n  font-weight: 600;\n  color: rgba(0, 0, 0, 0.5);\n}\n\n\n/* Headline */\n\n@media(min-width: 1024px) {\n  d-title h1 span {\n    display: block;\n  }\n}\n\n/* Figure */\n\nfigure {\n  position: relative;\n  margin-bottom: 2.5em;\n  margin-top: 1.5em;\n}\n\nfigcaption+figure {\n\n}\n\nfigure img {\n  width: 100%;\n}\n\nfigure svg text,\nfigure svg tspan {\n}\n\nfigcaption,\n.figcaption {\n  color: rgba(0, 0, 0, 0.6);\n  font-size: 12px;\n  line-height: 1.5em;\n}\n\n@media(min-width: 1024px) {\nfigcaption,\n.figcaption {\n    font-size: 13px;\n  }\n}\n\nfigure.external img {\n  background: white;\n  border: 1px solid rgba(0, 0, 0, 0.1);\n  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);\n  padding: 18px;\n  box-sizing: border-box;\n}\n\nfigcaption a {\n  color: rgba(0, 0, 0, 0.6);\n}\n\nfigcaption b,\nfigcaption strong, {\n  font-weight: 600;\n  color: rgba(0, 0, 0, 1.0);\n}\n";
+
+  var layout = "/*\n * Copyright 2018 The Distill Template Authors\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\n\n@supports not (display: grid) {\n  .base-grid,\n  distill-header,\n  d-title,\n  d-abstract,\n  d-article,\n  d-appendix,\n  distill-appendix,\n  d-byline,\n  d-footnote-list,\n  d-citation-list,\n  distill-footer {\n    display: block;\n    padding: 8px;\n  }\n}\n\n.base-grid,\ndistill-header,\nd-title,\nd-abstract,\nd-article,\nd-appendix,\ndistill-appendix,\nd-byline,\nd-footnote-list,\nd-citation-list,\ndistill-footer {\n  display: grid;\n  justify-items: stretch;\n  grid-template-columns: [screen-start] 8px [page-start kicker-start text-start gutter-start middle-start] 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr [text-end page-end gutter-end kicker-end middle-end] 8px [screen-end];\n  grid-column-gap: 8px;\n}\n\n.grid {\n  display: grid;\n  grid-column-gap: 8px;\n}\n\n@media(min-width: 768px) {\n  .base-grid,\n  distill-header,\n  d-title,\n  d-abstract,\n  d-article,\n  d-appendix,\n  distill-appendix,\n  d-byline,\n  d-footnote-list,\n  d-citation-list,\n  distill-footer {\n    grid-template-columns: [screen-start] 1fr [page-start kicker-start middle-start text-start] 45px 45px 45px 45px 45px 45px 45px 45px [ kicker-end text-end gutter-start] 45px [middle-end] 45px [page-end gutter-end] 1fr [screen-end];\n    grid-column-gap: 16px;\n  }\n\n  .grid {\n    grid-column-gap: 16px;\n  }\n}\n\n@media(min-width: 1000px) {\n  .base-grid,\n  distill-header,\n  d-title,\n  d-abstract,\n  d-article,\n  d-appendix,\n  distill-appendix,\n  d-byline,\n  d-footnote-list,\n  d-citation-list,\n  distill-footer {\n    grid-template-columns: [screen-start] 1fr [page-start kicker-start] 50px [middle-start] 50px [text-start kicker-end] 50px 50px 50px 50px 50px 50px 50px 50px [text-end gutter-start] 50px [middle-end] 50px [page-end gutter-end] 1fr [screen-end];\n    grid-column-gap: 16px;\n  }\n\n  .grid {\n    grid-column-gap: 16px;\n  }\n}\n\n@media(min-width: 1180px) {\n  .base-grid,\n  distill-header,\n  d-title,\n  d-abstract,\n  d-article,\n  d-appendix,\n  distill-appendix,\n  d-byline,\n  d-footnote-list,\n  d-citation-list,\n  distill-footer {\n    grid-template-columns: [screen-start] 1fr [page-start kicker-start] 60px [middle-start] 60px [text-start kicker-end] 60px 60px 60px 60px 60px 60px 60px 60px [text-end gutter-start] 60px [middle-end] 60px [page-end gutter-end] 1fr [screen-end];\n    grid-column-gap: 32px;\n  }\n\n  .grid {\n    grid-column-gap: 32px;\n  }\n}\n\n\n\n\n.base-grid {\n  grid-column: screen;\n}\n\n/* .l-body,\nd-article > *  {\n  grid-column: text;\n}\n\n.l-page,\nd-title > *,\nd-figure {\n  grid-column: page;\n} */\n\n.l-gutter {\n  grid-column: gutter;\n}\n\n.l-text,\n.l-body {\n  grid-column: text;\n}\n\n.l-page {\n  grid-column: page;\n}\n\n.l-body-outset {\n  grid-column: middle;\n}\n\n.l-page-outset {\n  grid-column: page;\n}\n\n.l-screen {\n  grid-column: screen;\n}\n\n.l-screen-inset {\n  grid-column: screen;\n  padding-left: 16px;\n  padding-left: 16px;\n}\n\n\n/* Aside */\n\nd-article aside {\n  grid-column: gutter;\n  font-size: 12px;\n  line-height: 1.6em;\n  color: rgba(0, 0, 0, 0.6)\n}\n\n@media(min-width: 768px) {\n  aside {\n    grid-column: gutter;\n  }\n\n  .side {\n    grid-column: gutter;\n  }\n}\n";
+
+  var print = "/*\n * Copyright 2018 The Distill Template Authors\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\n\n@media print {\n\n  @page {\n    size: 8in 11in;\n    @bottom-right {\n      content: counter(page) \" of \" counter(pages);\n    }\n  }\n\n  html {\n    /* no general margins -- CSS Grid takes care of those */\n  }\n\n  p, code {\n    page-break-inside: avoid;\n  }\n\n  h2, h3 {\n    page-break-after: avoid;\n  }\n\n  d-header {\n    visibility: hidden;\n  }\n\n  d-footer {\n    display: none!important;\n  }\n\n}\n";
+
+  var byline = "/*\n * Copyright 2018 The Distill Template Authors\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\n\nd-byline {\n  contain: style;\n  overflow: hidden;\n  border-top: 1px solid rgba(0, 0, 0, 0.1);\n  font-size: 0.8rem;\n  line-height: 1.8em;\n  padding: 1.5rem 0;\n  min-height: 1.8em;\n}\n\n\nd-byline .byline {\n  grid-template-columns: 1fr 1fr;\n  grid-column: text;\n}\n\n@media(min-width: 768px) {\n  d-byline .byline {\n    grid-template-columns: 1fr 1fr 1fr 1fr;\n  }\n}\n\nd-byline .authors-affiliations {\n  grid-column-end: span 2;\n  grid-template-columns: 1fr 1fr;\n  margin-bottom: 1em;\n}\n\n@media(min-width: 768px) {\n  d-byline .authors-affiliations {\n    margin-bottom: 0;\n  }\n}\n\nd-byline h3 {\n  font-size: 0.6rem;\n  font-weight: 400;\n  color: rgba(0, 0, 0, 0.5);\n  margin: 0;\n  text-transform: uppercase;\n}\n\nd-byline p {\n  margin: 0;\n}\n\nd-byline a,\nd-article d-byline a {\n  color: rgba(0, 0, 0, 0.8);\n  text-decoration: none;\n  border-bottom: none;\n}\n\nd-article d-byline a:hover {\n  text-decoration: underline;\n  border-bottom: none;\n}\n\nd-byline p.author {\n  font-weight: 500;\n}\n\nd-byline .affiliations {\n\n}\n";
+
+  var article = "/*\n * Copyright 2018 The Distill Template Authors\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\n\nd-article {\n  contain: layout style;\n  overflow-x: hidden;\n  border-top: 1px solid rgba(0, 0, 0, 0.1);\n  padding-top: 2rem;\n  color: rgba(0, 0, 0, 0.8);\n}\n\nd-article > * {\n  grid-column: text;\n}\n\n@media(min-width: 768px) {\n  d-article {\n    font-size: 16px;\n  }\n}\n\n@media(min-width: 1024px) {\n  d-article {\n    font-size: 1.06rem;\n    line-height: 1.7em;\n  }\n}\n\n\n/* H2 */\n\n\nd-article .marker {\n  text-decoration: none;\n  border: none;\n  counter-reset: section;\n  grid-column: kicker;\n  line-height: 1.7em;\n}\n\nd-article .marker:hover {\n  border: none;\n}\n\nd-article .marker span {\n  padding: 0 3px 4px;\n  border-bottom: 1px solid rgba(0, 0, 0, 0.2);\n  position: relative;\n  top: 4px;\n}\n\nd-article .marker:hover span {\n  color: rgba(0, 0, 0, 0.7);\n  border-bottom: 1px solid rgba(0, 0, 0, 0.7);\n}\n\nd-article h2 {\n  font-weight: 600;\n  font-size: 24px;\n  line-height: 1.25em;\n  margin: 2rem 0 1.5rem 0;\n  border-bottom: 1px solid rgba(0, 0, 0, 0.1);\n  padding-bottom: 1rem;\n}\n\n@media(min-width: 1024px) {\n  d-article h2 {\n    font-size: 36px;\n  }\n}\n\n/* H3 */\n\nd-article h3 {\n  font-weight: 700;\n  font-size: 18px;\n  line-height: 1.4em;\n  margin-bottom: 1em;\n  margin-top: 2em;\n}\n\n@media(min-width: 1024px) {\n  d-article h3 {\n    font-size: 20px;\n  }\n}\n\n/* H4 */\n\nd-article h4 {\n  font-weight: 600;\n  text-transform: uppercase;\n  font-size: 14px;\n  line-height: 1.4em;\n}\n\nd-article a {\n  color: inherit;\n}\n\nd-article p,\nd-article ul,\nd-article ol,\nd-article blockquote {\n  margin-top: 0;\n  margin-bottom: 1em;\n  margin-left: 0;\n  margin-right: 0;\n}\n\nd-article blockquote {\n  border-left: 2px solid rgba(0, 0, 0, 0.2);\n  padding-left: 2em;\n  font-style: italic;\n  color: rgba(0, 0, 0, 0.6);\n}\n\nd-article a {\n  border-bottom: 1px solid rgba(0, 0, 0, 0.4);\n  text-decoration: none;\n}\n\nd-article a:hover {\n  border-bottom: 1px solid rgba(0, 0, 0, 0.8);\n}\n\nd-article .link {\n  text-decoration: underline;\n  cursor: pointer;\n}\n\nd-article ul,\nd-article ol {\n  padding-left: 24px;\n}\n\nd-article li {\n  margin-bottom: 1em;\n  margin-left: 0;\n  padding-left: 0;\n}\n\nd-article li:last-child {\n  margin-bottom: 0;\n}\n\nd-article pre {\n  font-size: 14px;\n  margin-bottom: 20px;\n}\n\nd-article hr {\n  grid-column: screen;\n  width: 100%;\n  border: none;\n  border-bottom: 1px solid rgba(0, 0, 0, 0.1);\n  margin-top: 60px;\n  margin-bottom: 60px;\n}\n\nd-article section {\n  margin-top: 60px;\n  margin-bottom: 60px;\n}\n\nd-article span.equation-mimic {\n  font-family: georgia;\n  font-size: 115%;\n  font-style: italic;\n}\n\nd-article > d-code,\nd-article section > d-code  {\n  display: block;\n}\n\nd-article > d-math[block],\nd-article section > d-math[block]  {\n  display: block;\n}\n\n@media (max-width: 768px) {\n  d-article > d-code,\n  d-article section > d-code,\n  d-article > d-math[block],\n  d-article section > d-math[block] {\n      overflow-x: scroll;\n      -ms-overflow-style: none;  // IE 10+\n      overflow: -moz-scrollbars-none;  // Firefox\n  }\n\n  d-article > d-code::-webkit-scrollbar,\n  d-article section > d-code::-webkit-scrollbar,\n  d-article > d-math[block]::-webkit-scrollbar,\n  d-article section > d-math[block]::-webkit-scrollbar {\n    display: none;  // Safari and Chrome\n  }\n}\n\nd-article .citation {\n  color: #668;\n  cursor: pointer;\n}\n\nd-include {\n  width: auto;\n  display: block;\n}\n\nd-figure {\n  contain: layout style;\n}\n\n/* KaTeX */\n\n.katex, .katex-prerendered {\n  contain: style;\n  display: inline-block;\n}\n\n/* Tables */\n\nd-article table {\n  border-collapse: collapse;\n  margin-bottom: 1.5rem;\n  border-bottom: 1px solid rgba(0, 0, 0, 0.2);\n}\n\nd-article table th {\n  border-bottom: 1px solid rgba(0, 0, 0, 0.2);\n}\n\nd-article table td {\n  border-bottom: 1px solid rgba(0, 0, 0, 0.05);\n}\n\nd-article table tr:last-of-type td {\n  border-bottom: none;\n}\n\nd-article table th,\nd-article table td {\n  font-size: 15px;\n  padding: 2px 8px;\n}\n\nd-article table tbody :first-child td {\n  padding-top: 2px;\n}\n";
+
+  var title = "/*\n * Copyright 2018 The Distill Template Authors\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\n\nd-title {\n  padding: 2rem 0 1.5rem;\n  contain: layout style;\n  overflow-x: hidden;\n}\n\n@media(min-width: 768px) {\n  d-title {\n    padding: 4rem 0 1.5rem;\n  }\n}\n\nd-title h1 {\n  grid-column: text;\n  font-size: 40px;\n  font-weight: 700;\n  line-height: 1.1em;\n  margin: 0 0 0.5rem;\n}\n\n@media(min-width: 768px) {\n  d-title h1 {\n    font-size: 50px;\n  }\n}\n\nd-title p {\n  font-weight: 300;\n  font-size: 1.2rem;\n  line-height: 1.55em;\n  grid-column: text;\n}\n\nd-title .status {\n  margin-top: 0px;\n  font-size: 12px;\n  color: #009688;\n  opacity: 0.8;\n  grid-column: kicker;\n}\n\nd-title .status span {\n  line-height: 1;\n  display: inline-block;\n  padding: 6px 0;\n  border-bottom: 1px solid #80cbc4;\n  font-size: 11px;\n  text-transform: uppercase;\n}\n";
+
+  // Copyright 2018 The Distill Template Authors
+
+  const styles$2 = base + layout + title + byline + article + math + print;
+
+  function makeStyleTag(dom) {
+
+    const styleTagId = 'distill-prerendered-styles';
+    const prerenderedTag = dom.getElementById(styleTagId);
+    if (!prerenderedTag) {
+      const styleTag = dom.createElement('style');
+      styleTag.id = styleTagId;
+      styleTag.type = 'text/css';
+      const cssTextTag = dom.createTextNode(styles$2);
+      styleTag.appendChild(cssTextTag);
+      const firstScriptTag = dom.head.querySelector('script');
+      dom.head.insertBefore(styleTag, firstScriptTag);
+    }
+
+  }
+
+  // Copyright 2018 The Distill Template Authors
+  //
+  // Licensed under the Apache License, Version 2.0 (the "License");
+  // you may not use this file except in compliance with the License.
+  // You may obtain a copy of the License at
+  //
+  //      http://www.apache.org/licenses/LICENSE-2.0
+  //
+  // Unless required by applicable law or agreed to in writing, software
+  // distributed under the License is distributed on an "AS IS" BASIS,
+  // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  // See the License for the specific language governing permissions and
+  // limitations under the License.
+
+  function addPolyfill(polyfill, polyfillLoadedCallback) {
+    console.debug('Runlevel 0: Polyfill required: ' + polyfill.name);
+    const script = document.createElement('script');
+    script.src = polyfill.url;
+    script.async = false;
+    if (polyfillLoadedCallback) {
+      script.onload = function() { polyfillLoadedCallback(polyfill); };
+    }
+    script.onerror = function() {
+      new Error('Runlevel 0: Polyfills failed to load script ' + polyfill.name);
+    };
+    document.head.appendChild(script);
+  }
+
+  const polyfills = [
+    {
+      name: 'WebComponents',
+      support: function() {
+        return 'customElements' in window &&
+               'attachShadow' in Element.prototype &&
+               'getRootNode' in Element.prototype &&
+               'content' in document.createElement('template') &&
+               'Promise' in window &&
+               'from' in Array;
+      },
+      url: 'https://distill.pub/third-party/polyfills/webcomponents-lite.js'
+    }, {
+      name: 'IntersectionObserver',
+      support: function() {
+        return 'IntersectionObserver' in window &&
+               'IntersectionObserverEntry' in window;
+      },
+      url: 'https://distill.pub/third-party/polyfills/intersection-observer.js'
+    },
+  ];
+
+  class Polyfills {
+
+    static browserSupportsAllFeatures() {
+      return polyfills.every((poly) => poly.support());
+    }
+
+    static load(callback) {
+      // Define an intermediate callback that checks if all is loaded.
+      const polyfillLoaded = function(polyfill) {
+        polyfill.loaded = true;
+        console.debug('Runlevel 0: Polyfill has finished loading: ' + polyfill.name);
+        // console.debug(window[polyfill.name]);
+        if (Polyfills.neededPolyfills.every((poly) => poly.loaded)) {
+          console.debug('Runlevel 0: All required polyfills have finished loading.');
+          console.debug('Runlevel 0->1.');
+          window.distillRunlevel = 1;
+          callback();
+        }
+      };
+      // Add polyfill script tags
+      for (const polyfill of Polyfills.neededPolyfills) {
+        addPolyfill(polyfill, polyfillLoaded);
+      }
+    }
+
+    static get neededPolyfills() {
+      if (!Polyfills._neededPolyfills) {
+        Polyfills._neededPolyfills = polyfills.filter((poly) => !poly.support());
+      }
+      return Polyfills._neededPolyfills;
+    }
+  }
+
+  // Copyright 2018 The Distill Template Authors
+  //
+  // Licensed under the Apache License, Version 2.0 (the "License");
+  // you may not use this file except in compliance with the License.
+  // You may obtain a copy of the License at
+  //
+  //      http://www.apache.org/licenses/LICENSE-2.0
+  //
+  // Unless required by applicable law or agreed to in writing, software
+  // distributed under the License is distributed on an "AS IS" BASIS,
+  // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  // See the License for the specific language governing permissions and
+  // limitations under the License.
+
+  // const marginSmall = 16;
+  // const marginLarge = 3 * marginSmall;
+  // const margin = marginSmall + marginLarge;
+  // const gutter = marginSmall;
+  // const outsetAmount = margin / 2;
+  // const numCols = 4;
+  // const numGutters = numCols - 1;
+  // const columnWidth = (768 - 2 * marginLarge - numGutters * gutter) / numCols;
+  //
+  // const screenwidth = 768;
+  // const pageWidth = screenwidth - 2 * marginLarge;
+  // const bodyWidth = pageWidth - columnWidth - gutter;
+
+  function body(selector) {
+    return `${selector} {
+      grid-column: left / text;
+    }
+  `;
+  }
+
+  // Copyright 2018 The Distill Template Authors
+
+  const T$b = Template('d-abstract', `
+<style>
+  :host {
+    font-size: 1.25rem;
+    line-height: 1.6em;
+    color: rgba(0, 0, 0, 0.7);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::slotted(p) {
+    margin-top: 0;
+    margin-bottom: 1em;
+    grid-column: text-start / middle-end;
+  }
+  ${body('d-abstract')}
+</style>
+
+<slot></slot>
+`);
+
+  class Abstract extends T$b(HTMLElement) {
+
+  }
+
+  // Copyright 2018 The Distill Template Authors
+
+  const T$a = Template('d-appendix', `
+<style>
+
+d-appendix {
+  contain: layout style;
+  font-size: 0.8em;
+  line-height: 1.7em;
+  margin-top: 60px;
+  margin-bottom: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  color: rgba(0,0,0,0.5);
+  padding-top: 60px;
+  padding-bottom: 48px;
+}
+
+d-appendix h3 {
+  grid-column: page-start / text-start;
+  font-size: 15px;
+  font-weight: 500;
+  margin-top: 1em;
+  margin-bottom: 0;
+  color: rgba(0,0,0,0.65);
+}
+
+d-appendix h3 + * {
+  margin-top: 1em;
+}
+
+d-appendix ol {
+  padding: 0 0 0 15px;
+}
+
+@media (min-width: 768px) {
+  d-appendix ol {
+    padding: 0 0 0 30px;
+    margin-left: -30px;
+  }
+}
+
+d-appendix li {
+  margin-bottom: 1em;
+}
+
+d-appendix a {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+d-appendix > * {
+  grid-column: text;
+}
+
+d-appendix > d-footnote-list,
+d-appendix > d-citation-list,
+d-appendix > distill-appendix {
+  grid-column: screen;
+}
+
+</style>
+
+`, false);
+
+  class Appendix extends T$a(HTMLElement) {
+
+  }
+
+  // Copyright 2018 The Distill Template Authors
+  //
+  // Licensed under the Apache License, Version 2.0 (the "License");
+  // you may not use this file except in compliance with the License.
+  // You may obtain a copy of the License at
+  //
+  //      http://www.apache.org/licenses/LICENSE-2.0
+  //
+  // Unless required by applicable law or agreed to in writing, software
+  // distributed under the License is distributed on an "AS IS" BASIS,
+  // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  // See the License for the specific language governing permissions and
+  // limitations under the License.
+
+  // import { Template } from '../mixins/template';
+  // import { Controller } from '../controller';
+
+  const isOnlyWhitespace = /^\s*$/;
+
+  class Article extends HTMLElement {
+    static get is() { return 'd-article'; }
+
+    constructor() {
+      super();
+
+      new MutationObserver( (mutations) => {
+        for (const mutation of mutations) {
+          for (const addedNode of mutation.addedNodes) {
+            switch (addedNode.nodeName) {
+            case '#text': { // usually text nodes are only linebreaks.
+              const text = addedNode.nodeValue;
+              if (!isOnlyWhitespace.test(text)) {
+                console.warn('Use of unwrapped text in distill articles is discouraged as it breaks layout! Please wrap any text in a <span> or <p> tag. We found the following text: ' + text);
+                const wrapper = document.createElement('span');
+                wrapper.innerHTML = addedNode.nodeValue;
+                addedNode.parentNode.insertBefore(wrapper, addedNode);
+                addedNode.parentNode.removeChild(addedNode);
+              }
+            } break;
+            }
+          }
+        }
+      }).observe(this, {childList: true});
+    }
+
+  }
+
+  var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+  function createCommonjsModule(fn, module) {
+  	return module = { exports: {} }, fn(module, module.exports), module.exports;
+  }
+
+  var bibtexParse = createCommonjsModule(function (module, exports) {
+  /* start bibtexParse 0.0.22 */
+
+  //Original work by Henrik Muehe (c) 2010
+  //
+  //CommonJS port by Mikola Lysenko 2013
+  //
+  //Port to Browser lib by ORCID / RCPETERS
+  //
+  //Issues:
+  //no comment handling within strings
+  //no string concatenation
+  //no variable values yet
+  //Grammar implemented here:
+  //bibtex -> (string | preamble | comment | entry)*;
+  //string -> '@STRING' '{' key_equals_value '}';
+  //preamble -> '@PREAMBLE' '{' value '}';
+  //comment -> '@COMMENT' '{' value '}';
+  //entry -> '@' key '{' key ',' key_value_list '}';
+  //key_value_list -> key_equals_value (',' key_equals_value)*;
+  //key_equals_value -> key '=' value;
+  //value -> value_quotes | value_braces | key;
+  //value_quotes -> '"' .*? '"'; // not quite
+  //value_braces -> '{' .*? '"'; // not quite
+  (function(exports) {
+
+      function BibtexParser() {
+          
+          this.months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+          this.notKey = [',','{','}',' ','='];
+          this.pos = 0;
+          this.input = "";
+          this.entries = new Array();
+
+          this.currentEntry = "";
+
+          this.setInput = function(t) {
+              this.input = t;
+          };
+
+          this.getEntries = function() {
+              return this.entries;
+          };
+
+          this.isWhitespace = function(s) {
+              return (s == ' ' || s == '\r' || s == '\t' || s == '\n');
+          };
+
+          this.match = function(s, canCommentOut) {
+              if (canCommentOut == undefined || canCommentOut == null)
+                  canCommentOut = true;
+              this.skipWhitespace(canCommentOut);
+              if (this.input.substring(this.pos, this.pos + s.length) == s) {
+                  this.pos += s.length;
+              } else {
+                  throw "Token mismatch, expected " + s + ", found "
+                          + this.input.substring(this.pos);
+              }            this.skipWhitespace(canCommentOut);
+          };
+
+          this.tryMatch = function(s, canCommentOut) {
+              if (canCommentOut == undefined || canCommentOut == null)
+                  canCommentOut = true;
+              this.skipWhitespace(canCommentOut);
+              if (this.input.substring(this.pos, this.pos + s.length) == s) {
+                  return true;
+              } else {
+                  return false;
+              }        };
+
+          /* when search for a match all text can be ignored, not just white space */
+          this.matchAt = function() {
+              while (this.input.length > this.pos && this.input[this.pos] != '@') {
+                  this.pos++;
+              }
+              if (this.input[this.pos] == '@') {
+                  return true;
+              }            return false;
+          };
+
+          this.skipWhitespace = function(canCommentOut) {
+              while (this.isWhitespace(this.input[this.pos])) {
+                  this.pos++;
+              }            if (this.input[this.pos] == "%" && canCommentOut == true) {
+                  while (this.input[this.pos] != "\n") {
+                      this.pos++;
+                  }                this.skipWhitespace(canCommentOut);
+              }        };
+
+          this.value_braces = function() {
+              var bracecount = 0;
+              this.match("{", false);
+              var start = this.pos;
+              var escaped = false;
+              while (true) {
+                  if (!escaped) {
+                      if (this.input[this.pos] == '}') {
+                          if (bracecount > 0) {
+                              bracecount--;
+                          } else {
+                              var end = this.pos;
+                              this.match("}", false);
+                              return this.input.substring(start, end);
+                          }                    } else if (this.input[this.pos] == '{') {
+                          bracecount++;
+                      } else if (this.pos >= this.input.length - 1) {
+                          throw "Unterminated value";
+                      }                }                if (this.input[this.pos] == '\\' && escaped == false)
+                      escaped = true;
+                  else
+                      escaped = false;
+                  this.pos++;
+              }        };
+
+          this.value_comment = function() {
+              var str = '';
+              var brcktCnt = 0;
+              while (!(this.tryMatch("}", false) && brcktCnt == 0)) {
+                  str = str + this.input[this.pos];
+                  if (this.input[this.pos] == '{')
+                      brcktCnt++;
+                  if (this.input[this.pos] == '}')
+                      brcktCnt--;
+                  if (this.pos >= this.input.length - 1) {
+                      throw "Unterminated value:" + this.input.substring(start);
+                  }                this.pos++;
+              }            return str;
+          };
+
+          this.value_quotes = function() {
+              this.match('"', false);
+              var start = this.pos;
+              var escaped = false;
+              while (true) {
+                  if (!escaped) {
+                      if (this.input[this.pos] == '"') {
+                          var end = this.pos;
+                          this.match('"', false);
+                          return this.input.substring(start, end);
+                      } else if (this.pos >= this.input.length - 1) {
+                          throw "Unterminated value:" + this.input.substring(start);
+                      }                }
+                  if (this.input[this.pos] == '\\' && escaped == false)
+                      escaped = true;
+                  else
+                      escaped = false;
+                  this.pos++;
+              }        };
+
+          this.single_value = function() {
+              var start = this.pos;
+              if (this.tryMatch("{")) {
+                  return this.value_braces();
+              } else if (this.tryMatch('"')) {
+                  return this.value_quotes();
+              } else {
+                  var k = this.key();
+                  if (k.match("^[0-9]+$"))
+                      return k;
+                  else if (this.months.indexOf(k.toLowerCase()) >= 0)
+                      return k.toLowerCase();
+                  else
+                      throw "Value expected:" + this.input.substring(start) + ' for key: ' + k;
+              
+              }        };
+
+          this.value = function() {
+              var values = [];
+              values.push(this.single_value());
+              while (this.tryMatch("#")) {
+                  this.match("#");
+                  values.push(this.single_value());
+              }            return values.join("");
+          };
+
+          this.key = function() {
+              var start = this.pos;
+              while (true) {
+                  if (this.pos >= this.input.length) {
+                      throw "Runaway key";
+                  }                                // а-яА-Я is Cyrillic
+                  //console.log(this.input[this.pos]);
+                  if (this.notKey.indexOf(this.input[this.pos]) >= 0) {
+                      return this.input.substring(start, this.pos);
+                  } else {
+                      this.pos++;
+                      
+                  }            }        };
+
+          this.key_equals_value = function() {
+              var key = this.key();
+              if (this.tryMatch("=")) {
+                  this.match("=");
+                  var val = this.value();
+                  return [ key, val ];
+              } else {
+                  throw "... = value expected, equals sign missing:"
+                          + this.input.substring(this.pos);
+              }        };
+
+          this.key_value_list = function() {
+              var kv = this.key_equals_value();
+              this.currentEntry['entryTags'] = {};
+              this.currentEntry['entryTags'][kv[0]] = kv[1];
+              while (this.tryMatch(",")) {
+                  this.match(",");
+                  // fixes problems with commas at the end of a list
+                  if (this.tryMatch("}")) {
+                      break;
+                  }
+                  kv = this.key_equals_value();
+                  this.currentEntry['entryTags'][kv[0]] = kv[1];
+              }        };
+
+          this.entry_body = function(d) {
+              this.currentEntry = {};
+              this.currentEntry['citationKey'] = this.key();
+              this.currentEntry['entryType'] = d.substring(1);
+              this.match(",");
+              this.key_value_list();
+              this.entries.push(this.currentEntry);
+          };
+
+          this.directive = function() {
+              this.match("@");
+              return "@" + this.key();
+          };
+
+          this.preamble = function() {
+              this.currentEntry = {};
+              this.currentEntry['entryType'] = 'PREAMBLE';
+              this.currentEntry['entry'] = this.value_comment();
+              this.entries.push(this.currentEntry);
+          };
+
+          this.comment = function() {
+              this.currentEntry = {};
+              this.currentEntry['entryType'] = 'COMMENT';
+              this.currentEntry['entry'] = this.value_comment();
+              this.entries.push(this.currentEntry);
+          };
+
+          this.entry = function(d) {
+              this.entry_body(d);
+          };
+
+          this.bibtex = function() {
+              while (this.matchAt()) {
+                  var d = this.directive();
+                  this.match("{");
+                  if (d == "@STRING") {
+                      this.string();
+                  } else if (d == "@PREAMBLE") {
+                      this.preamble();
+                  } else if (d == "@COMMENT") {
+                      this.comment();
+                  } else {
+                      this.entry(d);
+                  }
+                  this.match("}");
+              }        };
+      }    
+      exports.toJSON = function(bibtex) {
+          var b = new BibtexParser();
+          b.setInput(bibtex);
+          b.bibtex();
+          return b.entries;
+      };
+
+      /* added during hackathon don't hate on me */
+      exports.toBibtex = function(json) {
+          var out = '';
+          for ( var i in json) {
+              out += "@" + json[i].entryType;
+              out += '{';
+              if (json[i].citationKey)
+                  out += json[i].citationKey + ', ';
+              if (json[i].entry)
+                  out += json[i].entry ;
+              if (json[i].entryTags) {
+                  var tags = '';
+                  for (var jdx in json[i].entryTags) {
+                      if (tags.length != 0)
+                          tags += ', ';
+                      tags += jdx + '= {' + json[i].entryTags[jdx] + '}';
+                  }
+                  out += tags;
+              }
+              out += '}\n\n';
+          }
+          return out;
+          
+      };
+
+  })(exports);
+
+  /* end bibtexParse */
+  });
+
+  // Copyright 2018 The Distill Template Authors
+
+  function normalizeTag(string) {
+    return string
+      .replace(/[\t\n ]+/g, ' ')
+      .replace(/{\\["^`.'acu~Hvs]( )?([a-zA-Z])}/g, (full, x, char) => char)
+      .replace(/{\\([a-zA-Z])}/g, (full, char) => char)
+      .replace(/[{}]/gi,'');  // Replace curly braces forcing plaintext in latex.
+  }
+
+  function parseBibtex(bibtex) {
+    const bibliography = new Map();
+    const parsedEntries = bibtexParse.toJSON(bibtex);
+    for (const entry of parsedEntries) {
+      // normalize tags; note entryTags is an object, not Map
+      for (const [key, value] of Object.entries(entry.entryTags)) {
+        entry.entryTags[key.toLowerCase()] = normalizeTag(value);
+      }
+      entry.entryTags.type = entry.entryType;
+      // add to bibliography
+      bibliography.set(entry.citationKey, entry.entryTags);
+    }
+    return bibliography;
+  }
+
+  function serializeFrontmatterToBibtex(frontMatter) {
+    return `@article{${frontMatter.slug},
+  author = {${frontMatter.bibtexAuthors}},
+  title = {${frontMatter.title}},
+  journal = {${frontMatter.journal.title}},
+  year = {${frontMatter.publishedYear}},
+  note = {${frontMatter.url}},
+  doi = {${frontMatter.doi}}
+}`;
+  }
+
+  // Copyright 2018 The Distill Template Authors
+
+  class Bibliography extends HTMLElement {
+
+    static get is() { return 'd-bibliography'; }
+
+    constructor() {
+      super();
+
+      // set up mutation observer
+      const options = {childList: true, characterData: true, subtree: true};
+      const observer = new MutationObserver( (entries) => {
+        for (const entry of entries) {
+          if (entry.target.nodeName === 'SCRIPT' || entry.type === 'characterData') {
+            this.parseIfPossible();
+          }
+        }
+      });
+      observer.observe(this, options);
+    }
+
+    connectedCallback() {
+      requestAnimationFrame(() => {
+        this.parseIfPossible();
+      });
+    }
+
+    parseIfPossible() {
+      const scriptTag = this.querySelector('script');
+      if (!scriptTag) return;
+      if (scriptTag.type == 'text/bibtex') {
+        const newBibtex = scriptTag.textContent;
+        if (this.bibtex !== newBibtex) {
+          this.bibtex = newBibtex;
+          const bibliography = parseBibtex(this.bibtex);
+          this.notify(bibliography);
+        }
+      } else if (scriptTag.type == 'text/json') {
+        const bibliography = new Map(JSON.parse(scriptTag.textContent));
+        this.notify(bibliography);
+      } else {
+        console.warn('Unsupported bibliography script tag type: ' + scriptTag.type);
+      }
+    }
+
+    notify(bibliography) {
+      const options = { detail: bibliography, bubbles: true };
+      const event = new CustomEvent('onBibliographyChanged', options);
+      this.dispatchEvent(event);
+    }
+
+    /* observe 'src' attribute */
+
+    static get observedAttributes() {
+      return ['src'];
+    }
+
+    receivedBibtex(event) {
+      const bibliography = parseBibtex(event.target.response);
+      this.notify(bibliography);
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+      var oReq = new XMLHttpRequest();
+      oReq.onload = (e) => this.receivedBibtex(e);
+      oReq.onerror = () => console.warn(`Could not load Bibtex! (tried ${newValue})`);
+      oReq.responseType = 'text';
+      oReq.open('GET', newValue, true);
+      oReq.send();
+    }
+
+
+  }
+
+  // Copyright 2018 The Distill Template Authors
+  //
+  // Licensed under the Apache License, Version 2.0 (the "License");
+  // you may not use this file except in compliance with the License.
+  // You may obtain a copy of the License at
+  //
+  //      http://www.apache.org/licenses/LICENSE-2.0
+  //
+  // Unless required by applicable law or agreed to in writing, software
+  // distributed under the License is distributed on an "AS IS" BASIS,
+  // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  // See the License for the specific language governing permissions and
+  // limitations under the License.
+
+  // import style from '../styles/d-byline.css';
+
+  function bylineTemplate(frontMatter) {
+    return `
+  <div class="byline grid">
+    <div class="authors-affiliations grid">
+      <h3>Authors</h3>
+      <h3>Affiliations</h3>
+      ${frontMatter.authors.map(author => `
+        <p class="author">
+          ${author.personalURL ? `
+            <a class="name" href="${author.personalURL}">${author.name}</a>` : `
+            <span class="name">${author.name}</span>`}
+        </p>
+        <p class="affiliation">
+        ${author.affiliations.map(affiliation =>
+          affiliation.url ? `<a class="affiliation" href="${affiliation.url}">${affiliation.name}</a>` : `<span class="affiliation">${affiliation.name}</span>`
+        ).join(', ')}
+        </p>
+      `).join('')}
+    </div>
+    <div>
+      <h3>Published</h3>
+      ${frontMatter.publishedDate ? `
+        <p>${frontMatter.publishedMonth} ${frontMatter.publishedDay}, ${frontMatter.publishedYear}</p> ` : `
+        <p><em>Not published yet.</em></p>`}
+    </div>
+    <div>
+      <h3>DOI</h3>
+      ${frontMatter.doi ? `
+        <p><a href="https://doi.org/${frontMatter.doi}">${frontMatter.doi}</a></p>` : `
+        <p><em>No DOI yet.</em></p>`}
+    </div>
+  </div>
+`;
+  }
+
+  class Byline extends HTMLElement {
+
+    static get is() { return 'd-byline'; }
+
+    set frontMatter(frontMatter) {
+      this.innerHTML = bylineTemplate(frontMatter);
+    }
+
+  }
+
+  // Copyright 2018 The Distill Template Authors
+
+  const T$9 = Template(
+    "d-cite",
+    `
+<style>
+
+:host {
+  display: inline-block;
+}
+
+.citation {
+  color: hsla(206, 90%, 20%, 0.7);
+}
+
+.citation-number {
+  cursor: default;
+  white-space: nowrap;
+  font-family: -apple-system, BlinkMacSystemFont, "Roboto", Helvetica, sans-serif;
+  font-size: 75%;
+  color: hsla(206, 90%, 20%, 0.7);
+  display: inline-block;
+  line-height: 1.1em;
+  text-align: center;
+  position: relative;
+  top: -2px;
+  margin: 0 2px;
+}
+
+figcaption .citation-number {
+  font-size: 11px;
+  font-weight: normal;
+  top: -2px;
+  line-height: 1em;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+ul li {
+  padding: 15px 10px 15px 10px;
+  border-bottom: 1px solid rgba(0,0,0,0.1)
+}
+
+ul li:last-of-type {
+  border-bottom: none;
+}
+
+</style>
+
+<d-hover-box id="hover-box"></d-hover-box>
+
+<div id="citation-" class="citation">
+  <span class="citation-number"></span>
+</div>
+`
+  );
+
+  class Cite extends T$9(HTMLElement) {
+    /* Lifecycle */
+    constructor() {
+      super();
+      this._numbers = [];
+      this._entries = [];
+    }
+
+    connectedCallback() {
+      this.outerSpan = this.root.querySelector("#citation-");
+      this.innerSpan = this.root.querySelector(".citation-number");
+      this.hoverBox = this.root.querySelector("d-hover-box");
+      window.customElements.whenDefined("d-hover-box").then(() => {
+        this.hoverBox.listen(this);
+      });
+      // in case this component got connected after values were set
+      if (this.numbers) {
+        this.displayNumbers(this.numbers);
+      }
+      if (this.entries) {
+        this.displayEntries(this.entries);
+      }
+    }
+
+    //TODO This causes an infinite loop on firefox with polyfills.
+    // This is only needed for interactive editing so no priority.
+    // disconnectedCallback() {
+    // const options = { detail: [this, this.keys], bubbles: true };
+    // const event = new CustomEvent('onCiteKeyRemoved', options);
+    // document.dispatchEvent(event);
+    // }
+
+    /* observe 'key' attribute */
+
+    static get observedAttributes() {
+      return ["key", "bibtex-key"];
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+      const eventName = oldValue ? "onCiteKeyChanged" : "onCiteKeyCreated";
+      const keys = newValue.split(",").map(k => k.trim());
+      const options = { detail: [this, keys], bubbles: true };
+      const event = new CustomEvent(eventName, options);
+      document.dispatchEvent(event);
+    }
+
+    set key(value) {
+      this.setAttribute("key", value);
+    }
+
+    get key() {
+      return this.getAttribute("key") || this.getAttribute("bibtex-key");
+    }
+
+    get keys() {
+      const result = this.key.split(",");
+      console.log(result);
+      return result;
+    }
+
+    /* Setters & Rendering */
+
+    set numbers(numbers) {
+      this._numbers = numbers;
+      this.displayNumbers(numbers);
+    }
+
+    get numbers() {
+      return this._numbers;
+    }
+
+    displayNumbers(numbers) {
+      if (!this.innerSpan) return;
+      const numberStrings = numbers.map(index => {
+        return index == -1 ? "?" : index + 1 + "";
+      });
+      const textContent = "[" + numberStrings.join(", ") + "]";
+      this.innerSpan.textContent = textContent;
+    }
+
+    set entries(entries) {
+      this._entries = entries;
+      this.displayEntries(entries);
+    }
+
+    get entries() {
+      return this._entries;
+    }
+
+    displayEntries(entries) {
+      if (!this.hoverBox) return;
+      this.hoverBox.innerHTML = `<ul>
+      ${entries
+        .map(hover_cite)
+        .map(html => `<li>${html}</li>`)
+        .join("\n")}
+    </ul>`;
+    }
+  }
+
+  // Copyright 2018 The Distill Template Authors
+
+  const styles$1 = `
+d-citation-list {
+  contain: style;
+}
+
+d-citation-list .references {
+  grid-column: text;
+}
+
+d-citation-list .references .title {
+  font-weight: 500;
+}
+`;
+
+  function renderCitationList(element, entries, dom=document) {
+    if (entries.size > 0) {
+      element.style.display = '';
+      let list = element.querySelector('.references');
+      if (list) {
+        list.innerHTML = '';
+      } else {
+        const stylesTag = dom.createElement('style');
+        stylesTag.innerHTML = styles$1;
+        element.appendChild(stylesTag);
+
+        const heading = dom.createElement('h3');
+        heading.id = 'references';
+        heading.textContent = 'References';
+        element.appendChild(heading);
+
+        list = dom.createElement('ol');
+        list.id = 'references-list';
+        list.className = 'references';
+        element.appendChild(list);
+      }
+
+      for (const [key, entry] of entries) {
+        const listItem = dom.createElement('li');
+        listItem.id = key;
+        listItem.innerHTML = bibliography_cite(entry);
+        list.appendChild(listItem);
+      }
+    } else {
+      element.style.display = 'none';
+    }
+  }
+
+  class CitationList extends HTMLElement {
+
+    static get is() { return 'd-citation-list'; }
+
+    connectedCallback() {
+      if (!this.hasAttribute('distill-prerendered')) {
+        this.style.display = 'none';
+      }
+    }
+
+    set citations(citations) {
+      renderCitationList(this, citations);
+    }
+
+  }
+
+  var prism = createCommonjsModule(function (module) {
+  /* **********************************************
+       Begin prism-core.js
+  ********************************************** */
+
+  /// <reference lib="WebWorker"/>
+
+  var _self = (typeof window !== 'undefined')
+  	? window   // if in browser
+  	: (
+  		(typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope)
+  			? self // if in worker
+  			: {}   // if in node js
+  	);
+
+  /**
    * Prism: Lightweight, robust, elegant syntax highlighting
    *
    * @license MIT <https://opensource.org/licenses/MIT>
    * @author Lea Verou <https://lea.verou.me>
    * @namespace
    * @public
-   */t.exports&&(t.exports=e),void 0!==H&&(H.Prism=e),e.languages.markup={comment:{pattern:/<!--(?:(?!<!--)[\s\S])*?-->/,greedy:!0},prolog:{pattern:/<\?[\s\S]+?\?>/,greedy:!0},doctype:{pattern:/<!DOCTYPE(?:[^>"'[\]]|"[^"]*"|'[^']*')+(?:\[(?:[^<"'\]]|"[^"]*"|'[^']*'|<(?!!--)|<!--(?:[^-]|-(?!->))*-->)*\]\s*)?>/i,greedy:!0,inside:{"internal-subset":{pattern:/(^[^\[]*\[)[\s\S]+(?=\]>$)/,lookbehind:!0,greedy:!0,inside:null},string:{pattern:/"[^"]*"|'[^']*'/,greedy:!0},punctuation:/^<!|>$|[[\]]/,"doctype-tag":/^DOCTYPE/i,name:/[^\s<>'"]+/}},cdata:{pattern:/<!\[CDATA\[[\s\S]*?\]\]>/i,greedy:!0},tag:{pattern:/<\/?(?!\d)[^\s>\/=$<%]+(?:\s(?:\s*[^\s>\/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+(?=[\s>]))|(?=[\s/>])))+)?\s*\/?>/,greedy:!0,inside:{tag:{pattern:/^<\/?[^\s>\/]+/,inside:{punctuation:/^<\/?/,namespace:/^[^\s>\/:]+:/}},"special-attr":[],"attr-value":{pattern:/=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+)/,inside:{punctuation:[{pattern:/^=/,alias:"attr-equals"},{pattern:/^(\s*)["']|["']$/,lookbehind:!0}]}},punctuation:/\/?>/,"attr-name":{pattern:/[^\s>\/]+/,inside:{namespace:/^[^\s>\/:]+:/}}}},entity:[{pattern:/&[\da-z]{1,8};/i,alias:"named-entity"},/&#x?[\da-f]{1,8};/i]},e.languages.markup.tag.inside["attr-value"].inside.entity=e.languages.markup.entity,e.languages.markup.doctype.inside["internal-subset"].inside=e.languages.markup,e.hooks.add("wrap",(function(t){"entity"===t.type&&(t.attributes.title=t.content.replace(/&amp;/,"&"))})),Object.defineProperty(e.languages.markup.tag,"addInlined",{value:function(t,n){var i={};i["language-"+n]={pattern:/(^<!\[CDATA\[)[\s\S]+?(?=\]\]>$)/i,lookbehind:!0,inside:e.languages[n]},i.cdata=/^<!\[CDATA\[|\]\]>$/i;var r={"included-cdata":{pattern:/<!\[CDATA\[[\s\S]*?\]\]>/i,inside:i}};r["language-"+n]={pattern:/[\s\S]+/,inside:e.languages[n]};var o={};o[t]={pattern:RegExp(/(<__[^>]*>)(?:<!\[CDATA\[(?:[^\]]|\](?!\]>))*\]\]>|(?!<!\[CDATA\[)[\s\S])*?(?=<\/__>)/.source.replace(/__/g,(function(){return t})),"i"),lookbehind:!0,greedy:!0,inside:r},e.languages.insertBefore("markup","cdata",o)}}),Object.defineProperty(e.languages.markup.tag,"addAttribute",{value:function(t,n){e.languages.markup.tag.inside["special-attr"].push({pattern:RegExp(/(^|["'\s])/.source+"(?:"+t+")"+/\s*=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+(?=[\s>]))/.source,"i"),lookbehind:!0,inside:{"attr-name":/^[^\s=]+/,"attr-value":{pattern:/=[\s\S]+/,inside:{value:{pattern:/(^=\s*(["']|(?!["'])))\S[\s\S]*(?=\2$)/,lookbehind:!0,alias:[n,"language-"+n],inside:e.languages[n]},punctuation:[{pattern:/^=/,alias:"attr-equals"},/"|'/]}}}})}}),e.languages.html=e.languages.markup,e.languages.mathml=e.languages.markup,e.languages.svg=e.languages.markup,e.languages.xml=e.languages.extend("markup",{}),e.languages.ssml=e.languages.xml,e.languages.atom=e.languages.xml,e.languages.rss=e.languages.xml,function(t){var e=/(?:"(?:\\(?:\r\n|[\s\S])|[^"\\\r\n])*"|'(?:\\(?:\r\n|[\s\S])|[^'\\\r\n])*')/;t.languages.css={comment:/\/\*[\s\S]*?\*\//,atrule:{pattern:RegExp("@[\\w-](?:"+/[^;{\s"']|\s+(?!\s)/.source+"|"+e.source+")*?"+/(?:;|(?=\s*\{))/.source),inside:{rule:/^@[\w-]+/,"selector-function-argument":{pattern:/(\bselector\s*\(\s*(?![\s)]))(?:[^()\s]|\s+(?![\s)])|\((?:[^()]|\([^()]*\))*\))+(?=\s*\))/,lookbehind:!0,alias:"selector"},keyword:{pattern:/(^|[^\w-])(?:and|not|only|or)(?![\w-])/,lookbehind:!0}}},url:{pattern:RegExp("\\burl\\((?:"+e.source+"|"+/(?:[^\\\r\n()"']|\\[\s\S])*/.source+")\\)","i"),greedy:!0,inside:{function:/^url/i,punctuation:/^\(|\)$/,string:{pattern:RegExp("^"+e.source+"$"),alias:"url"}}},selector:{pattern:RegExp("(^|[{}\\s])[^{}\\s](?:[^{};\"'\\s]|\\s+(?![\\s{])|"+e.source+")*(?=\\s*\\{)"),lookbehind:!0},string:{pattern:e,greedy:!0},property:{pattern:/(^|[^-\w\xA0-\uFFFF])(?!\s)[-_a-z\xA0-\uFFFF](?:(?!\s)[-\w\xA0-\uFFFF])*(?=\s*:)/i,lookbehind:!0},important:/!important\b/i,function:{pattern:/(^|[^-a-z0-9])[-a-z0-9]+(?=\()/i,lookbehind:!0},punctuation:/[(){};:,]/},t.languages.css.atrule.inside.rest=t.languages.css;var n=t.languages.markup;n&&(n.tag.addInlined("style","css"),n.tag.addAttribute("style","css"))}(e),e.languages.clike={comment:[{pattern:/(^|[^\\])\/\*[\s\S]*?(?:\*\/|$)/,lookbehind:!0,greedy:!0},{pattern:/(^|[^\\:])\/\/.*/,lookbehind:!0,greedy:!0}],string:{pattern:/(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,greedy:!0},"class-name":{pattern:/(\b(?:class|extends|implements|instanceof|interface|new|trait)\s+|\bcatch\s+\()[\w.\\]+/i,lookbehind:!0,inside:{punctuation:/[.\\]/}},keyword:/\b(?:break|catch|continue|do|else|finally|for|function|if|in|instanceof|new|null|return|throw|try|while)\b/,boolean:/\b(?:false|true)\b/,function:/\b\w+(?=\()/,number:/\b0x[\da-f]+\b|(?:\b\d+(?:\.\d*)?|\B\.\d+)(?:e[+-]?\d+)?/i,operator:/[<>]=?|[!=]=?=?|--?|\+\+?|&&?|\|\|?|[?*/~^%]/,punctuation:/[{}[\];(),.:]/},e.languages.javascript=e.languages.extend("clike",{"class-name":[e.languages.clike["class-name"],{pattern:/(^|[^$\w\xA0-\uFFFF])(?!\s)[_$A-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\.(?:constructor|prototype))/,lookbehind:!0}],keyword:[{pattern:/((?:^|\})\s*)catch\b/,lookbehind:!0},{pattern:/(^|[^.]|\.\.\.\s*)\b(?:as|assert(?=\s*\{)|async(?=\s*(?:function\b|\(|[$\w\xA0-\uFFFF]|$))|await|break|case|class|const|continue|debugger|default|delete|do|else|enum|export|extends|finally(?=\s*(?:\{|$))|for|from(?=\s*(?:['"]|$))|function|(?:get|set)(?=\s*(?:[#\[$\w\xA0-\uFFFF]|$))|if|implements|import|in|instanceof|interface|let|new|null|of|package|private|protected|public|return|static|super|switch|this|throw|try|typeof|undefined|var|void|while|with|yield)\b/,lookbehind:!0}],function:/#?(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*(?:\.\s*(?:apply|bind|call)\s*)?\()/,number:{pattern:RegExp(/(^|[^\w$])/.source+"(?:"+/NaN|Infinity/.source+"|"+/0[bB][01]+(?:_[01]+)*n?/.source+"|"+/0[oO][0-7]+(?:_[0-7]+)*n?/.source+"|"+/0[xX][\dA-Fa-f]+(?:_[\dA-Fa-f]+)*n?/.source+"|"+/\d+(?:_\d+)*n/.source+"|"+/(?:\d+(?:_\d+)*(?:\.(?:\d+(?:_\d+)*)?)?|\.\d+(?:_\d+)*)(?:[Ee][+-]?\d+(?:_\d+)*)?/.source+")"+/(?![\w$])/.source),lookbehind:!0},operator:/--|\+\+|\*\*=?|=>|&&=?|\|\|=?|[!=]==|<<=?|>>>?=?|[-+*/%&|^!=<>]=?|\.{3}|\?\?=?|\?\.?|[~:]/}),e.languages.javascript["class-name"][0].pattern=/(\b(?:class|extends|implements|instanceof|interface|new)\s+)[\w.\\]+/,e.languages.insertBefore("javascript","keyword",{regex:{pattern:RegExp(/((?:^|[^$\w\xA0-\uFFFF."'\])\s]|\b(?:return|yield))\s*)/.source+/\//.source+"(?:"+/(?:\[(?:[^\]\\\r\n]|\\.)*\]|\\.|[^/\\\[\r\n])+\/[dgimyus]{0,7}/.source+"|"+/(?:\[(?:[^[\]\\\r\n]|\\.|\[(?:[^[\]\\\r\n]|\\.|\[(?:[^[\]\\\r\n]|\\.)*\])*\])*\]|\\.|[^/\\\[\r\n])+\/[dgimyus]{0,7}v[dgimyus]{0,7}/.source+")"+/(?=(?:\s|\/\*(?:[^*]|\*(?!\/))*\*\/)*(?:$|[\r\n,.;:})\]]|\/\/))/.source),lookbehind:!0,greedy:!0,inside:{"regex-source":{pattern:/^(\/)[\s\S]+(?=\/[a-z]*$)/,lookbehind:!0,alias:"language-regex",inside:e.languages.regex},"regex-delimiter":/^\/|\/$/,"regex-flags":/^[a-z]+$/}},"function-variable":{pattern:/#?(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*[=:]\s*(?:async\s*)?(?:\bfunction\b|(?:\((?:[^()]|\([^()]*\))*\)|(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*)\s*=>))/,alias:"function"},parameter:[{pattern:/(function(?:\s+(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*)?\s*\(\s*)(?!\s)(?:[^()\s]|\s+(?![\s)])|\([^()]*\))+(?=\s*\))/,lookbehind:!0,inside:e.languages.javascript},{pattern:/(^|[^$\w\xA0-\uFFFF])(?!\s)[_$a-z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*=>)/i,lookbehind:!0,inside:e.languages.javascript},{pattern:/(\(\s*)(?!\s)(?:[^()\s]|\s+(?![\s)])|\([^()]*\))+(?=\s*\)\s*=>)/,lookbehind:!0,inside:e.languages.javascript},{pattern:/((?:\b|\s|^)(?!(?:as|async|await|break|case|catch|class|const|continue|debugger|default|delete|do|else|enum|export|extends|finally|for|from|function|get|if|implements|import|in|instanceof|interface|let|new|null|of|package|private|protected|public|return|set|static|super|switch|this|throw|try|typeof|undefined|var|void|while|with|yield)(?![$\w\xA0-\uFFFF]))(?:(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*\s*)\(\s*|\]\s*\(\s*)(?!\s)(?:[^()\s]|\s+(?![\s)])|\([^()]*\))+(?=\s*\)\s*\{)/,lookbehind:!0,inside:e.languages.javascript}],constant:/\b[A-Z](?:[A-Z_]|\dx?)*\b/}),e.languages.insertBefore("javascript","string",{hashbang:{pattern:/^#!.*/,greedy:!0,alias:"comment"},"template-string":{pattern:/`(?:\\[\s\S]|\$\{(?:[^{}]|\{(?:[^{}]|\{[^}]*\})*\})+\}|(?!\$\{)[^\\`])*`/,greedy:!0,inside:{"template-punctuation":{pattern:/^`|`$/,alias:"string"},interpolation:{pattern:/((?:^|[^\\])(?:\\{2})*)\$\{(?:[^{}]|\{(?:[^{}]|\{[^}]*\})*\})+\}/,lookbehind:!0,inside:{"interpolation-punctuation":{pattern:/^\$\{|\}$/,alias:"punctuation"},rest:e.languages.javascript}},string:/[\s\S]+/}},"string-property":{pattern:/((?:^|[,{])[ \t]*)(["'])(?:\\(?:\r\n|[\s\S])|(?!\2)[^\\\r\n])*\2(?=\s*:)/m,lookbehind:!0,greedy:!0,alias:"property"}}),e.languages.insertBefore("javascript","operator",{"literal-property":{pattern:/((?:^|[,{])[ \t]*)(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*:)/m,lookbehind:!0,alias:"property"}}),e.languages.markup&&(e.languages.markup.tag.addInlined("script","javascript"),e.languages.markup.tag.addAttribute(/on(?:abort|blur|change|click|composition(?:end|start|update)|dblclick|error|focus(?:in|out)?|key(?:down|up)|load|mouse(?:down|enter|leave|move|out|over|up)|reset|resize|scroll|select|slotchange|submit|unload|wheel)/.source,"javascript")),e.languages.js=e.languages.javascript,function(){if(void 0!==e&&"undefined"!=typeof document){Element.prototype.matches||(Element.prototype.matches=Element.prototype.msMatchesSelector||Element.prototype.webkitMatchesSelector);var t={js:"javascript",py:"python",rb:"ruby",ps1:"powershell",psm1:"powershell",sh:"bash",bat:"batch",h:"c",tex:"latex"},n="data-src-status",i="loading",r="loaded",o="pre[data-src]:not(["+n+'="'+r+'"]):not(['+n+'="'+i+'"])';e.hooks.add("before-highlightall",(function(t){t.selector+=", "+o})),e.hooks.add("before-sanity-check",(function(a){var s=a.element;if(s.matches(o)){a.code="",s.setAttribute(n,i);var l=s.appendChild(document.createElement("CODE"));l.textContent="Loading…";var u=s.getAttribute("data-src"),c=a.language;if("none"===c){var d=(/\.(\w+)$/.exec(u)||[,"none"])[1];c=t[d]||d}e.util.setLanguage(l,c),e.util.setLanguage(s,c);var h=e.plugins.autoloader;h&&h.loadLanguages(c),function(t,e,n){var i=new XMLHttpRequest;i.open("GET",t,!0),i.onreadystatechange=function(){4==i.readyState&&(i.status<400&&i.responseText?e(i.responseText):i.status>=400?n("✖ Error "+i.status+" while fetching file: "+i.statusText):n("✖ Error: File does not exist or is empty"))},i.send(null)}(u,(function(t){s.setAttribute(n,r);var i=function(t){var e=/^\s*(\d+)\s*(?:(,)\s*(?:(\d+)\s*)?)?$/.exec(t||"");if(e){var n=Number(e[1]),i=e[2],r=e[3];return i?r?[n,Number(r)]:[n,void 0]:[n,n]}}(s.getAttribute("data-range"));if(i){var o=t.split(/\r\n?|\n/g),a=i[0],u=null==i[1]?o.length:i[1];a<0&&(a+=o.length),a=Math.max(0,Math.min(a-1,o.length)),u<0&&(u+=o.length),u=Math.max(0,Math.min(u,o.length)),t=o.slice(a,u).join("\n"),s.hasAttribute("data-start")||s.setAttribute("data-start",String(a+1))}l.textContent=t,e.highlightElement(l)}),(function(t){s.setAttribute(n,"failed"),l.textContent=t}))}})),e.plugins.fileHighlight={highlight:function(t){for(var n,i=(t||document).querySelectorAll(o),r=0;n=i[r++];)e.highlightElement(n)}};var a=!1;e.fileHighlight=function(){a||(console.warn("Prism.fileHighlight is deprecated. Use `Prism.plugins.fileHighlight.highlight` instead."),a=!0),e.plugins.fileHighlight.highlight.apply(this,arguments)}}}()}));Prism.languages.python={comment:{pattern:/(^|[^\\])#.*/,lookbehind:!0,greedy:!0},"string-interpolation":{pattern:/(?:f|fr|rf)(?:("""|''')[\s\S]*?\1|("|')(?:\\.|(?!\2)[^\\\r\n])*\2)/i,greedy:!0,inside:{interpolation:{pattern:/((?:^|[^{])(?:\{\{)*)\{(?!\{)(?:[^{}]|\{(?!\{)(?:[^{}]|\{(?!\{)(?:[^{}])+\})+\})+\}/,lookbehind:!0,inside:{"format-spec":{pattern:/(:)[^:(){}]+(?=\}$)/,lookbehind:!0},"conversion-option":{pattern:/![sra](?=[:}]$)/,alias:"punctuation"},rest:null}},string:/[\s\S]+/}},"triple-quoted-string":{pattern:/(?:[rub]|br|rb)?("""|''')[\s\S]*?\1/i,greedy:!0,alias:"string"},string:{pattern:/(?:[rub]|br|rb)?("|')(?:\\.|(?!\1)[^\\\r\n])*\1/i,greedy:!0},function:{pattern:/((?:^|\s)def[ \t]+)[a-zA-Z_]\w*(?=\s*\()/g,lookbehind:!0},"class-name":{pattern:/(\bclass\s+)\w+/i,lookbehind:!0},decorator:{pattern:/(^[\t ]*)@\w+(?:\.\w+)*/m,lookbehind:!0,alias:["annotation","punctuation"],inside:{punctuation:/\./}},keyword:/\b(?:_(?=\s*:)|and|as|assert|async|await|break|case|class|continue|def|del|elif|else|except|exec|finally|for|from|global|if|import|in|is|lambda|match|nonlocal|not|or|pass|print|raise|return|try|while|with|yield)\b/,builtin:/\b(?:__import__|abs|all|any|apply|ascii|basestring|bin|bool|buffer|bytearray|bytes|callable|chr|classmethod|cmp|coerce|compile|complex|delattr|dict|dir|divmod|enumerate|eval|execfile|file|filter|float|format|frozenset|getattr|globals|hasattr|hash|help|hex|id|input|int|intern|isinstance|issubclass|iter|len|list|locals|long|map|max|memoryview|min|next|object|oct|open|ord|pow|property|range|raw_input|reduce|reload|repr|reversed|round|set|setattr|slice|sorted|staticmethod|str|sum|super|tuple|type|unichr|unicode|vars|xrange|zip)\b/,boolean:/\b(?:False|None|True)\b/,number:/\b0(?:b(?:_?[01])+|o(?:_?[0-7])+|x(?:_?[a-f0-9])+)\b|(?:\b\d+(?:_\d+)*(?:\.(?:\d+(?:_\d+)*)?)?|\B\.\d+(?:_\d+)*)(?:e[+-]?\d+(?:_\d+)*)?j?(?!\w)/i,operator:/[-+%=]=?|!=|:=|\*\*?=?|\/\/?=?|<[<=>]?|>[=>]?|[&|^~]/,punctuation:/[{}[\];(),.:]/},Prism.languages.python["string-interpolation"].inside.interpolation.inside.rest=Prism.languages.python,Prism.languages.py=Prism.languages.python,Prism.languages.clike={comment:[{pattern:/(^|[^\\])\/\*[\s\S]*?(?:\*\/|$)/,lookbehind:!0,greedy:!0},{pattern:/(^|[^\\:])\/\/.*/,lookbehind:!0,greedy:!0}],string:{pattern:/(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,greedy:!0},"class-name":{pattern:/(\b(?:class|extends|implements|instanceof|interface|new|trait)\s+|\bcatch\s+\()[\w.\\]+/i,lookbehind:!0,inside:{punctuation:/[.\\]/}},keyword:/\b(?:break|catch|continue|do|else|finally|for|function|if|in|instanceof|new|null|return|throw|try|while)\b/,boolean:/\b(?:false|true)\b/,function:/\b\w+(?=\()/,number:/\b0x[\da-f]+\b|(?:\b\d+(?:\.\d*)?|\B\.\d+)(?:e[+-]?\d+)?/i,operator:/[<>]=?|[!=]=?=?|--?|\+\+?|&&?|\|\|?|[?*/~^%]/,punctuation:/[{}[\];(),.:]/},Prism.languages.lua={comment:/^#!.+|--(?:\[(=*)\[[\s\S]*?\]\1\]|.*)/m,string:{pattern:/(["'])(?:(?!\1)[^\\\r\n]|\\z(?:\r\n|\s)|\\(?:\r\n|[^z]))*\1|\[(=*)\[[\s\S]*?\]\2\]/,greedy:!0},number:/\b0x[a-f\d]+(?:\.[a-f\d]*)?(?:p[+-]?\d+)?\b|\b\d+(?:\.\B|(?:\.\d*)?(?:e[+-]?\d+)?\b)|\B\.\d+(?:e[+-]?\d+)?\b/i,keyword:/\b(?:and|break|do|else|elseif|end|false|for|function|goto|if|in|local|nil|not|or|repeat|return|then|true|until|while)\b/,function:/(?!\d)\w+(?=\s*(?:[({]))/,operator:[/[-+*%^&|#]|\/\/?|<[<=]?|>[>=]?|[=~]=?/,{pattern:/(^|[^.])\.\.(?!\.)/,lookbehind:!0}],punctuation:/[\[\](){},;]|\.+|:+/},function(t){var e="\\b(?:BASH|BASHOPTS|BASH_ALIASES|BASH_ARGC|BASH_ARGV|BASH_CMDS|BASH_COMPLETION_COMPAT_DIR|BASH_LINENO|BASH_REMATCH|BASH_SOURCE|BASH_VERSINFO|BASH_VERSION|COLORTERM|COLUMNS|COMP_WORDBREAKS|DBUS_SESSION_BUS_ADDRESS|DEFAULTS_PATH|DESKTOP_SESSION|DIRSTACK|DISPLAY|EUID|GDMSESSION|GDM_LANG|GNOME_KEYRING_CONTROL|GNOME_KEYRING_PID|GPG_AGENT_INFO|GROUPS|HISTCONTROL|HISTFILE|HISTFILESIZE|HISTSIZE|HOME|HOSTNAME|HOSTTYPE|IFS|INSTANCE|JOB|LANG|LANGUAGE|LC_ADDRESS|LC_ALL|LC_IDENTIFICATION|LC_MEASUREMENT|LC_MONETARY|LC_NAME|LC_NUMERIC|LC_PAPER|LC_TELEPHONE|LC_TIME|LESSCLOSE|LESSOPEN|LINES|LOGNAME|LS_COLORS|MACHTYPE|MAILCHECK|MANDATORY_PATH|NO_AT_BRIDGE|OLDPWD|OPTERR|OPTIND|ORBIT_SOCKETDIR|OSTYPE|PAPERSIZE|PATH|PIPESTATUS|PPID|PS1|PS2|PS3|PS4|PWD|RANDOM|REPLY|SECONDS|SELINUX_INIT|SESSION|SESSIONTYPE|SESSION_MANAGER|SHELL|SHELLOPTS|SHLVL|SSH_AUTH_SOCK|TERM|UID|UPSTART_EVENTS|UPSTART_INSTANCE|UPSTART_JOB|UPSTART_SESSION|USER|WINDOWID|XAUTHORITY|XDG_CONFIG_DIRS|XDG_CURRENT_DESKTOP|XDG_DATA_DIRS|XDG_GREETER_DATA_DIR|XDG_MENU_PREFIX|XDG_RUNTIME_DIR|XDG_SEAT|XDG_SEAT_PATH|XDG_SESSION_DESKTOP|XDG_SESSION_ID|XDG_SESSION_PATH|XDG_SESSION_TYPE|XDG_VTNR|XMODIFIERS)\\b",n={pattern:/(^(["']?)\w+\2)[ \t]+\S.*/,lookbehind:!0,alias:"punctuation",inside:null},i={bash:n,environment:{pattern:RegExp("\\$"+e),alias:"constant"},variable:[{pattern:/\$?\(\([\s\S]+?\)\)/,greedy:!0,inside:{variable:[{pattern:/(^\$\(\([\s\S]+)\)\)/,lookbehind:!0},/^\$\(\(/],number:/\b0x[\dA-Fa-f]+\b|(?:\b\d+(?:\.\d*)?|\B\.\d+)(?:[Ee]-?\d+)?/,operator:/--|\+\+|\*\*=?|<<=?|>>=?|&&|\|\||[=!+\-*/%<>^&|]=?|[?~:]/,punctuation:/\(\(?|\)\)?|,|;/}},{pattern:/\$\((?:\([^)]+\)|[^()])+\)|`[^`]+`/,greedy:!0,inside:{variable:/^\$\(|^`|\)$|`$/}},{pattern:/\$\{[^}]+\}/,greedy:!0,inside:{operator:/:[-=?+]?|[!\/]|##?|%%?|\^\^?|,,?/,punctuation:/[\[\]]/,environment:{pattern:RegExp("(\\{)"+e),lookbehind:!0,alias:"constant"}}},/\$(?:\w+|[#?*!@$])/],entity:/\\(?:[abceEfnrtv\\"]|O?[0-7]{1,3}|U[0-9a-fA-F]{8}|u[0-9a-fA-F]{4}|x[0-9a-fA-F]{1,2})/};t.languages.bash={shebang:{pattern:/^#!\s*\/.*/,alias:"important"},comment:{pattern:/(^|[^"{\\$])#.*/,lookbehind:!0},"function-name":[{pattern:/(\bfunction\s+)[\w-]+(?=(?:\s*\(?:\s*\))?\s*\{)/,lookbehind:!0,alias:"function"},{pattern:/\b[\w-]+(?=\s*\(\s*\)\s*\{)/,alias:"function"}],"for-or-select":{pattern:/(\b(?:for|select)\s+)\w+(?=\s+in\s)/,alias:"variable",lookbehind:!0},"assign-left":{pattern:/(^|[\s;|&]|[<>]\()\w+(?:\.\w+)*(?=\+?=)/,inside:{environment:{pattern:RegExp("(^|[\\s;|&]|[<>]\\()"+e),lookbehind:!0,alias:"constant"}},alias:"variable",lookbehind:!0},parameter:{pattern:/(^|\s)-{1,2}(?:\w+:[+-]?)?\w+(?:\.\w+)*(?=[=\s]|$)/,alias:"variable",lookbehind:!0},string:[{pattern:/((?:^|[^<])<<-?\s*)(\w+)\s[\s\S]*?(?:\r?\n|\r)\2/,lookbehind:!0,greedy:!0,inside:i},{pattern:/((?:^|[^<])<<-?\s*)(["'])(\w+)\2\s[\s\S]*?(?:\r?\n|\r)\3/,lookbehind:!0,greedy:!0,inside:{bash:n}},{pattern:/(^|[^\\](?:\\\\)*)"(?:\\[\s\S]|\$\([^)]+\)|\$(?!\()|`[^`]+`|[^"\\`$])*"/,lookbehind:!0,greedy:!0,inside:i},{pattern:/(^|[^$\\])'[^']*'/,lookbehind:!0,greedy:!0},{pattern:/\$'(?:[^'\\]|\\[\s\S])*'/,greedy:!0,inside:{entity:i.entity}}],environment:{pattern:RegExp("\\$?"+e),alias:"constant"},variable:i.variable,function:{pattern:/(^|[\s;|&]|[<>]\()(?:add|apropos|apt|apt-cache|apt-get|aptitude|aspell|automysqlbackup|awk|basename|bash|bc|bconsole|bg|bzip2|cal|cargo|cat|cfdisk|chgrp|chkconfig|chmod|chown|chroot|cksum|clear|cmp|column|comm|composer|cp|cron|crontab|csplit|curl|cut|date|dc|dd|ddrescue|debootstrap|df|diff|diff3|dig|dir|dircolors|dirname|dirs|dmesg|docker|docker-compose|du|egrep|eject|env|ethtool|expand|expect|expr|fdformat|fdisk|fg|fgrep|file|find|fmt|fold|format|free|fsck|ftp|fuser|gawk|git|gparted|grep|groupadd|groupdel|groupmod|groups|grub-mkconfig|gzip|halt|head|hg|history|host|hostname|htop|iconv|id|ifconfig|ifdown|ifup|import|install|ip|java|jobs|join|kill|killall|less|link|ln|locate|logname|logrotate|look|lpc|lpr|lprint|lprintd|lprintq|lprm|ls|lsof|lynx|make|man|mc|mdadm|mkconfig|mkdir|mke2fs|mkfifo|mkfs|mkisofs|mknod|mkswap|mmv|more|most|mount|mtools|mtr|mutt|mv|nano|nc|netstat|nice|nl|node|nohup|notify-send|npm|nslookup|op|open|parted|passwd|paste|pathchk|ping|pkill|pnpm|podman|podman-compose|popd|pr|printcap|printenv|ps|pushd|pv|quota|quotacheck|quotactl|ram|rar|rcp|reboot|remsync|rename|renice|rev|rm|rmdir|rpm|rsync|scp|screen|sdiff|sed|sendmail|seq|service|sftp|sh|shellcheck|shuf|shutdown|sleep|slocate|sort|split|ssh|stat|strace|su|sudo|sum|suspend|swapon|sync|sysctl|tac|tail|tar|tee|time|timeout|top|touch|tr|traceroute|tsort|tty|umount|uname|unexpand|uniq|units|unrar|unshar|unzip|update-grub|uptime|useradd|userdel|usermod|users|uudecode|uuencode|v|vcpkg|vdir|vi|vim|virsh|vmstat|wait|watch|wc|wget|whereis|which|who|whoami|write|xargs|xdg-open|yarn|yes|zenity|zip|zsh|zypper)(?=$|[)\s;|&])/,lookbehind:!0},keyword:{pattern:/(^|[\s;|&]|[<>]\()(?:case|do|done|elif|else|esac|fi|for|function|if|in|select|then|until|while)(?=$|[)\s;|&])/,lookbehind:!0},builtin:{pattern:/(^|[\s;|&]|[<>]\()(?:\.|:|alias|bind|break|builtin|caller|cd|command|continue|declare|echo|enable|eval|exec|exit|export|getopts|hash|help|let|local|logout|mapfile|printf|pwd|read|readarray|readonly|return|set|shift|shopt|source|test|times|trap|type|typeset|ulimit|umask|unalias|unset)(?=$|[)\s;|&])/,lookbehind:!0,alias:"class-name"},boolean:{pattern:/(^|[\s;|&]|[<>]\()(?:false|true)(?=$|[)\s;|&])/,lookbehind:!0},"file-descriptor":{pattern:/\B&\d\b/,alias:"important"},operator:{pattern:/\d?<>|>\||\+=|=[=~]?|!=?|<<[<-]?|[&\d]?>>|\d[<>]&?|[<>][&=]?|&[>&]?|\|[&|]?/,inside:{"file-descriptor":{pattern:/^\d/,alias:"important"}}},punctuation:/\$?\(\(?|\)\)?|\.\.|[{}[\];\\]/,number:{pattern:/(^|\s)(?:[1-9]\d*|0)(?:[.,]\d+)?\b/,lookbehind:!0}},n.inside=t.languages.bash;for(var r=["comment","function-name","for-or-select","assign-left","parameter","string","environment","function","keyword","builtin","boolean","file-descriptor","operator","punctuation","number"],o=i.variable[1].inside,a=0;a<r.length;a++)o[r[a]]=t.languages.bash[r[a]];t.languages.sh=t.languages.bash,t.languages.shell=t.languages.bash}(Prism),Prism.languages.go=Prism.languages.extend("clike",{string:{pattern:/(^|[^\\])"(?:\\.|[^"\\\r\n])*"|`[^`]*`/,lookbehind:!0,greedy:!0},keyword:/\b(?:break|case|chan|const|continue|default|defer|else|fallthrough|for|func|go(?:to)?|if|import|interface|map|package|range|return|select|struct|switch|type|var)\b/,boolean:/\b(?:_|false|iota|nil|true)\b/,number:[/\b0(?:b[01_]+|o[0-7_]+)i?\b/i,/\b0x(?:[a-f\d_]+(?:\.[a-f\d_]*)?|\.[a-f\d_]+)(?:p[+-]?\d+(?:_\d+)*)?i?(?!\w)/i,/(?:\b\d[\d_]*(?:\.[\d_]*)?|\B\.\d[\d_]*)(?:e[+-]?[\d_]+)?i?(?!\w)/i],operator:/[*\/%^!=]=?|\+[=+]?|-[=-]?|\|[=|]?|&(?:=|&|\^=?)?|>(?:>=?|=)?|<(?:<=?|=|-)?|:=|\.\.\./,builtin:/\b(?:append|bool|byte|cap|close|complex|complex(?:64|128)|copy|delete|error|float(?:32|64)|u?int(?:8|16|32|64)?|imag|len|make|new|panic|print(?:ln)?|real|recover|rune|string|uintptr)\b/}),Prism.languages.insertBefore("go","string",{char:{pattern:/'(?:\\.|[^'\\\r\n]){0,10}'/,greedy:!0}}),delete Prism.languages.go["class-name"],function(t){var e=/(?:\\.|[^\\\n\r]|(?:\n|\r\n?)(?![\r\n]))/.source;function n(t){return t=t.replace(/<inner>/g,(function(){return e})),RegExp(/((?:^|[^\\])(?:\\{2})*)/.source+"(?:"+t+")")}var i=/(?:\\.|``(?:[^`\r\n]|`(?!`))+``|`[^`\r\n]+`|[^\\|\r\n`])+/.source,r=/\|?__(?:\|__)+\|?(?:(?:\n|\r\n?)|(?![\s\S]))/.source.replace(/__/g,(function(){return i})),o=/\|?[ \t]*:?-{3,}:?[ \t]*(?:\|[ \t]*:?-{3,}:?[ \t]*)+\|?(?:\n|\r\n?)/.source;t.languages.markdown=t.languages.extend("markup",{}),t.languages.insertBefore("markdown","prolog",{"front-matter-block":{pattern:/(^(?:\s*[\r\n])?)---(?!.)[\s\S]*?[\r\n]---(?!.)/,lookbehind:!0,greedy:!0,inside:{punctuation:/^---|---$/,"front-matter":{pattern:/\S+(?:\s+\S+)*/,alias:["yaml","language-yaml"],inside:t.languages.yaml}}},blockquote:{pattern:/^>(?:[\t ]*>)*/m,alias:"punctuation"},table:{pattern:RegExp("^"+r+o+"(?:"+r+")*","m"),inside:{"table-data-rows":{pattern:RegExp("^("+r+o+")(?:"+r+")*$"),lookbehind:!0,inside:{"table-data":{pattern:RegExp(i),inside:t.languages.markdown},punctuation:/\|/}},"table-line":{pattern:RegExp("^("+r+")"+o+"$"),lookbehind:!0,inside:{punctuation:/\||:?-{3,}:?/}},"table-header-row":{pattern:RegExp("^"+r+"$"),inside:{"table-header":{pattern:RegExp(i),alias:"important",inside:t.languages.markdown},punctuation:/\|/}}}},code:[{pattern:/((?:^|\n)[ \t]*\n|(?:^|\r\n?)[ \t]*\r\n?)(?: {4}|\t).+(?:(?:\n|\r\n?)(?: {4}|\t).+)*/,lookbehind:!0,alias:"keyword"},{pattern:/^```[\s\S]*?^```$/m,greedy:!0,inside:{"code-block":{pattern:/^(```.*(?:\n|\r\n?))[\s\S]+?(?=(?:\n|\r\n?)^```$)/m,lookbehind:!0},"code-language":{pattern:/^(```).+/,lookbehind:!0},punctuation:/```/}}],title:[{pattern:/\S.*(?:\n|\r\n?)(?:==+|--+)(?=[ \t]*$)/m,alias:"important",inside:{punctuation:/==+$|--+$/}},{pattern:/(^\s*)#.+/m,lookbehind:!0,alias:"important",inside:{punctuation:/^#+|#+$/}}],hr:{pattern:/(^\s*)([*-])(?:[\t ]*\2){2,}(?=\s*$)/m,lookbehind:!0,alias:"punctuation"},list:{pattern:/(^\s*)(?:[*+-]|\d+\.)(?=[\t ].)/m,lookbehind:!0,alias:"punctuation"},"url-reference":{pattern:/!?\[[^\]]+\]:[\t ]+(?:\S+|<(?:\\.|[^>\\])+>)(?:[\t ]+(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\((?:\\.|[^)\\])*\)))?/,inside:{variable:{pattern:/^(!?\[)[^\]]+/,lookbehind:!0},string:/(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\((?:\\.|[^)\\])*\))$/,punctuation:/^[\[\]!:]|[<>]/},alias:"url"},bold:{pattern:n(/\b__(?:(?!_)<inner>|_(?:(?!_)<inner>)+_)+__\b|\*\*(?:(?!\*)<inner>|\*(?:(?!\*)<inner>)+\*)+\*\*/.source),lookbehind:!0,greedy:!0,inside:{content:{pattern:/(^..)[\s\S]+(?=..$)/,lookbehind:!0,inside:{}},punctuation:/\*\*|__/}},italic:{pattern:n(/\b_(?:(?!_)<inner>|__(?:(?!_)<inner>)+__)+_\b|\*(?:(?!\*)<inner>|\*\*(?:(?!\*)<inner>)+\*\*)+\*/.source),lookbehind:!0,greedy:!0,inside:{content:{pattern:/(^.)[\s\S]+(?=.$)/,lookbehind:!0,inside:{}},punctuation:/[*_]/}},strike:{pattern:n(/(~~?)(?:(?!~)<inner>)+\2/.source),lookbehind:!0,greedy:!0,inside:{content:{pattern:/(^~~?)[\s\S]+(?=\1$)/,lookbehind:!0,inside:{}},punctuation:/~~?/}},"code-snippet":{pattern:/(^|[^\\`])(?:``[^`\r\n]+(?:`[^`\r\n]+)*``(?!`)|`[^`\r\n]+`(?!`))/,lookbehind:!0,greedy:!0,alias:["code","keyword"]},url:{pattern:n(/!?\[(?:(?!\])<inner>)+\](?:\([^\s)]+(?:[\t ]+"(?:\\.|[^"\\])*")?\)|[ \t]?\[(?:(?!\])<inner>)+\])/.source),lookbehind:!0,greedy:!0,inside:{operator:/^!/,content:{pattern:/(^\[)[^\]]+(?=\])/,lookbehind:!0,inside:{}},variable:{pattern:/(^\][ \t]?\[)[^\]]+(?=\]$)/,lookbehind:!0},url:{pattern:/(^\]\()[^\s)]+/,lookbehind:!0},string:{pattern:/(^[ \t]+)"(?:\\.|[^"\\])*"(?=\)$)/,lookbehind:!0}}}}),["url","bold","italic","strike"].forEach((function(e){["url","bold","italic","strike","code-snippet"].forEach((function(n){e!==n&&(t.languages.markdown[e].inside.content.inside[n]=t.languages.markdown[n])}))})),t.hooks.add("after-tokenize",(function(t){"markdown"!==t.language&&"md"!==t.language||function t(e){if(e&&"string"!=typeof e)for(var n=0,i=e.length;n<i;n++){var r=e[n];if("code"===r.type){var o=r.content[1],a=r.content[3];if(o&&a&&"code-language"===o.type&&"code-block"===a.type&&"string"==typeof o.content){var s=o.content.replace(/\b#/g,"sharp").replace(/\b\+\+/g,"pp"),l="language-"+(s=(/[a-z][\w-]*/i.exec(s)||[""])[0].toLowerCase());a.alias?"string"==typeof a.alias?a.alias=[a.alias,l]:a.alias.push(l):a.alias=[l]}}else t(r.content)}}(t.tokens)})),t.hooks.add("wrap",(function(e){if("code-block"===e.type){for(var n="",i=0,r=e.classes.length;i<r;i++){var o=e.classes[i],u=/language-(.+)/.exec(o);if(u){n=u[1];break}}var c=t.languages[n];if(c)e.content=t.highlight(e.content.replace(a,"").replace(/&(\w{1,8}|#x?[\da-f]{1,8});/gi,(function(t,e){var n;return"#"===(e=e.toLowerCase())[0]?(n="x"===e[1]?parseInt(e.slice(2),16):Number(e.slice(1)),l(n)):s[e]||t})),c,n);else if(n&&"none"!==n&&t.plugins.autoloader){var d="md-"+(new Date).valueOf()+"-"+Math.floor(1e16*Math.random());e.attributes.id=d,t.plugins.autoloader.loadLanguages(n,(function(){var e=document.getElementById(d);e&&(e.innerHTML=t.highlight(e.textContent,t.languages[n],n))}))}}}));var a=RegExp(t.languages.markup.tag.pattern.source,"gi"),s={amp:"&",lt:"<",gt:">",quot:'"'},l=String.fromCodePoint||String.fromCharCode;t.languages.md=t.languages.markdown}(Prism),Prism.languages.julia={comment:{pattern:/(^|[^\\])(?:#=(?:[^#=]|=(?!#)|#(?!=)|#=(?:[^#=]|=(?!#)|#(?!=))*=#)*=#|#.*)/,lookbehind:!0},regex:{pattern:/r"(?:\\.|[^"\\\r\n])*"[imsx]{0,4}/,greedy:!0},string:{pattern:/"""[\s\S]+?"""|(?:\b\w+)?"(?:\\.|[^"\\\r\n])*"|`(?:[^\\`\r\n]|\\.)*`/,greedy:!0},char:{pattern:/(^|[^\w'])'(?:\\[^\r\n][^'\r\n]*|[^\\\r\n])'/,lookbehind:!0,greedy:!0},keyword:/\b(?:abstract|baremodule|begin|bitstype|break|catch|ccall|const|continue|do|else|elseif|end|export|finally|for|function|global|if|immutable|import|importall|in|let|local|macro|module|print|println|quote|return|struct|try|type|typealias|using|while)\b/,boolean:/\b(?:false|true)\b/,number:/(?:\b(?=\d)|\B(?=\.))(?:0[box])?(?:[\da-f]+(?:_[\da-f]+)*(?:\.(?:\d+(?:_\d+)*)?)?|\.\d+(?:_\d+)*)(?:[efp][+-]?\d+(?:_\d+)*)?j?/i,operator:/&&|\|\||[-+*^%÷⊻&$\\]=?|\/[\/=]?|!=?=?|\|[=>]?|<(?:<=?|[=:|])?|>(?:=|>>?=?)?|==?=?|[~≠≤≥'√∛]/,punctuation:/::?|[{}[\]();,.?]/,constant:/\b(?:(?:Inf|NaN)(?:16|32|64)?|im|pi)\b|[πℯ]/};const X=s("d-code",'\n<style>\n\ncode {\n  white-space: nowrap;\n  background: rgba(0, 0, 0, 0.04);\n  border-radius: 2px;\n  padding: 4px 7px;\n  font-size: 15px;\n  color: rgba(0, 0, 0, 0.6);\n}\n\npre code {\n  display: block;\n  border-left: 2px solid rgba(0, 0, 0, .1);\n  padding: 0 0 0 36px;\n}\n\n/**\n * prism.js default theme for JavaScript, CSS and HTML\n * Based on dabblet (http://dabblet.com)\n * @author Lea Verou\n */\n\ncode[class*="language-"],\npre[class*="language-"] {\n\tcolor: black;\n\tbackground: none;\n\ttext-shadow: 0 1px white;\n\tfont-family: Consolas, Monaco, \'Andale Mono\', \'Ubuntu Mono\', monospace;\n\tfont-size: 1em;\n\ttext-align: left;\n\twhite-space: pre;\n\tword-spacing: normal;\n\tword-break: normal;\n\tword-wrap: normal;\n\tline-height: 1.5;\n\n\t-moz-tab-size: 4;\n\t-o-tab-size: 4;\n\ttab-size: 4;\n\n\t-webkit-hyphens: none;\n\t-moz-hyphens: none;\n\t-ms-hyphens: none;\n\thyphens: none;\n}\n\npre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,\ncode[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {\n\ttext-shadow: none;\n\tbackground: #b3d4fc;\n}\n\npre[class*="language-"]::selection, pre[class*="language-"] ::selection,\ncode[class*="language-"]::selection, code[class*="language-"] ::selection {\n\ttext-shadow: none;\n\tbackground: #b3d4fc;\n}\n\n@media print {\n\tcode[class*="language-"],\n\tpre[class*="language-"] {\n\t\ttext-shadow: none;\n\t}\n}\n\n/* Code blocks */\npre[class*="language-"] {\n\tpadding: 1em;\n\tmargin: .5em 0;\n\toverflow: auto;\n}\n\n:not(pre) > code[class*="language-"],\npre[class*="language-"] {\n\tbackground: #f5f2f0;\n}\n\n/* Inline code */\n:not(pre) > code[class*="language-"] {\n\tpadding: .1em;\n\tborder-radius: .3em;\n\twhite-space: normal;\n}\n\n.token.comment,\n.token.prolog,\n.token.doctype,\n.token.cdata {\n\tcolor: slategray;\n}\n\n.token.punctuation {\n\tcolor: #999;\n}\n\n.token.namespace {\n\topacity: .7;\n}\n\n.token.property,\n.token.tag,\n.token.boolean,\n.token.number,\n.token.constant,\n.token.symbol,\n.token.deleted {\n\tcolor: #905;\n}\n\n.token.selector,\n.token.attr-name,\n.token.string,\n.token.char,\n.token.builtin,\n.token.inserted {\n\tcolor: #690;\n}\n\n.token.operator,\n.token.entity,\n.token.url,\n.language-css .token.string,\n.style .token.string {\n\tcolor: #9a6e3a;\n\t/* This background color was intended by the author of this theme. */\n\tbackground: hsla(0, 0%, 100%, .5);\n}\n\n.token.atrule,\n.token.attr-value,\n.token.keyword {\n\tcolor: #07a;\n}\n\n.token.function,\n.token.class-name {\n\tcolor: #DD4A68;\n}\n\n.token.regex,\n.token.important,\n.token.variable {\n\tcolor: #e90;\n}\n\n.token.important,\n.token.bold {\n\tfont-weight: bold;\n}\n.token.italic {\n\tfont-style: italic;\n}\n\n.token.entity {\n\tcursor: help;\n}\n\n</style>\n\n<code id="code-container"></code>\n\n');class Z extends(a(X(HTMLElement))){renderContent(){if(this.languageName=this.getAttribute("language"),!this.languageName)return void console.warn('You need to provide a language attribute to your <d-code> block to let us know how to highlight your code; e.g.:\n <d-code language="python">zeros = np.zeros(shape)</d-code>.');const t=K.languages[this.languageName];if(null==t)return void console.warn(`Distill does not yet support highlighting your code block in "${this.languageName}'.`);let e=this.textContent;const n=this.shadowRoot.querySelector("#code-container");if(this.hasAttribute("block")){e=e.replace(/\n/,"");const t=e.match(/\s*/);if(e=e.replace(new RegExp("\n"+t,"g"),"\n"),e=e.trim(),n.parentNode instanceof ShadowRoot){const t=document.createElement("pre");this.shadowRoot.removeChild(n),t.appendChild(n),this.shadowRoot.appendChild(t)}}n.className=`language-${this.languageName}`,n.innerHTML=K.highlight(e,t)}}const Q=s("d-footnote",'\n<style>\n\nd-math[block] {\n  display: block;\n}\n\n:host {\n\n}\n\nsup {\n  line-height: 1em;\n  font-size: 0.75em;\n  position: relative;\n  top: -.5em;\n  vertical-align: baseline;\n}\n\nspan {\n  color: hsla(206, 90%, 20%, 0.7);\n  cursor: default;\n}\n\n.footnote-container {\n  padding: 10px;\n}\n\n</style>\n\n<d-hover-box>\n  <div class="footnote-container">\n    <slot id="slot"></slot>\n  </div>\n</d-hover-box>\n\n<sup>\n  <span id="fn-" data-hover-ref=""></span>\n</sup>\n\n');class J extends(Q(HTMLElement)){constructor(){super(),new MutationObserver(this.notify).observe(this,{childList:!0,characterData:!0,subtree:!0})}notify(){const t=new CustomEvent("onFootnoteChanged",{detail:this,bubbles:!0});document.dispatchEvent(t)}connectedCallback(){this.hoverBox=this.root.querySelector("d-hover-box"),window.customElements.whenDefined("d-hover-box").then((()=>{this.hoverBox.listen(this)})),J.currentFootnoteId+=1;const t=J.currentFootnoteId.toString();this.root.host.id="d-footnote-"+t;const e="dt-fn-hover-box-"+t;this.hoverBox.id=e;const n=this.root.querySelector("#fn-");n.setAttribute("id","fn-"+t),n.setAttribute("data-hover-ref",e),n.textContent=t}}J.currentFootnoteId=0;const tt=s("d-footnote-list","\n<style>\n\nd-footnote-list {\n  contain: layout style;\n}\n\nd-footnote-list > * {\n  grid-column: text;\n}\n\nd-footnote-list a.footnote-backlink {\n  color: rgba(0,0,0,0.3);\n  padding-left: 0.5em;\n}\n\n</style>\n\n<h3>Footnotes</h3>\n<ol></ol>\n",!1);class et extends(tt(HTMLElement)){connectedCallback(){super.connectedCallback(),this.list=this.root.querySelector("ol"),this.root.style.display="none"}set footnotes(t){if(this.list.innerHTML="",t.length){this.root.style.display="";for(const e of t){const t=document.createElement("li");t.id=e.id+"-listing",t.innerHTML=e.innerHTML;const n=document.createElement("a");n.setAttribute("class","footnote-backlink"),n.textContent="[↩]",n.href="#"+e.id,t.appendChild(n),this.list.appendChild(t)}}else this.root.style.display="none"}}const nt=s("d-hover-box",'\n<style>\n\n:host {\n  position: absolute;\n  width: 100%;\n  left: 0px;\n  z-index: 10000;\n  display: none;\n  white-space: normal\n}\n\n.container {\n  position: relative;\n  width: 704px;\n  max-width: 100vw;\n  margin: 0 auto;\n}\n\n.panel {\n  position: absolute;\n  font-size: 1rem;\n  line-height: 1.5em;\n  top: 0;\n  left: 0;\n  width: 100%;\n  border: 1px solid rgba(0, 0, 0, 0.1);\n  background-color: rgba(250, 250, 250, 0.95);\n  box-shadow: 0 0 7px rgba(0, 0, 0, 0.1);\n  border-radius: 4px;\n  box-sizing: border-box;\n\n  backdrop-filter: blur(2px);\n  -webkit-backdrop-filter: blur(2px);\n}\n\n</style>\n\n<div class="container">\n  <div class="panel">\n    <slot></slot>\n  </div>\n</div>\n');class it extends(nt(HTMLElement)){constructor(){super()}connectedCallback(){}listen(t){this.bindDivEvents(this),this.bindTriggerEvents(t)}bindDivEvents(t){t.addEventListener("mouseover",(()=>{this.visible||this.showAtNode(t),this.stopTimeout()})),t.addEventListener("mouseout",(()=>{this.extendTimeout(500)})),t.addEventListener("touchstart",(t=>{t.stopPropagation()}),{passive:!0}),document.body.addEventListener("touchstart",(()=>{this.hide()}),{passive:!0})}bindTriggerEvents(t){t.addEventListener("mouseover",(()=>{this.visible||this.showAtNode(t),this.stopTimeout()})),t.addEventListener("mouseout",(()=>{this.extendTimeout(300)})),t.addEventListener("touchstart",(e=>{this.visible?this.hide():this.showAtNode(t),e.stopPropagation()}),{passive:!0})}show(t){this.visible=!0,this.style.display="block",this.style.top=Math.round(t[1]+10)+"px"}showAtNode(t){const e=t.getBoundingClientRect();this.show([t.offsetLeft+e.width,t.offsetTop+e.height])}hide(){this.visible=!1,this.style.display="none",this.stopTimeout()}stopTimeout(){this.timeout&&clearTimeout(this.timeout)}extendTimeout(t){this.stopTimeout(),this.timeout=setTimeout((()=>{this.hide()}),t)}}class rt extends HTMLElement{static get is(){return"d-title"}}const ot=s("d-references","\n<style>\nd-references {\n  display: block;\n}\n</style>\n",!1);class at extends(ot(HTMLElement)){}class st extends HTMLElement{static get is(){return"d-toc"}connectedCallback(){this.getAttribute("prerendered")||(window.onload=()=>{!function(t,e){let n='\n  <style>\n\n  d-toc {\n    contain: layout style;\n    display: block;\n  }\n\n  d-toc ul {\n    padding-left: 0;\n  }\n\n  d-toc ul > ul {\n    padding-left: 24px;\n  }\n\n  d-toc a {\n    border-bottom: none;\n    text-decoration: none;\n  }\n\n  </style>\n  <nav role="navigation" class="table-of-contents"></nav>\n  <h2>Table of contents</h2>\n  <ul>';for(const t of e){const e="D-TITLE"==t.parentElement.tagName,i=t.getAttribute("no-toc");if(e||i)continue;const r=t.textContent;let o='<li><a href="#'+t.getAttribute("id")+'">'+r+"</a></li>";"H3"==t.tagName?o="<ul>"+o+"</ul>":o+="<br>",n+=o}n+="</ul></nav>",t.innerHTML=n}(this,document.querySelector("d-article").querySelectorAll("h2, h3"))})}}class lt extends HTMLElement{static get is(){return"d-figure"}static get readyQueue(){return lt._readyQueue||(lt._readyQueue=[]),lt._readyQueue}static addToReadyQueue(t){-1===lt.readyQueue.indexOf(t)&&(lt.readyQueue.push(t),lt.runReadyQueue())}static runReadyQueue(){const t=lt.readyQueue.sort(((t,e)=>t._seenOnScreen-e._seenOnScreen)).filter((t=>!t._ready)).pop();t&&(t.ready(),requestAnimationFrame(lt.runReadyQueue))}constructor(){super(),this._ready=!1,this._onscreen=!1,this._offscreen=!0}connectedCallback(){this.loadsWhileScrolling=this.hasAttribute("loadsWhileScrolling"),lt.marginObserver.observe(this),lt.directObserver.observe(this)}disconnectedCallback(){lt.marginObserver.unobserve(this),lt.directObserver.unobserve(this)}static get marginObserver(){if(!lt._marginObserver){const t=window.innerHeight,e=Math.floor(2*t),n={rootMargin:e+"px 0px "+e+"px 0px",threshold:.01},i=lt.didObserveMarginIntersection,r=new IntersectionObserver(i,n);lt._marginObserver=r}return lt._marginObserver}static didObserveMarginIntersection(t){for(const e of t){const t=e.target;e.isIntersecting&&!t._ready&&lt.addToReadyQueue(t)}}static get directObserver(){return lt._directObserver||(lt._directObserver=new IntersectionObserver(lt.didObserveDirectIntersection,{rootMargin:"0px",threshold:[0,1]})),lt._directObserver}static didObserveDirectIntersection(t){for(const e of t){const t=e.target;e.isIntersecting?(t._seenOnScreen=new Date,t._offscreen&&t.onscreen()):t._onscreen&&t.offscreen()}}addEventListener(t,e){super.addEventListener(t,e),"ready"===t&&-1!==lt.readyQueue.indexOf(this)&&(this._ready=!1,lt.runReadyQueue()),"onscreen"===t&&this.onscreen()}ready(){this._ready=!0,lt.marginObserver.unobserve(this);const t=new CustomEvent("ready");this.dispatchEvent(t)}onscreen(){this._onscreen=!0,this._offscreen=!1;const t=new CustomEvent("onscreen");this.dispatchEvent(t)}offscreen(){this._onscreen=!1,this._offscreen=!0;const t=new CustomEvent("offscreen");this.dispatchEvent(t)}}if("undefined"!=typeof window){let t;lt.isScrolling=!1;const e=()=>{lt.isScrolling=!0,clearTimeout(t),t=setTimeout((()=>{lt.isScrolling=!1,lt.runReadyQueue()}),500)};window.addEventListener("scroll",e,!0)}const ut=s("d-interstitial",'\n<style>\n\n.overlay {\n  position: fixed;\n  width: 100%;\n  height: 100%;\n  top: 0;\n  left: 0;\n  background: white;\n\n  opacity: 1;\n  visibility: visible;\n\n  display: flex;\n  flex-flow: column;\n  justify-content: center;\n  z-index: 2147483647 /* MaxInt32 */\n\n}\n\n.container {\n  position: relative;\n  margin-left: auto;\n  margin-right: auto;\n  max-width: 420px;\n  padding: 2em;\n}\n\nh1 {\n  text-decoration: underline;\n  text-decoration-color: hsl(0,100%,40%);\n  -webkit-text-decoration-color: hsl(0,100%,40%);\n  margin-bottom: 1em;\n  line-height: 1.5em;\n}\n\ninput[type="password"] {\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n  -webkit-box-shadow: none;\n  -moz-box-shadow: none;\n  box-shadow: none;\n  -webkit-border-radius: none;\n  -moz-border-radius: none;\n  -ms-border-radius: none;\n  -o-border-radius: none;\n  border-radius: none;\n  outline: none;\n\n  font-size: 18px;\n  background: none;\n  width: 25%;\n  padding: 10px;\n  border: none;\n  border-bottom: solid 2px #999;\n  transition: border .3s;\n}\n\ninput[type="password"]:focus {\n  border-bottom: solid 2px #333;\n}\n\ninput[type="password"].wrong {\n  border-bottom: solid 2px hsl(0,100%,40%);\n}\n\np small {\n  color: #888;\n}\n\n.logo {\n  position: relative;\n  font-size: 1.5em;\n  margin-bottom: 3em;\n}\n\n.logo svg {\n  width: 36px;\n  position: relative;\n  top: 6px;\n  margin-right: 2px;\n}\n\n.logo svg path {\n  fill: none;\n  stroke: black;\n  stroke-width: 2px;\n}\n\n</style>\n\n<div class="overlay">\n  <div class="container">\n    <h1>This article is in review.</h1>\n    <p>Do not share this URL or the contents of this article. Thank you!</p>\n    <input id="interstitial-password-input" type="password" name="password" autofocus/>\n    <p><small>Enter the password we shared with you as part of the review process to view the article.</small></p>\n  </div>\n</div>\n');class ct extends(ut(HTMLElement)){connectedCallback(){this.shouldRemoveSelf()?this.parentElement.removeChild(this):this.root.querySelector("#interstitial-password-input").oninput=t=>this.passwordChanged(t)}passwordChanged(t){t.target.value===this.password&&(console.log("Correct password entered."),this.parentElement.removeChild(this),"undefined"!=typeof Storage&&(console.log("Saved that correct password was entered."),localStorage.setItem(this.localStorageIdentifier(),"true")))}shouldRemoveSelf(){return window&&"distill.pub"===window.location.hostname?(console.warn("Interstitial found on production, hiding it."),!0):"undefined"!=typeof Storage&&"true"===localStorage.getItem(this.localStorageIdentifier())&&(console.log("Loaded that correct password was entered before; skipping interstitial."),!0)}localStorageIdentifier(){return"distill-drafts"+(window?window.location.pathname:"-")+"interstitial-password-correct"}}function dt(t,e){return t<e?-1:t>e?1:t>=e?0:NaN}function ht(t){let e=t,n=t;function i(t,e,i,r){for(null==i&&(i=0),null==r&&(r=t.length);i<r;){const o=i+r>>>1;n(t[o],e)<0?i=o+1:r=o}return i}return 1===t.length&&(e=(e,n)=>t(e)-n,n=function(t){return(e,n)=>dt(t(e),n)}(t)),{left:i,center:function(t,n,r,o){null==r&&(r=0),null==o&&(o=t.length);const a=i(t,n,r,o-1);return a>r&&e(t[a-1],n)>-e(t[a],n)?a-1:a},right:function(t,e,i,r){for(null==i&&(i=0),null==r&&(r=t.length);i<r;){const o=i+r>>>1;n(t[o],e)>0?r=o:i=o+1}return i}}}const pt=ht(dt).right;ht((function(t){return null===t?NaN:+t})).center;var gt=Math.sqrt(50),ft=Math.sqrt(10),mt=Math.sqrt(2);function bt(t,e,n){var i=(e-t)/Math.max(0,n),r=Math.floor(Math.log(i)/Math.LN10),o=i/Math.pow(10,r);return r>=0?(o>=gt?10:o>=ft?5:o>=mt?2:1)*Math.pow(10,r):-Math.pow(10,-r)/(o>=gt?10:o>=ft?5:o>=mt?2:1)}function yt(t,e){switch(arguments.length){case 0:break;case 1:this.range(t);break;default:this.range(e).domain(t)}return this}function vt(t,e,n){t.prototype=e.prototype=n,n.constructor=t}function wt(t,e){var n=Object.create(t.prototype);for(var i in e)n[i]=e[i];return n}function xt(){}var kt=.7,St=1/kt,Tt="\\s*([+-]?\\d+)\\s*",Mt="\\s*([+-]?\\d*\\.?\\d+(?:[eE][+-]?\\d+)?)\\s*",Ct="\\s*([+-]?\\d*\\.?\\d+(?:[eE][+-]?\\d+)?)%\\s*",_t=/^#([0-9a-f]{3,8})$/,At=new RegExp("^rgb\\("+[Tt,Tt,Tt]+"\\)$"),Et=new RegExp("^rgb\\("+[Ct,Ct,Ct]+"\\)$"),Dt=new RegExp("^rgba\\("+[Tt,Tt,Tt,Mt]+"\\)$"),Lt=new RegExp("^rgba\\("+[Ct,Ct,Ct,Mt]+"\\)$"),Nt=new RegExp("^hsl\\("+[Mt,Ct,Ct]+"\\)$"),Ft=new RegExp("^hsla\\("+[Mt,Ct,Ct,Mt]+"\\)$"),Ot={aliceblue:15792383,antiquewhite:16444375,aqua:65535,aquamarine:8388564,azure:15794175,beige:16119260,bisque:16770244,black:0,blanchedalmond:16772045,blue:255,blueviolet:9055202,brown:10824234,burlywood:14596231,cadetblue:6266528,chartreuse:8388352,chocolate:13789470,coral:16744272,cornflowerblue:6591981,cornsilk:16775388,crimson:14423100,cyan:65535,darkblue:139,darkcyan:35723,darkgoldenrod:12092939,darkgray:11119017,darkgreen:25600,darkgrey:11119017,darkkhaki:12433259,darkmagenta:9109643,darkolivegreen:5597999,darkorange:16747520,darkorchid:10040012,darkred:9109504,darksalmon:15308410,darkseagreen:9419919,darkslateblue:4734347,darkslategray:3100495,darkslategrey:3100495,darkturquoise:52945,darkviolet:9699539,deeppink:16716947,deepskyblue:49151,dimgray:6908265,dimgrey:6908265,dodgerblue:2003199,firebrick:11674146,floralwhite:16775920,forestgreen:2263842,fuchsia:16711935,gainsboro:14474460,ghostwhite:16316671,gold:16766720,goldenrod:14329120,gray:8421504,green:32768,greenyellow:11403055,grey:8421504,honeydew:15794160,hotpink:16738740,indianred:13458524,indigo:4915330,ivory:16777200,khaki:15787660,lavender:15132410,lavenderblush:16773365,lawngreen:8190976,lemonchiffon:16775885,lightblue:11393254,lightcoral:15761536,lightcyan:14745599,lightgoldenrodyellow:16448210,lightgray:13882323,lightgreen:9498256,lightgrey:13882323,lightpink:16758465,lightsalmon:16752762,lightseagreen:2142890,lightskyblue:8900346,lightslategray:7833753,lightslategrey:7833753,lightsteelblue:11584734,lightyellow:16777184,lime:65280,limegreen:3329330,linen:16445670,magenta:16711935,maroon:8388608,mediumaquamarine:6737322,mediumblue:205,mediumorchid:12211667,mediumpurple:9662683,mediumseagreen:3978097,mediumslateblue:8087790,mediumspringgreen:64154,mediumturquoise:4772300,mediumvioletred:13047173,midnightblue:1644912,mintcream:16121850,mistyrose:16770273,moccasin:16770229,navajowhite:16768685,navy:128,oldlace:16643558,olive:8421376,olivedrab:7048739,orange:16753920,orangered:16729344,orchid:14315734,palegoldenrod:15657130,palegreen:10025880,paleturquoise:11529966,palevioletred:14381203,papayawhip:16773077,peachpuff:16767673,peru:13468991,pink:16761035,plum:14524637,powderblue:11591910,purple:8388736,rebeccapurple:6697881,red:16711680,rosybrown:12357519,royalblue:4286945,saddlebrown:9127187,salmon:16416882,sandybrown:16032864,seagreen:3050327,seashell:16774638,sienna:10506797,silver:12632256,skyblue:8900331,slateblue:6970061,slategray:7372944,slategrey:7372944,snow:16775930,springgreen:65407,steelblue:4620980,tan:13808780,teal:32896,thistle:14204888,tomato:16737095,turquoise:4251856,violet:15631086,wheat:16113331,white:16777215,whitesmoke:16119285,yellow:16776960,yellowgreen:10145074};function It(){return this.rgb().formatHex()}function Ut(){return this.rgb().formatRgb()}function Rt(t){var e,n;return t=(t+"").trim().toLowerCase(),(e=_t.exec(t))?(n=e[1].length,e=parseInt(e[1],16),6===n?$t(e):3===n?new qt(e>>8&15|e>>4&240,e>>4&15|240&e,(15&e)<<4|15&e,1):8===n?Ht(e>>24&255,e>>16&255,e>>8&255,(255&e)/255):4===n?Ht(e>>12&15|e>>8&240,e>>8&15|e>>4&240,e>>4&15|240&e,((15&e)<<4|15&e)/255):null):(e=At.exec(t))?new qt(e[1],e[2],e[3],1):(e=Et.exec(t))?new qt(255*e[1]/100,255*e[2]/100,255*e[3]/100,1):(e=Dt.exec(t))?Ht(e[1],e[2],e[3],e[4]):(e=Lt.exec(t))?Ht(255*e[1]/100,255*e[2]/100,255*e[3]/100,e[4]):(e=Nt.exec(t))?Gt(e[1],e[2]/100,e[3]/100,1):(e=Ft.exec(t))?Gt(e[1],e[2]/100,e[3]/100,e[4]):Ot.hasOwnProperty(t)?$t(Ot[t]):"transparent"===t?new qt(NaN,NaN,NaN,0):null}function $t(t){return new qt(t>>16&255,t>>8&255,255&t,1)}function Ht(t,e,n,i){return i<=0&&(t=e=n=NaN),new qt(t,e,n,i)}function Pt(t){return t instanceof xt||(t=Rt(t)),t?new qt((t=t.rgb()).r,t.g,t.b,t.opacity):new qt}function zt(t,e,n,i){return 1===arguments.length?Pt(t):new qt(t,e,n,null==i?1:i)}function qt(t,e,n,i){this.r=+t,this.g=+e,this.b=+n,this.opacity=+i}function Yt(){return"#"+Bt(this.r)+Bt(this.g)+Bt(this.b)}function jt(){var t=this.opacity;return(1===(t=isNaN(t)?1:Math.max(0,Math.min(1,t)))?"rgb(":"rgba(")+Math.max(0,Math.min(255,Math.round(this.r)||0))+", "+Math.max(0,Math.min(255,Math.round(this.g)||0))+", "+Math.max(0,Math.min(255,Math.round(this.b)||0))+(1===t?")":", "+t+")")}function Bt(t){return((t=Math.max(0,Math.min(255,Math.round(t)||0)))<16?"0":"")+t.toString(16)}function Gt(t,e,n,i){return i<=0?t=e=n=NaN:n<=0||n>=1?t=e=NaN:e<=0&&(t=NaN),new Vt(t,e,n,i)}function Wt(t){if(t instanceof Vt)return new Vt(t.h,t.s,t.l,t.opacity);if(t instanceof xt||(t=Rt(t)),!t)return new Vt;if(t instanceof Vt)return t;var e=(t=t.rgb()).r/255,n=t.g/255,i=t.b/255,r=Math.min(e,n,i),o=Math.max(e,n,i),a=NaN,s=o-r,l=(o+r)/2;return s?(a=e===o?(n-i)/s+6*(n<i):n===o?(i-e)/s+2:(e-n)/s+4,s/=l<.5?o+r:2-o-r,a*=60):s=l>0&&l<1?0:a,new Vt(a,s,l,t.opacity)}function Vt(t,e,n,i){this.h=+t,this.s=+e,this.l=+n,this.opacity=+i}function Kt(t,e,n){return 255*(t<60?e+(n-e)*t/60:t<180?n:t<240?e+(n-e)*(240-t)/60:e)}vt(xt,Rt,{copy:function(t){return Object.assign(new this.constructor,this,t)},displayable:function(){return this.rgb().displayable()},hex:It,formatHex:It,formatHsl:function(){return Wt(this).formatHsl()},formatRgb:Ut,toString:Ut}),vt(qt,zt,wt(xt,{brighter:function(t){return t=null==t?St:Math.pow(St,t),new qt(this.r*t,this.g*t,this.b*t,this.opacity)},darker:function(t){return t=null==t?kt:Math.pow(kt,t),new qt(this.r*t,this.g*t,this.b*t,this.opacity)},rgb:function(){return this},displayable:function(){return-.5<=this.r&&this.r<255.5&&-.5<=this.g&&this.g<255.5&&-.5<=this.b&&this.b<255.5&&0<=this.opacity&&this.opacity<=1},hex:Yt,formatHex:Yt,formatRgb:jt,toString:jt})),vt(Vt,(function(t,e,n,i){return 1===arguments.length?Wt(t):new Vt(t,e,n,null==i?1:i)}),wt(xt,{brighter:function(t){return t=null==t?St:Math.pow(St,t),new Vt(this.h,this.s,this.l*t,this.opacity)},darker:function(t){return t=null==t?kt:Math.pow(kt,t),new Vt(this.h,this.s,this.l*t,this.opacity)},rgb:function(){var t=this.h%360+360*(this.h<0),e=isNaN(t)||isNaN(this.s)?0:this.s,n=this.l,i=n+(n<.5?n:1-n)*e,r=2*n-i;return new qt(Kt(t>=240?t-240:t+120,r,i),Kt(t,r,i),Kt(t<120?t+240:t-120,r,i),this.opacity)},displayable:function(){return(0<=this.s&&this.s<=1||isNaN(this.s))&&0<=this.l&&this.l<=1&&0<=this.opacity&&this.opacity<=1},formatHsl:function(){var t=this.opacity;return(1===(t=isNaN(t)?1:Math.max(0,Math.min(1,t)))?"hsl(":"hsla(")+(this.h||0)+", "+100*(this.s||0)+"%, "+100*(this.l||0)+"%"+(1===t?")":", "+t+")")}}));const Xt=Math.PI/180,Zt=180/Math.PI,Qt=.96422,Jt=.82521,te=4/29,ee=6/29,ne=3*ee*ee,ie=ee*ee*ee;function re(t){if(t instanceof oe)return new oe(t.l,t.a,t.b,t.opacity);if(t instanceof ce)return de(t);t instanceof qt||(t=Pt(t));var e,n,i=ue(t.r),r=ue(t.g),o=ue(t.b),a=ae((.2225045*i+.7168786*r+.0606169*o)/1);return i===r&&r===o?e=n=a:(e=ae((.4360747*i+.3850649*r+.1430804*o)/Qt),n=ae((.0139322*i+.0971045*r+.7141733*o)/Jt)),new oe(116*a-16,500*(e-a),200*(a-n),t.opacity)}function oe(t,e,n,i){this.l=+t,this.a=+e,this.b=+n,this.opacity=+i}function ae(t){return t>ie?Math.pow(t,1/3):t/ne+te}function se(t){return t>ee?t*t*t:ne*(t-te)}function le(t){return 255*(t<=.0031308?12.92*t:1.055*Math.pow(t,1/2.4)-.055)}function ue(t){return(t/=255)<=.04045?t/12.92:Math.pow((t+.055)/1.055,2.4)}function ce(t,e,n,i){this.h=+t,this.c=+e,this.l=+n,this.opacity=+i}function de(t){if(isNaN(t.h))return new oe(t.l,0,0,t.opacity);var e=t.h*Xt;return new oe(t.l,Math.cos(e)*t.c,Math.sin(e)*t.c,t.opacity)}vt(oe,(function(t,e,n,i){return 1===arguments.length?re(t):new oe(t,e,n,null==i?1:i)}),wt(xt,{brighter:function(t){return new oe(this.l+18*(null==t?1:t),this.a,this.b,this.opacity)},darker:function(t){return new oe(this.l-18*(null==t?1:t),this.a,this.b,this.opacity)},rgb:function(){var t=(this.l+16)/116,e=isNaN(this.a)?t:t+this.a/500,n=isNaN(this.b)?t:t-this.b/200;return new qt(le(3.1338561*(e=Qt*se(e))-1.6168667*(t=1*se(t))-.4906146*(n=Jt*se(n))),le(-.9787684*e+1.9161415*t+.033454*n),le(.0719453*e-.2289914*t+1.4052427*n),this.opacity)}})),vt(ce,(function(t,e,n,i){return 1===arguments.length?function(t){if(t instanceof ce)return new ce(t.h,t.c,t.l,t.opacity);if(t instanceof oe||(t=re(t)),0===t.a&&0===t.b)return new ce(NaN,0<t.l&&t.l<100?0:NaN,t.l,t.opacity);var e=Math.atan2(t.b,t.a)*Zt;return new ce(e<0?e+360:e,Math.sqrt(t.a*t.a+t.b*t.b),t.l,t.opacity)}(t):new ce(t,e,n,null==i?1:i)}),wt(xt,{brighter:function(t){return new ce(this.h,this.c,this.l+18*(null==t?1:t),this.opacity)},darker:function(t){return new ce(this.h,this.c,this.l-18*(null==t?1:t),this.opacity)},rgb:function(){return de(this).rgb()}}));var he=-.14861,pe=1.78277,ge=-.29227,fe=-.90649,me=1.97294,be=me*fe,ye=me*pe,ve=pe*ge-fe*he;function we(t,e,n,i){return 1===arguments.length?function(t){if(t instanceof xe)return new xe(t.h,t.s,t.l,t.opacity);t instanceof qt||(t=Pt(t));var e=t.r/255,n=t.g/255,i=t.b/255,r=(ve*i+be*e-ye*n)/(ve+be-ye),o=i-r,a=(me*(n-r)-ge*o)/fe,s=Math.sqrt(a*a+o*o)/(me*r*(1-r)),l=s?Math.atan2(a,o)*Zt-120:NaN;return new xe(l<0?l+360:l,s,r,t.opacity)}(t):new xe(t,e,n,null==i?1:i)}function xe(t,e,n,i){this.h=+t,this.s=+e,this.l=+n,this.opacity=+i}vt(xe,we,wt(xt,{brighter:function(t){return t=null==t?St:Math.pow(St,t),new xe(this.h,this.s,this.l*t,this.opacity)},darker:function(t){return t=null==t?kt:Math.pow(kt,t),new xe(this.h,this.s,this.l*t,this.opacity)},rgb:function(){var t=isNaN(this.h)?0:(this.h+120)*Xt,e=+this.l,n=isNaN(this.s)?0:this.s*e*(1-e),i=Math.cos(t),r=Math.sin(t);return new qt(255*(e+n*(he*i+pe*r)),255*(e+n*(ge*i+fe*r)),255*(e+n*(me*i)),this.opacity)}}));var ke=t=>()=>t;function Se(t,e){return function(n){return t+n*e}}function Te(t,e){var n=e-t;return n?Se(t,n):ke(isNaN(t)?e:t)}var Me=function t(e){var n=function(t){return 1==(t=+t)?Te:function(e,n){return n-e?function(t,e,n){return t=Math.pow(t,n),e=Math.pow(e,n)-t,n=1/n,function(i){return Math.pow(t+i*e,n)}}(e,n,t):ke(isNaN(e)?n:e)}}(e);function i(t,e){var i=n((t=zt(t)).r,(e=zt(e)).r),r=n(t.g,e.g),o=n(t.b,e.b),a=Te(t.opacity,e.opacity);return function(e){return t.r=i(e),t.g=r(e),t.b=o(e),t.opacity=a(e),t+""}}return i.gamma=t,i}(1);function Ce(t,e){e||(e=[]);var n,i=t?Math.min(e.length,t.length):0,r=e.slice();return function(o){for(n=0;n<i;++n)r[n]=t[n]*(1-o)+e[n]*o;return r}}function _e(t,e){var n,i=e?e.length:0,r=t?Math.min(i,t.length):0,o=new Array(r),a=new Array(i);for(n=0;n<r;++n)o[n]=Oe(t[n],e[n]);for(;n<i;++n)a[n]=e[n];return function(t){for(n=0;n<r;++n)a[n]=o[n](t);return a}}function Ae(t,e){var n=new Date;return t=+t,e=+e,function(i){return n.setTime(t*(1-i)+e*i),n}}function Ee(t,e){return t=+t,e=+e,function(n){return t*(1-n)+e*n}}function De(t,e){var n,i={},r={};for(n in null!==t&&"object"==typeof t||(t={}),null!==e&&"object"==typeof e||(e={}),e)n in t?i[n]=Oe(t[n],e[n]):r[n]=e[n];return function(t){for(n in i)r[n]=i[n](t);return r}}var Le=/[-+]?(?:\d+\.?\d*|\.?\d+)(?:[eE][-+]?\d+)?/g,Ne=new RegExp(Le.source,"g");function Fe(t,e){var n,i,r,o=Le.lastIndex=Ne.lastIndex=0,a=-1,s=[],l=[];for(t+="",e+="";(n=Le.exec(t))&&(i=Ne.exec(e));)(r=i.index)>o&&(r=e.slice(o,r),s[a]?s[a]+=r:s[++a]=r),(n=n[0])===(i=i[0])?s[a]?s[a]+=i:s[++a]=i:(s[++a]=null,l.push({i:a,x:Ee(n,i)})),o=Ne.lastIndex;return o<e.length&&(r=e.slice(o),s[a]?s[a]+=r:s[++a]=r),s.length<2?l[0]?function(t){return function(e){return t(e)+""}}(l[0].x):function(t){return function(){return t}}(e):(e=l.length,function(t){for(var n,i=0;i<e;++i)s[(n=l[i]).i]=n.x(t);return s.join("")})}function Oe(t,e){var n,i,r=typeof e;return null==e||"boolean"===r?ke(e):("number"===r?Ee:"string"===r?(n=Rt(e))?(e=n,Me):Fe:e instanceof Rt?Me:e instanceof Date?Ae:(i=e,!ArrayBuffer.isView(i)||i instanceof DataView?Array.isArray(e)?_e:"function"!=typeof e.valueOf&&"function"!=typeof e.toString||isNaN(e)?De:Ee:Ce))(t,e)}function Ie(t,e){return t=+t,e=+e,function(n){return Math.round(t*(1-n)+e*n)}}function Ue(t){return((t=Math.exp(t))+1/t)/2}function Re(t){return function e(n){function i(e,i){var r=t((e=we(e)).h,(i=we(i)).h),o=Te(e.s,i.s),a=Te(e.l,i.l),s=Te(e.opacity,i.opacity);return function(t){return e.h=r(t),e.s=o(t),e.l=a(Math.pow(t,n)),e.opacity=s(t),e+""}}return n=+n,i.gamma=e,i}(1)}function $e(t){return+t}!function t(e,n,i){function r(t,r){var o,a,s=t[0],l=t[1],u=t[2],c=r[0],d=r[1],h=r[2],p=c-s,g=d-l,f=p*p+g*g;if(f<1e-12)a=Math.log(h/u)/e,o=function(t){return[s+t*p,l+t*g,u*Math.exp(e*t*a)]};else{var m=Math.sqrt(f),b=(h*h-u*u+i*f)/(2*u*n*m),y=(h*h-u*u-i*f)/(2*h*n*m),v=Math.log(Math.sqrt(b*b+1)-b),w=Math.log(Math.sqrt(y*y+1)-y);a=(w-v)/e,o=function(t){var i,r=t*a,o=Ue(v),c=u/(n*m)*(o*(i=e*r+v,((i=Math.exp(2*i))-1)/(i+1))-function(t){return((t=Math.exp(t))-1/t)/2}(v));return[s+c*p,l+c*g,u*o/Ue(e*r+v)]}}return o.duration=1e3*a*e/Math.SQRT2,o}return r.rho=function(e){var n=Math.max(.001,+e),i=n*n;return t(n,i,i*i)},r}(Math.SQRT2,2,4),Re((function(t,e){var n=e-t;return n?Se(t,n>180||n<-180?n-360*Math.round(n/360):n):ke(isNaN(t)?e:t)})),Re(Te);var He=[0,1];function Pe(t){return t}function ze(t,e){return(e-=t=+t)?function(n){return(n-t)/e}:(n=isNaN(e)?NaN:.5,function(){return n});var n}function qe(t,e,n){var i=t[0],r=t[1],o=e[0],a=e[1];return r<i?(i=ze(r,i),o=n(a,o)):(i=ze(i,r),o=n(o,a)),function(t){return o(i(t))}}function Ye(t,e,n){var i=Math.min(t.length,e.length)-1,r=new Array(i),o=new Array(i),a=-1;for(t[i]<t[0]&&(t=t.slice().reverse(),e=e.slice().reverse());++a<i;)r[a]=ze(t[a],t[a+1]),o[a]=n(e[a],e[a+1]);return function(e){var n=pt(t,e,1,i)-1;return o[n](r[n](e))}}function je(t,e){if((n=(t=e?t.toExponential(e-1):t.toExponential()).indexOf("e"))<0)return null;var n,i=t.slice(0,n);return[i.length>1?i[0]+i.slice(2):i,+t.slice(n+1)]}function Be(t){return(t=je(Math.abs(t)))?t[1]:NaN}var Ge,We=/^(?:(.)?([<>=^]))?([+\-( ])?([$#])?(0)?(\d+)?(,)?(\.\d+)?(~)?([a-z%])?$/i;function Ve(t){if(!(e=We.exec(t)))throw new Error("invalid format: "+t);var e;return new Ke({fill:e[1],align:e[2],sign:e[3],symbol:e[4],zero:e[5],width:e[6],comma:e[7],precision:e[8]&&e[8].slice(1),trim:e[9],type:e[10]})}function Ke(t){this.fill=void 0===t.fill?" ":t.fill+"",this.align=void 0===t.align?">":t.align+"",this.sign=void 0===t.sign?"-":t.sign+"",this.symbol=void 0===t.symbol?"":t.symbol+"",this.zero=!!t.zero,this.width=void 0===t.width?void 0:+t.width,this.comma=!!t.comma,this.precision=void 0===t.precision?void 0:+t.precision,this.trim=!!t.trim,this.type=void 0===t.type?"":t.type+""}function Xe(t,e){var n=je(t,e);if(!n)return t+"";var i=n[0],r=n[1];return r<0?"0."+new Array(-r).join("0")+i:i.length>r+1?i.slice(0,r+1)+"."+i.slice(r+1):i+new Array(r-i.length+2).join("0")}Ve.prototype=Ke.prototype,Ke.prototype.toString=function(){return this.fill+this.align+this.sign+this.symbol+(this.zero?"0":"")+(void 0===this.width?"":Math.max(1,0|this.width))+(this.comma?",":"")+(void 0===this.precision?"":"."+Math.max(0,0|this.precision))+(this.trim?"~":"")+this.type};var Ze={"%":(t,e)=>(100*t).toFixed(e),b:t=>Math.round(t).toString(2),c:t=>t+"",d:function(t){return Math.abs(t=Math.round(t))>=1e21?t.toLocaleString("en").replace(/,/g,""):t.toString(10)},e:(t,e)=>t.toExponential(e),f:(t,e)=>t.toFixed(e),g:(t,e)=>t.toPrecision(e),o:t=>Math.round(t).toString(8),p:(t,e)=>Xe(100*t,e),r:Xe,s:function(t,e){var n=je(t,e);if(!n)return t+"";var i=n[0],r=n[1],o=r-(Ge=3*Math.max(-8,Math.min(8,Math.floor(r/3))))+1,a=i.length;return o===a?i:o>a?i+new Array(o-a+1).join("0"):o>0?i.slice(0,o)+"."+i.slice(o):"0."+new Array(1-o).join("0")+je(t,Math.max(0,e+o-1))[0]},X:t=>Math.round(t).toString(16).toUpperCase(),x:t=>Math.round(t).toString(16)};function Qe(t){return t}var Je,tn,en,nn=Array.prototype.map,rn=["y","z","a","f","p","n","µ","m","","k","M","G","T","P","E","Z","Y"];function on(t){var e=t.domain;return t.ticks=function(t){var n=e();return function(t,e,n){var i,r,o,a,s=-1;if(n=+n,(t=+t)==(e=+e)&&n>0)return[t];if((i=e<t)&&(r=t,t=e,e=r),0===(a=bt(t,e,n))||!isFinite(a))return[];if(a>0){let n=Math.round(t/a),i=Math.round(e/a);for(n*a<t&&++n,i*a>e&&--i,o=new Array(r=i-n+1);++s<r;)o[s]=(n+s)*a}else{a=-a;let n=Math.round(t*a),i=Math.round(e*a);for(n/a<t&&++n,i/a>e&&--i,o=new Array(r=i-n+1);++s<r;)o[s]=(n+s)/a}return i&&o.reverse(),o}(n[0],n[n.length-1],null==t?10:t)},t.tickFormat=function(t,n){var i=e();return function(t,e,n,i){var r,o=function(t,e,n){var i=Math.abs(e-t)/Math.max(0,n),r=Math.pow(10,Math.floor(Math.log(i)/Math.LN10)),o=i/r;return o>=gt?r*=10:o>=ft?r*=5:o>=mt&&(r*=2),e<t?-r:r}(t,e,n);switch((i=Ve(null==i?",f":i)).type){case"s":var a=Math.max(Math.abs(t),Math.abs(e));return null!=i.precision||isNaN(r=function(t,e){return Math.max(0,3*Math.max(-8,Math.min(8,Math.floor(Be(e)/3)))-Be(Math.abs(t)))}(o,a))||(i.precision=r),en(i,a);case"":case"e":case"g":case"p":case"r":null!=i.precision||isNaN(r=function(t,e){return t=Math.abs(t),e=Math.abs(e)-t,Math.max(0,Be(e)-Be(t))+1}(o,Math.max(Math.abs(t),Math.abs(e))))||(i.precision=r-("e"===i.type));break;case"f":case"%":null!=i.precision||isNaN(r=function(t){return Math.max(0,-Be(Math.abs(t)))}(o))||(i.precision=r-2*("%"===i.type))}return tn(i)}(i[0],i[i.length-1],null==t?10:t,n)},t.nice=function(n){null==n&&(n=10);var i,r,o=e(),a=0,s=o.length-1,l=o[a],u=o[s],c=10;for(u<l&&(r=l,l=u,u=r,r=a,a=s,s=r);c-- >0;){if((r=bt(l,u,n))===i)return o[a]=l,o[s]=u,e(o);if(r>0)l=Math.floor(l/r)*r,u=Math.ceil(u/r)*r;else{if(!(r<0))break;l=Math.ceil(l*r)/r,u=Math.floor(u*r)/r}i=r}return t},t}function an(){var t=function(){var t,e,n,i,r,o,a=He,s=He,l=Oe,u=Pe;function c(){var t,e,n,l=Math.min(a.length,s.length);return u!==Pe&&(t=a[0],e=a[l-1],t>e&&(n=t,t=e,e=n),u=function(n){return Math.max(t,Math.min(e,n))}),i=l>2?Ye:qe,r=o=null,d}function d(e){return null==e||isNaN(e=+e)?n:(r||(r=i(a.map(t),s,l)))(t(u(e)))}return d.invert=function(n){return u(e((o||(o=i(s,a.map(t),Ee)))(n)))},d.domain=function(t){return arguments.length?(a=Array.from(t,$e),c()):a.slice()},d.range=function(t){return arguments.length?(s=Array.from(t),c()):s.slice()},d.rangeRound=function(t){return s=Array.from(t),l=Ie,c()},d.clamp=function(t){return arguments.length?(u=!!t||Pe,c()):u!==Pe},d.interpolate=function(t){return arguments.length?(l=t,c()):l},d.unknown=function(t){return arguments.length?(n=t,d):n},function(n,i){return t=n,e=i,c()}}()(Pe,Pe);return t.copy=function(){return e=t,an().domain(e.domain()).range(e.range()).interpolate(e.interpolate()).clamp(e.clamp()).unknown(e.unknown());var e},yt.apply(t,arguments),on(t)}Je=function(t){var e,n,i=void 0===t.grouping||void 0===t.thousands?Qe:(e=nn.call(t.grouping,Number),n=t.thousands+"",function(t,i){for(var r=t.length,o=[],a=0,s=e[0],l=0;r>0&&s>0&&(l+s+1>i&&(s=Math.max(1,i-l)),o.push(t.substring(r-=s,r+s)),!((l+=s+1)>i));)s=e[a=(a+1)%e.length];return o.reverse().join(n)}),r=void 0===t.currency?"":t.currency[0]+"",o=void 0===t.currency?"":t.currency[1]+"",a=void 0===t.decimal?".":t.decimal+"",s=void 0===t.numerals?Qe:function(t){return function(e){return e.replace(/[0-9]/g,(function(e){return t[+e]}))}}(nn.call(t.numerals,String)),l=void 0===t.percent?"%":t.percent+"",u=void 0===t.minus?"−":t.minus+"",c=void 0===t.nan?"NaN":t.nan+"";function d(t){var e=(t=Ve(t)).fill,n=t.align,d=t.sign,h=t.symbol,p=t.zero,g=t.width,f=t.comma,m=t.precision,b=t.trim,y=t.type;"n"===y?(f=!0,y="g"):Ze[y]||(void 0===m&&(m=12),b=!0,y="g"),(p||"0"===e&&"="===n)&&(p=!0,e="0",n="=");var v="$"===h?r:"#"===h&&/[boxX]/.test(y)?"0"+y.toLowerCase():"",w="$"===h?o:/[%p]/.test(y)?l:"",x=Ze[y],k=/[defgprs%]/.test(y);function S(t){var r,o,l,h=v,S=w;if("c"===y)S=x(t)+S,t="";else{var T=(t=+t)<0||1/t<0;if(t=isNaN(t)?c:x(Math.abs(t),m),b&&(t=function(t){t:for(var e,n=t.length,i=1,r=-1;i<n;++i)switch(t[i]){case".":r=e=i;break;case"0":0===r&&(r=i),e=i;break;default:if(!+t[i])break t;r>0&&(r=0)}return r>0?t.slice(0,r)+t.slice(e+1):t}(t)),T&&0==+t&&"+"!==d&&(T=!1),h=(T?"("===d?d:u:"-"===d||"("===d?"":d)+h,S=("s"===y?rn[8+Ge/3]:"")+S+(T&&"("===d?")":""),k)for(r=-1,o=t.length;++r<o;)if(48>(l=t.charCodeAt(r))||l>57){S=(46===l?a+t.slice(r+1):t.slice(r))+S,t=t.slice(0,r);break}}f&&!p&&(t=i(t,1/0));var M=h.length+t.length+S.length,C=M<g?new Array(g-M+1).join(e):"";switch(f&&p&&(t=i(C+t,C.length?g-S.length:1/0),C=""),n){case"<":t=h+t+S+C;break;case"=":t=h+C+t+S;break;case"^":t=C.slice(0,M=C.length>>1)+h+t+S+C.slice(M);break;default:t=C+h+t+S}return s(t)}return m=void 0===m?6:/[gprs]/.test(y)?Math.max(1,Math.min(21,m)):Math.max(0,Math.min(20,m)),S.toString=function(){return t+""},S}return{format:d,formatPrefix:function(t,e){var n=d(((t=Ve(t)).type="f",t)),i=3*Math.max(-8,Math.min(8,Math.floor(Be(e)/3))),r=Math.pow(10,-i),o=rn[8+i/3];return function(t){return n(r*t)+o}}}}({thousands:",",grouping:[3],currency:["$",""]}),tn=Je.format,en=Je.formatPrefix;var sn=new Date,ln=new Date;function un(t,e,n,i){function r(e){return t(e=0===arguments.length?new Date:new Date(+e)),e}return r.floor=function(e){return t(e=new Date(+e)),e},r.ceil=function(n){return t(n=new Date(n-1)),e(n,1),t(n),n},r.round=function(t){var e=r(t),n=r.ceil(t);return t-e<n-t?e:n},r.offset=function(t,n){return e(t=new Date(+t),null==n?1:Math.floor(n)),t},r.range=function(n,i,o){var a,s=[];if(n=r.ceil(n),o=null==o?1:Math.floor(o),!(n<i&&o>0))return s;do{s.push(a=new Date(+n)),e(n,o),t(n)}while(a<n&&n<i);return s},r.filter=function(n){return un((function(e){if(e>=e)for(;t(e),!n(e);)e.setTime(e-1)}),(function(t,i){if(t>=t)if(i<0)for(;++i<=0;)for(;e(t,-1),!n(t););else for(;--i>=0;)for(;e(t,1),!n(t););}))},n&&(r.count=function(e,i){return sn.setTime(+e),ln.setTime(+i),t(sn),t(ln),Math.floor(n(sn,ln))},r.every=function(t){return t=Math.floor(t),isFinite(t)&&t>0?t>1?r.filter(i?function(e){return i(e)%t==0}:function(e){return r.count(0,e)%t==0}):r:null}),r}var cn=un((function(){}),(function(t,e){t.setTime(+t+e)}),(function(t,e){return e-t}));cn.every=function(t){return t=Math.floor(t),isFinite(t)&&t>0?t>1?un((function(e){e.setTime(Math.floor(e/t)*t)}),(function(e,n){e.setTime(+e+n*t)}),(function(e,n){return(n-e)/t})):cn:null},cn.range;const dn=1e3,hn=6e4,pn=36e5,gn=864e5,fn=6048e5;var mn=un((function(t){t.setTime(t-t.getMilliseconds())}),(function(t,e){t.setTime(+t+e*dn)}),(function(t,e){return(e-t)/dn}),(function(t){return t.getUTCSeconds()}));mn.range;var bn=un((function(t){t.setTime(t-t.getMilliseconds()-t.getSeconds()*dn)}),(function(t,e){t.setTime(+t+e*hn)}),(function(t,e){return(e-t)/hn}),(function(t){return t.getMinutes()}));bn.range;var yn=un((function(t){t.setTime(t-t.getMilliseconds()-t.getSeconds()*dn-t.getMinutes()*hn)}),(function(t,e){t.setTime(+t+e*pn)}),(function(t,e){return(e-t)/pn}),(function(t){return t.getHours()}));yn.range;var vn=un((t=>t.setHours(0,0,0,0)),((t,e)=>t.setDate(t.getDate()+e)),((t,e)=>(e-t-(e.getTimezoneOffset()-t.getTimezoneOffset())*hn)/gn),(t=>t.getDate()-1));function wn(t){return un((function(e){e.setDate(e.getDate()-(e.getDay()+7-t)%7),e.setHours(0,0,0,0)}),(function(t,e){t.setDate(t.getDate()+7*e)}),(function(t,e){return(e-t-(e.getTimezoneOffset()-t.getTimezoneOffset())*hn)/fn}))}vn.range;var xn=wn(0),kn=wn(1),Sn=wn(2),Tn=wn(3),Mn=wn(4),Cn=wn(5),_n=wn(6);xn.range,kn.range,Sn.range,Tn.range,Mn.range,Cn.range,_n.range;var An=un((function(t){t.setDate(1),t.setHours(0,0,0,0)}),(function(t,e){t.setMonth(t.getMonth()+e)}),(function(t,e){return e.getMonth()-t.getMonth()+12*(e.getFullYear()-t.getFullYear())}),(function(t){return t.getMonth()}));An.range;var En=un((function(t){t.setMonth(0,1),t.setHours(0,0,0,0)}),(function(t,e){t.setFullYear(t.getFullYear()+e)}),(function(t,e){return e.getFullYear()-t.getFullYear()}),(function(t){return t.getFullYear()}));En.every=function(t){return isFinite(t=Math.floor(t))&&t>0?un((function(e){e.setFullYear(Math.floor(e.getFullYear()/t)*t),e.setMonth(0,1),e.setHours(0,0,0,0)}),(function(e,n){e.setFullYear(e.getFullYear()+n*t)})):null},En.range;var Dn=un((function(t){t.setUTCSeconds(0,0)}),(function(t,e){t.setTime(+t+e*hn)}),(function(t,e){return(e-t)/hn}),(function(t){return t.getUTCMinutes()}));Dn.range;var Ln=un((function(t){t.setUTCMinutes(0,0,0)}),(function(t,e){t.setTime(+t+e*pn)}),(function(t,e){return(e-t)/pn}),(function(t){return t.getUTCHours()}));Ln.range;var Nn=un((function(t){t.setUTCHours(0,0,0,0)}),(function(t,e){t.setUTCDate(t.getUTCDate()+e)}),(function(t,e){return(e-t)/gn}),(function(t){return t.getUTCDate()-1}));function Fn(t){return un((function(e){e.setUTCDate(e.getUTCDate()-(e.getUTCDay()+7-t)%7),e.setUTCHours(0,0,0,0)}),(function(t,e){t.setUTCDate(t.getUTCDate()+7*e)}),(function(t,e){return(e-t)/fn}))}Nn.range;var On=Fn(0),In=Fn(1),Un=Fn(2),Rn=Fn(3),$n=Fn(4),Hn=Fn(5),Pn=Fn(6);On.range,In.range,Un.range,Rn.range,$n.range,Hn.range,Pn.range;var zn=un((function(t){t.setUTCDate(1),t.setUTCHours(0,0,0,0)}),(function(t,e){t.setUTCMonth(t.getUTCMonth()+e)}),(function(t,e){return e.getUTCMonth()-t.getUTCMonth()+12*(e.getUTCFullYear()-t.getUTCFullYear())}),(function(t){return t.getUTCMonth()}));zn.range;var qn=un((function(t){t.setUTCMonth(0,1),t.setUTCHours(0,0,0,0)}),(function(t,e){t.setUTCFullYear(t.getUTCFullYear()+e)}),(function(t,e){return e.getUTCFullYear()-t.getUTCFullYear()}),(function(t){return t.getUTCFullYear()}));qn.every=function(t){return isFinite(t=Math.floor(t))&&t>0?un((function(e){e.setUTCFullYear(Math.floor(e.getUTCFullYear()/t)*t),e.setUTCMonth(0,1),e.setUTCHours(0,0,0,0)}),(function(e,n){e.setUTCFullYear(e.getUTCFullYear()+n*t)})):null},qn.range;var Yn=new Date,jn=new Date;function Bn(t,e,n,i){function r(e){return t(e=0===arguments.length?new Date:new Date(+e)),e}return r.floor=function(e){return t(e=new Date(+e)),e},r.ceil=function(n){return t(n=new Date(n-1)),e(n,1),t(n),n},r.round=function(t){var e=r(t),n=r.ceil(t);return t-e<n-t?e:n},r.offset=function(t,n){return e(t=new Date(+t),null==n?1:Math.floor(n)),t},r.range=function(n,i,o){var a,s=[];if(n=r.ceil(n),o=null==o?1:Math.floor(o),!(n<i&&o>0))return s;do{s.push(a=new Date(+n)),e(n,o),t(n)}while(a<n&&n<i);return s},r.filter=function(n){return Bn((function(e){if(e>=e)for(;t(e),!n(e);)e.setTime(e-1)}),(function(t,i){if(t>=t)if(i<0)for(;++i<=0;)for(;e(t,-1),!n(t););else for(;--i>=0;)for(;e(t,1),!n(t););}))},n&&(r.count=function(e,i){return Yn.setTime(+e),jn.setTime(+i),t(Yn),t(jn),Math.floor(n(Yn,jn))},r.every=function(t){return t=Math.floor(t),isFinite(t)&&t>0?t>1?r.filter(i?function(e){return i(e)%t==0}:function(e){return r.count(0,e)%t==0}):r:null}),r}var Gn=Bn((function(){}),(function(t,e){t.setTime(+t+e)}),(function(t,e){return e-t}));Gn.every=function(t){return t=Math.floor(t),isFinite(t)&&t>0?t>1?Bn((function(e){e.setTime(Math.floor(e/t)*t)}),(function(e,n){e.setTime(+e+n*t)}),(function(e,n){return(n-e)/t})):Gn:null},Gn.range;var Wn=1e3,Vn=6e4,Kn=36e5,Xn=864e5,Zn=6048e5,Qn=Bn((function(t){t.setTime(t-t.getMilliseconds())}),(function(t,e){t.setTime(+t+e*Wn)}),(function(t,e){return(e-t)/Wn}),(function(t){return t.getUTCSeconds()}));Qn.range;var Jn=Bn((function(t){t.setTime(t-t.getMilliseconds()-t.getSeconds()*Wn)}),(function(t,e){t.setTime(+t+e*Vn)}),(function(t,e){return(e-t)/Vn}),(function(t){return t.getMinutes()}));Jn.range;var ti=Bn((function(t){t.setTime(t-t.getMilliseconds()-t.getSeconds()*Wn-t.getMinutes()*Vn)}),(function(t,e){t.setTime(+t+e*Kn)}),(function(t,e){return(e-t)/Kn}),(function(t){return t.getHours()}));ti.range;var ei=Bn((function(t){t.setHours(0,0,0,0)}),(function(t,e){t.setDate(t.getDate()+e)}),(function(t,e){return(e-t-(e.getTimezoneOffset()-t.getTimezoneOffset())*Vn)/Xn}),(function(t){return t.getDate()-1}));function ni(t){return Bn((function(e){e.setDate(e.getDate()-(e.getDay()+7-t)%7),e.setHours(0,0,0,0)}),(function(t,e){t.setDate(t.getDate()+7*e)}),(function(t,e){return(e-t-(e.getTimezoneOffset()-t.getTimezoneOffset())*Vn)/Zn}))}ei.range;var ii=ni(0),ri=ni(1),oi=ni(2),ai=ni(3),si=ni(4),li=ni(5),ui=ni(6);ii.range,ri.range,oi.range,ai.range,si.range,li.range,ui.range;var ci=Bn((function(t){t.setDate(1),t.setHours(0,0,0,0)}),(function(t,e){t.setMonth(t.getMonth()+e)}),(function(t,e){return e.getMonth()-t.getMonth()+12*(e.getFullYear()-t.getFullYear())}),(function(t){return t.getMonth()}));ci.range;var di=Bn((function(t){t.setMonth(0,1),t.setHours(0,0,0,0)}),(function(t,e){t.setFullYear(t.getFullYear()+e)}),(function(t,e){return e.getFullYear()-t.getFullYear()}),(function(t){return t.getFullYear()}));di.every=function(t){return isFinite(t=Math.floor(t))&&t>0?Bn((function(e){e.setFullYear(Math.floor(e.getFullYear()/t)*t),e.setMonth(0,1),e.setHours(0,0,0,0)}),(function(e,n){e.setFullYear(e.getFullYear()+n*t)})):null},di.range;var hi=Bn((function(t){t.setUTCSeconds(0,0)}),(function(t,e){t.setTime(+t+e*Vn)}),(function(t,e){return(e-t)/Vn}),(function(t){return t.getUTCMinutes()}));hi.range;var pi=Bn((function(t){t.setUTCMinutes(0,0,0)}),(function(t,e){t.setTime(+t+e*Kn)}),(function(t,e){return(e-t)/Kn}),(function(t){return t.getUTCHours()}));pi.range;var gi=Bn((function(t){t.setUTCHours(0,0,0,0)}),(function(t,e){t.setUTCDate(t.getUTCDate()+e)}),(function(t,e){return(e-t)/Xn}),(function(t){return t.getUTCDate()-1}));function fi(t){return Bn((function(e){e.setUTCDate(e.getUTCDate()-(e.getUTCDay()+7-t)%7),e.setUTCHours(0,0,0,0)}),(function(t,e){t.setUTCDate(t.getUTCDate()+7*e)}),(function(t,e){return(e-t)/Zn}))}gi.range;var mi=fi(0),bi=fi(1),yi=fi(2),vi=fi(3),wi=fi(4),xi=fi(5),ki=fi(6);mi.range,bi.range,yi.range,vi.range,wi.range,xi.range,ki.range;var Si=Bn((function(t){t.setUTCDate(1),t.setUTCHours(0,0,0,0)}),(function(t,e){t.setUTCMonth(t.getUTCMonth()+e)}),(function(t,e){return e.getUTCMonth()-t.getUTCMonth()+12*(e.getUTCFullYear()-t.getUTCFullYear())}),(function(t){return t.getUTCMonth()}));Si.range;var Ti=Bn((function(t){t.setUTCMonth(0,1),t.setUTCHours(0,0,0,0)}),(function(t,e){t.setUTCFullYear(t.getUTCFullYear()+e)}),(function(t,e){return e.getUTCFullYear()-t.getUTCFullYear()}),(function(t){return t.getUTCFullYear()}));function Mi(t){if(0<=t.y&&t.y<100){var e=new Date(-1,t.m,t.d,t.H,t.M,t.S,t.L);return e.setFullYear(t.y),e}return new Date(t.y,t.m,t.d,t.H,t.M,t.S,t.L)}function Ci(t){if(0<=t.y&&t.y<100){var e=new Date(Date.UTC(-1,t.m,t.d,t.H,t.M,t.S,t.L));return e.setUTCFullYear(t.y),e}return new Date(Date.UTC(t.y,t.m,t.d,t.H,t.M,t.S,t.L))}function _i(t,e,n){return{y:t,m:e,d:n,H:0,M:0,S:0,L:0}}Ti.every=function(t){return isFinite(t=Math.floor(t))&&t>0?Bn((function(e){e.setUTCFullYear(Math.floor(e.getUTCFullYear()/t)*t),e.setUTCMonth(0,1),e.setUTCHours(0,0,0,0)}),(function(e,n){e.setUTCFullYear(e.getUTCFullYear()+n*t)})):null},Ti.range;var Ai,Ei,Di,Li={"-":"",_:" ",0:"0"},Ni=/^\s*\d+/,Fi=/^%/,Oi=/[\\^$*+?|[\]().{}]/g;function Ii(t,e,n){var i=t<0?"-":"",r=(i?-t:t)+"",o=r.length;return i+(o<n?new Array(n-o+1).join(e)+r:r)}function Ui(t){return t.replace(Oi,"\\$&")}function Ri(t){return new RegExp("^(?:"+t.map(Ui).join("|")+")","i")}function $i(t){for(var e={},n=-1,i=t.length;++n<i;)e[t[n].toLowerCase()]=n;return e}function Hi(t,e,n){var i=Ni.exec(e.slice(n,n+1));return i?(t.w=+i[0],n+i[0].length):-1}function Pi(t,e,n){var i=Ni.exec(e.slice(n,n+1));return i?(t.u=+i[0],n+i[0].length):-1}function zi(t,e,n){var i=Ni.exec(e.slice(n,n+2));return i?(t.U=+i[0],n+i[0].length):-1}function qi(t,e,n){var i=Ni.exec(e.slice(n,n+2));return i?(t.V=+i[0],n+i[0].length):-1}function Yi(t,e,n){var i=Ni.exec(e.slice(n,n+2));return i?(t.W=+i[0],n+i[0].length):-1}function ji(t,e,n){var i=Ni.exec(e.slice(n,n+4));return i?(t.y=+i[0],n+i[0].length):-1}function Bi(t,e,n){var i=Ni.exec(e.slice(n,n+2));return i?(t.y=+i[0]+(+i[0]>68?1900:2e3),n+i[0].length):-1}function Gi(t,e,n){var i=/^(Z)|([+-]\d\d)(?::?(\d\d))?/.exec(e.slice(n,n+6));return i?(t.Z=i[1]?0:-(i[2]+(i[3]||"00")),n+i[0].length):-1}function Wi(t,e,n){var i=Ni.exec(e.slice(n,n+1));return i?(t.q=3*i[0]-3,n+i[0].length):-1}function Vi(t,e,n){var i=Ni.exec(e.slice(n,n+2));return i?(t.m=i[0]-1,n+i[0].length):-1}function Ki(t,e,n){var i=Ni.exec(e.slice(n,n+2));return i?(t.d=+i[0],n+i[0].length):-1}function Xi(t,e,n){var i=Ni.exec(e.slice(n,n+3));return i?(t.m=0,t.d=+i[0],n+i[0].length):-1}function Zi(t,e,n){var i=Ni.exec(e.slice(n,n+2));return i?(t.H=+i[0],n+i[0].length):-1}function Qi(t,e,n){var i=Ni.exec(e.slice(n,n+2));return i?(t.M=+i[0],n+i[0].length):-1}function Ji(t,e,n){var i=Ni.exec(e.slice(n,n+2));return i?(t.S=+i[0],n+i[0].length):-1}function tr(t,e,n){var i=Ni.exec(e.slice(n,n+3));return i?(t.L=+i[0],n+i[0].length):-1}function er(t,e,n){var i=Ni.exec(e.slice(n,n+6));return i?(t.L=Math.floor(i[0]/1e3),n+i[0].length):-1}function nr(t,e,n){var i=Fi.exec(e.slice(n,n+1));return i?n+i[0].length:-1}function ir(t,e,n){var i=Ni.exec(e.slice(n));return i?(t.Q=+i[0],n+i[0].length):-1}function rr(t,e,n){var i=Ni.exec(e.slice(n));return i?(t.s=+i[0],n+i[0].length):-1}function or(t,e){return Ii(t.getDate(),e,2)}function ar(t,e){return Ii(t.getHours(),e,2)}function sr(t,e){return Ii(t.getHours()%12||12,e,2)}function lr(t,e){return Ii(1+ei.count(di(t),t),e,3)}function ur(t,e){return Ii(t.getMilliseconds(),e,3)}function cr(t,e){return ur(t,e)+"000"}function dr(t,e){return Ii(t.getMonth()+1,e,2)}function hr(t,e){return Ii(t.getMinutes(),e,2)}function pr(t,e){return Ii(t.getSeconds(),e,2)}function gr(t){var e=t.getDay();return 0===e?7:e}function fr(t,e){return Ii(ii.count(di(t)-1,t),e,2)}function mr(t){var e=t.getDay();return e>=4||0===e?si(t):si.ceil(t)}function br(t,e){return t=mr(t),Ii(si.count(di(t),t)+(4===di(t).getDay()),e,2)}function yr(t){return t.getDay()}function vr(t,e){return Ii(ri.count(di(t)-1,t),e,2)}function wr(t,e){return Ii(t.getFullYear()%100,e,2)}function xr(t,e){return Ii((t=mr(t)).getFullYear()%100,e,2)}function kr(t,e){return Ii(t.getFullYear()%1e4,e,4)}function Sr(t,e){var n=t.getDay();return Ii((t=n>=4||0===n?si(t):si.ceil(t)).getFullYear()%1e4,e,4)}function Tr(t){var e=t.getTimezoneOffset();return(e>0?"-":(e*=-1,"+"))+Ii(e/60|0,"0",2)+Ii(e%60,"0",2)}function Mr(t,e){return Ii(t.getUTCDate(),e,2)}function Cr(t,e){return Ii(t.getUTCHours(),e,2)}function _r(t,e){return Ii(t.getUTCHours()%12||12,e,2)}function Ar(t,e){return Ii(1+gi.count(Ti(t),t),e,3)}function Er(t,e){return Ii(t.getUTCMilliseconds(),e,3)}function Dr(t,e){return Er(t,e)+"000"}function Lr(t,e){return Ii(t.getUTCMonth()+1,e,2)}function Nr(t,e){return Ii(t.getUTCMinutes(),e,2)}function Fr(t,e){return Ii(t.getUTCSeconds(),e,2)}function Or(t){var e=t.getUTCDay();return 0===e?7:e}function Ir(t,e){return Ii(mi.count(Ti(t)-1,t),e,2)}function Ur(t){var e=t.getUTCDay();return e>=4||0===e?wi(t):wi.ceil(t)}function Rr(t,e){return t=Ur(t),Ii(wi.count(Ti(t),t)+(4===Ti(t).getUTCDay()),e,2)}function $r(t){return t.getUTCDay()}function Hr(t,e){return Ii(bi.count(Ti(t)-1,t),e,2)}function Pr(t,e){return Ii(t.getUTCFullYear()%100,e,2)}function zr(t,e){return Ii((t=Ur(t)).getUTCFullYear()%100,e,2)}function qr(t,e){return Ii(t.getUTCFullYear()%1e4,e,4)}function Yr(t,e){var n=t.getUTCDay();return Ii((t=n>=4||0===n?wi(t):wi.ceil(t)).getUTCFullYear()%1e4,e,4)}function jr(){return"+0000"}function Br(){return"%"}function Gr(t){return+t}function Wr(t){return Math.floor(+t/1e3)}Ai=function(t){var e=t.dateTime,n=t.date,i=t.time,r=t.periods,o=t.days,a=t.shortDays,s=t.months,l=t.shortMonths,u=Ri(r),c=$i(r),d=Ri(o),h=$i(o),p=Ri(a),g=$i(a),f=Ri(s),m=$i(s),b=Ri(l),y=$i(l),v={a:function(t){return a[t.getDay()]},A:function(t){return o[t.getDay()]},b:function(t){return l[t.getMonth()]},B:function(t){return s[t.getMonth()]},c:null,d:or,e:or,f:cr,g:xr,G:Sr,H:ar,I:sr,j:lr,L:ur,m:dr,M:hr,p:function(t){return r[+(t.getHours()>=12)]},q:function(t){return 1+~~(t.getMonth()/3)},Q:Gr,s:Wr,S:pr,u:gr,U:fr,V:br,w:yr,W:vr,x:null,X:null,y:wr,Y:kr,Z:Tr,"%":Br},w={a:function(t){return a[t.getUTCDay()]},A:function(t){return o[t.getUTCDay()]},b:function(t){return l[t.getUTCMonth()]},B:function(t){return s[t.getUTCMonth()]},c:null,d:Mr,e:Mr,f:Dr,g:zr,G:Yr,H:Cr,I:_r,j:Ar,L:Er,m:Lr,M:Nr,p:function(t){return r[+(t.getUTCHours()>=12)]},q:function(t){return 1+~~(t.getUTCMonth()/3)},Q:Gr,s:Wr,S:Fr,u:Or,U:Ir,V:Rr,w:$r,W:Hr,x:null,X:null,y:Pr,Y:qr,Z:jr,"%":Br},x={a:function(t,e,n){var i=p.exec(e.slice(n));return i?(t.w=g[i[0].toLowerCase()],n+i[0].length):-1},A:function(t,e,n){var i=d.exec(e.slice(n));return i?(t.w=h[i[0].toLowerCase()],n+i[0].length):-1},b:function(t,e,n){var i=b.exec(e.slice(n));return i?(t.m=y[i[0].toLowerCase()],n+i[0].length):-1},B:function(t,e,n){var i=f.exec(e.slice(n));return i?(t.m=m[i[0].toLowerCase()],n+i[0].length):-1},c:function(t,n,i){return T(t,e,n,i)},d:Ki,e:Ki,f:er,g:Bi,G:ji,H:Zi,I:Zi,j:Xi,L:tr,m:Vi,M:Qi,p:function(t,e,n){var i=u.exec(e.slice(n));return i?(t.p=c[i[0].toLowerCase()],n+i[0].length):-1},q:Wi,Q:ir,s:rr,S:Ji,u:Pi,U:zi,V:qi,w:Hi,W:Yi,x:function(t,e,i){return T(t,n,e,i)},X:function(t,e,n){return T(t,i,e,n)},y:Bi,Y:ji,Z:Gi,"%":nr};function k(t,e){return function(n){var i,r,o,a=[],s=-1,l=0,u=t.length;for(n instanceof Date||(n=new Date(+n));++s<u;)37===t.charCodeAt(s)&&(a.push(t.slice(l,s)),null!=(r=Li[i=t.charAt(++s)])?i=t.charAt(++s):r="e"===i?" ":"0",(o=e[i])&&(i=o(n,r)),a.push(i),l=s+1);return a.push(t.slice(l,s)),a.join("")}}function S(t,e){return function(n){var i,r,o=_i(1900,void 0,1);if(T(o,t,n+="",0)!=n.length)return null;if("Q"in o)return new Date(o.Q);if("s"in o)return new Date(1e3*o.s+("L"in o?o.L:0));if(e&&!("Z"in o)&&(o.Z=0),"p"in o&&(o.H=o.H%12+12*o.p),void 0===o.m&&(o.m="q"in o?o.q:0),"V"in o){if(o.V<1||o.V>53)return null;"w"in o||(o.w=1),"Z"in o?(r=(i=Ci(_i(o.y,0,1))).getUTCDay(),i=r>4||0===r?bi.ceil(i):bi(i),i=gi.offset(i,7*(o.V-1)),o.y=i.getUTCFullYear(),o.m=i.getUTCMonth(),o.d=i.getUTCDate()+(o.w+6)%7):(r=(i=Mi(_i(o.y,0,1))).getDay(),i=r>4||0===r?ri.ceil(i):ri(i),i=ei.offset(i,7*(o.V-1)),o.y=i.getFullYear(),o.m=i.getMonth(),o.d=i.getDate()+(o.w+6)%7)}else("W"in o||"U"in o)&&("w"in o||(o.w="u"in o?o.u%7:"W"in o?1:0),r="Z"in o?Ci(_i(o.y,0,1)).getUTCDay():Mi(_i(o.y,0,1)).getDay(),o.m=0,o.d="W"in o?(o.w+6)%7+7*o.W-(r+5)%7:o.w+7*o.U-(r+6)%7);return"Z"in o?(o.H+=o.Z/100|0,o.M+=o.Z%100,Ci(o)):Mi(o)}}function T(t,e,n,i){for(var r,o,a=0,s=e.length,l=n.length;a<s;){if(i>=l)return-1;if(37===(r=e.charCodeAt(a++))){if(r=e.charAt(a++),!(o=x[r in Li?e.charAt(a++):r])||(i=o(t,n,i))<0)return-1}else if(r!=n.charCodeAt(i++))return-1}return i}return v.x=k(n,v),v.X=k(i,v),v.c=k(e,v),w.x=k(n,w),w.X=k(i,w),w.c=k(e,w),{format:function(t){var e=k(t+="",v);return e.toString=function(){return t},e},parse:function(t){var e=S(t+="",!1);return e.toString=function(){return t},e},utcFormat:function(t){var e=k(t+="",w);return e.toString=function(){return t},e},utcParse:function(t){var e=S(t+="",!0);return e.toString=function(){return t},e}}}({dateTime:"%x, %X",date:"%-m/%-d/%Y",time:"%-I:%M:%S %p",periods:["AM","PM"],days:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],shortDays:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],months:["January","February","March","April","May","June","July","August","September","October","November","December"],shortMonths:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]}),Ai.format,Ai.parse,Ei=Ai.utcFormat,Di=Ai.utcParse;var Vr="%Y-%m-%dT%H:%M:%S.%LZ";Date.prototype.toISOString||Ei(Vr),+new Date("2000-01-01T00:00:00.000Z")||Di(Vr);var Kr={value:function(){}};function Xr(){for(var t,e=0,n=arguments.length,i={};e<n;++e){if(!(t=arguments[e]+"")||t in i||/[\s.]/.test(t))throw new Error("illegal type: "+t);i[t]=[]}return new Zr(i)}function Zr(t){this._=t}function Qr(t,e){for(var n,i=0,r=t.length;i<r;++i)if((n=t[i]).name===e)return n.value}function Jr(t,e,n){for(var i=0,r=t.length;i<r;++i)if(t[i].name===e){t[i]=Kr,t=t.slice(0,i).concat(t.slice(i+1));break}return null!=n&&t.push({name:e,value:n}),t}Zr.prototype=Xr.prototype={constructor:Zr,on:function(t,e){var n,i,r=this._,o=(i=r,(t+"").trim().split(/^|\s+/).map((function(t){var e="",n=t.indexOf(".");if(n>=0&&(e=t.slice(n+1),t=t.slice(0,n)),t&&!i.hasOwnProperty(t))throw new Error("unknown type: "+t);return{type:t,name:e}}))),a=-1,s=o.length;if(!(arguments.length<2)){if(null!=e&&"function"!=typeof e)throw new Error("invalid callback: "+e);for(;++a<s;)if(n=(t=o[a]).type)r[n]=Jr(r[n],t.name,e);else if(null==e)for(n in r)r[n]=Jr(r[n],t.name,null);return this}for(;++a<s;)if((n=(t=o[a]).type)&&(n=Qr(r[n],t.name)))return n},copy:function(){var t={},e=this._;for(var n in e)t[n]=e[n].slice();return new Zr(t)},call:function(t,e){if((n=arguments.length-2)>0)for(var n,i,r=new Array(n),o=0;o<n;++o)r[o]=arguments[o+2];if(!this._.hasOwnProperty(t))throw new Error("unknown type: "+t);for(o=0,n=(i=this._[t]).length;o<n;++o)i[o].value.apply(e,r)},apply:function(t,e,n){if(!this._.hasOwnProperty(t))throw new Error("unknown type: "+t);for(var i=this._[t],r=0,o=i.length;r<o;++r)i[r].value.apply(e,n)}};var to="http://www.w3.org/1999/xhtml",eo={svg:"http://www.w3.org/2000/svg",xhtml:to,xlink:"http://www.w3.org/1999/xlink",xml:"http://www.w3.org/XML/1998/namespace",xmlns:"http://www.w3.org/2000/xmlns/"};function no(t){var e=t+="",n=e.indexOf(":");return n>=0&&"xmlns"!==(e=t.slice(0,n))&&(t=t.slice(n+1)),eo.hasOwnProperty(e)?{space:eo[e],local:t}:t}function io(t){return function(){var e=this.ownerDocument,n=this.namespaceURI;return n===to&&e.documentElement.namespaceURI===to?e.createElement(t):e.createElementNS(n,t)}}function ro(t){return function(){return this.ownerDocument.createElementNS(t.space,t.local)}}function oo(t){var e=no(t);return(e.local?ro:io)(e)}function ao(){}function so(t){return null==t?ao:function(){return this.querySelector(t)}}function lo(){return[]}function uo(t){return new Array(t.length)}function co(t,e){this.ownerDocument=t.ownerDocument,this.namespaceURI=t.namespaceURI,this._next=null,this._parent=t,this.__data__=e}co.prototype={constructor:co,appendChild:function(t){return this._parent.insertBefore(t,this._next)},insertBefore:function(t,e){return this._parent.insertBefore(t,e)},querySelector:function(t){return this._parent.querySelector(t)},querySelectorAll:function(t){return this._parent.querySelectorAll(t)}};function ho(t,e,n,i,r,o){for(var a,s=0,l=e.length,u=o.length;s<u;++s)(a=e[s])?(a.__data__=o[s],i[s]=a):n[s]=new co(t,o[s]);for(;s<l;++s)(a=e[s])&&(r[s]=a)}function po(t,e,n,i,r,o,a){var s,l,u,c={},d=e.length,h=o.length,p=new Array(d);for(s=0;s<d;++s)(l=e[s])&&(p[s]=u="$"+a.call(l,l.__data__,s,e),u in c?r[s]=l:c[u]=l);for(s=0;s<h;++s)(l=c[u="$"+a.call(t,o[s],s,o)])?(i[s]=l,l.__data__=o[s],c[u]=null):n[s]=new co(t,o[s]);for(s=0;s<d;++s)(l=e[s])&&c[p[s]]===l&&(r[s]=l)}function go(t,e){return t<e?-1:t>e?1:t>=e?0:NaN}function fo(t){return function(){this.removeAttribute(t)}}function mo(t){return function(){this.removeAttributeNS(t.space,t.local)}}function bo(t,e){return function(){this.setAttribute(t,e)}}function yo(t,e){return function(){this.setAttributeNS(t.space,t.local,e)}}function vo(t,e){return function(){var n=e.apply(this,arguments);null==n?this.removeAttribute(t):this.setAttribute(t,n)}}function wo(t,e){return function(){var n=e.apply(this,arguments);null==n?this.removeAttributeNS(t.space,t.local):this.setAttributeNS(t.space,t.local,n)}}function xo(t){return t.ownerDocument&&t.ownerDocument.defaultView||t.document&&t||t.defaultView}function ko(t){return function(){this.style.removeProperty(t)}}function So(t,e,n){return function(){this.style.setProperty(t,e,n)}}function To(t,e,n){return function(){var i=e.apply(this,arguments);null==i?this.style.removeProperty(t):this.style.setProperty(t,i,n)}}function Mo(t){return function(){delete this[t]}}function Co(t,e){return function(){this[t]=e}}function _o(t,e){return function(){var n=e.apply(this,arguments);null==n?delete this[t]:this[t]=n}}function Ao(t){return t.trim().split(/^|\s+/)}function Eo(t){return t.classList||new Do(t)}function Do(t){this._node=t,this._names=Ao(t.getAttribute("class")||"")}function Lo(t,e){for(var n=Eo(t),i=-1,r=e.length;++i<r;)n.add(e[i])}function No(t,e){for(var n=Eo(t),i=-1,r=e.length;++i<r;)n.remove(e[i])}function Fo(t){return function(){Lo(this,t)}}function Oo(t){return function(){No(this,t)}}function Io(t,e){return function(){(e.apply(this,arguments)?Lo:No)(this,t)}}function Uo(){this.textContent=""}function Ro(t){return function(){this.textContent=t}}function $o(t){return function(){var e=t.apply(this,arguments);this.textContent=null==e?"":e}}function Ho(){this.innerHTML=""}function Po(t){return function(){this.innerHTML=t}}function zo(t){return function(){var e=t.apply(this,arguments);this.innerHTML=null==e?"":e}}function qo(){this.nextSibling&&this.parentNode.appendChild(this)}function Yo(){this.previousSibling&&this.parentNode.insertBefore(this,this.parentNode.firstChild)}function jo(){return null}function Bo(){var t=this.parentNode;t&&t.removeChild(this)}function Go(){var t=this.cloneNode(!1),e=this.parentNode;return e?e.insertBefore(t,this.nextSibling):t}function Wo(){var t=this.cloneNode(!0),e=this.parentNode;return e?e.insertBefore(t,this.nextSibling):t}Do.prototype={add:function(t){this._names.indexOf(t)<0&&(this._names.push(t),this._node.setAttribute("class",this._names.join(" ")))},remove:function(t){var e=this._names.indexOf(t);e>=0&&(this._names.splice(e,1),this._node.setAttribute("class",this._names.join(" ")))},contains:function(t){return this._names.indexOf(t)>=0}};var Vo={},Ko=null;function Xo(t,e,n){return t=Zo(t,e,n),function(e){var n=e.relatedTarget;n&&(n===this||8&n.compareDocumentPosition(this))||t.call(this,e)}}function Zo(t,e,n){return function(i){var r=Ko;Ko=i;try{t.call(this,this.__data__,e,n)}finally{Ko=r}}}function Qo(t){return function(){var e=this.__on;if(e){for(var n,i=0,r=-1,o=e.length;i<o;++i)n=e[i],t.type&&n.type!==t.type||n.name!==t.name?e[++r]=n:this.removeEventListener(n.type,n.listener,n.capture);++r?e.length=r:delete this.__on}}}function Jo(t,e,n){var i=Vo.hasOwnProperty(t.type)?Xo:Zo;return function(r,o,a){var s,l=this.__on,u=i(e,o,a);if(l)for(var c=0,d=l.length;c<d;++c)if((s=l[c]).type===t.type&&s.name===t.name)return this.removeEventListener(s.type,s.listener,s.capture),this.addEventListener(s.type,s.listener=u,s.capture=n),void(s.value=e);this.addEventListener(t.type,u,n),s={type:t.type,name:t.name,value:e,listener:u,capture:n},l?l.push(s):this.__on=[s]}}function ta(t,e,n,i){var r=Ko;t.sourceEvent=Ko,Ko=t;try{return e.apply(n,i)}finally{Ko=r}}function ea(t,e,n){var i=xo(t),r=i.CustomEvent;"function"==typeof r?r=new r(e,n):(r=i.document.createEvent("Event"),n?(r.initEvent(e,n.bubbles,n.cancelable),r.detail=n.detail):r.initEvent(e,!1,!1)),t.dispatchEvent(r)}function na(t,e){return function(){return ea(this,t,e)}}function ia(t,e){return function(){return ea(this,t,e.apply(this,arguments))}}"undefined"!=typeof document&&("onmouseenter"in document.documentElement||(Vo={mouseenter:"mouseover",mouseleave:"mouseout"}));var ra=[null];function oa(t,e){this._groups=t,this._parents=e}function aa(t){return"string"==typeof t?new oa([[document.querySelector(t)]],[document.documentElement]):new oa([[t]],ra)}oa.prototype={constructor:oa,select:function(t){"function"!=typeof t&&(t=so(t));for(var e=this._groups,n=e.length,i=new Array(n),r=0;r<n;++r)for(var o,a,s=e[r],l=s.length,u=i[r]=new Array(l),c=0;c<l;++c)(o=s[c])&&(a=t.call(o,o.__data__,c,s))&&("__data__"in o&&(a.__data__=o.__data__),u[c]=a);return new oa(i,this._parents)},selectAll:function(t){"function"!=typeof t&&(t=function(t){return null==t?lo:function(){return this.querySelectorAll(t)}}(t));for(var e=this._groups,n=e.length,i=[],r=[],o=0;o<n;++o)for(var a,s=e[o],l=s.length,u=0;u<l;++u)(a=s[u])&&(i.push(t.call(a,a.__data__,u,s)),r.push(a));return new oa(i,r)},filter:function(t){"function"!=typeof t&&(t=function(t){return function(){return this.matches(t)}}(t));for(var e=this._groups,n=e.length,i=new Array(n),r=0;r<n;++r)for(var o,a=e[r],s=a.length,l=i[r]=[],u=0;u<s;++u)(o=a[u])&&t.call(o,o.__data__,u,a)&&l.push(o);return new oa(i,this._parents)},data:function(t,e){if(!t)return g=new Array(this.size()),c=-1,this.each((function(t){g[++c]=t})),g;var n,i=e?po:ho,r=this._parents,o=this._groups;"function"!=typeof t&&(n=t,t=function(){return n});for(var a=o.length,s=new Array(a),l=new Array(a),u=new Array(a),c=0;c<a;++c){var d=r[c],h=o[c],p=h.length,g=t.call(d,d&&d.__data__,c,r),f=g.length,m=l[c]=new Array(f),b=s[c]=new Array(f);i(d,h,m,b,u[c]=new Array(p),g,e);for(var y,v,w=0,x=0;w<f;++w)if(y=m[w]){for(w>=x&&(x=w+1);!(v=b[x])&&++x<f;);y._next=v||null}}return(s=new oa(s,r))._enter=l,s._exit=u,s},enter:function(){return new oa(this._enter||this._groups.map(uo),this._parents)},exit:function(){return new oa(this._exit||this._groups.map(uo),this._parents)},join:function(t,e,n){var i=this.enter(),r=this,o=this.exit();return i="function"==typeof t?t(i):i.append(t+""),null!=e&&(r=e(r)),null==n?o.remove():n(o),i&&r?i.merge(r).order():r},merge:function(t){for(var e=this._groups,n=t._groups,i=e.length,r=n.length,o=Math.min(i,r),a=new Array(i),s=0;s<o;++s)for(var l,u=e[s],c=n[s],d=u.length,h=a[s]=new Array(d),p=0;p<d;++p)(l=u[p]||c[p])&&(h[p]=l);for(;s<i;++s)a[s]=e[s];return new oa(a,this._parents)},order:function(){for(var t=this._groups,e=-1,n=t.length;++e<n;)for(var i,r=t[e],o=r.length-1,a=r[o];--o>=0;)(i=r[o])&&(a&&4^i.compareDocumentPosition(a)&&a.parentNode.insertBefore(i,a),a=i);return this},sort:function(t){function e(e,n){return e&&n?t(e.__data__,n.__data__):!e-!n}t||(t=go);for(var n=this._groups,i=n.length,r=new Array(i),o=0;o<i;++o){for(var a,s=n[o],l=s.length,u=r[o]=new Array(l),c=0;c<l;++c)(a=s[c])&&(u[c]=a);u.sort(e)}return new oa(r,this._parents).order()},call:function(){var t=arguments[0];return arguments[0]=this,t.apply(null,arguments),this},nodes:function(){var t=new Array(this.size()),e=-1;return this.each((function(){t[++e]=this})),t},node:function(){for(var t=this._groups,e=0,n=t.length;e<n;++e)for(var i=t[e],r=0,o=i.length;r<o;++r){var a=i[r];if(a)return a}return null},size:function(){var t=0;return this.each((function(){++t})),t},empty:function(){return!this.node()},each:function(t){for(var e=this._groups,n=0,i=e.length;n<i;++n)for(var r,o=e[n],a=0,s=o.length;a<s;++a)(r=o[a])&&t.call(r,r.__data__,a,o);return this},attr:function(t,e){var n=no(t);if(arguments.length<2){var i=this.node();return n.local?i.getAttributeNS(n.space,n.local):i.getAttribute(n)}return this.each((null==e?n.local?mo:fo:"function"==typeof e?n.local?wo:vo:n.local?yo:bo)(n,e))},style:function(t,e,n){return arguments.length>1?this.each((null==e?ko:"function"==typeof e?To:So)(t,e,null==n?"":n)):function(t,e){return t.style.getPropertyValue(e)||xo(t).getComputedStyle(t,null).getPropertyValue(e)}(this.node(),t)},property:function(t,e){return arguments.length>1?this.each((null==e?Mo:"function"==typeof e?_o:Co)(t,e)):this.node()[t]},classed:function(t,e){var n=Ao(t+"");if(arguments.length<2){for(var i=Eo(this.node()),r=-1,o=n.length;++r<o;)if(!i.contains(n[r]))return!1;return!0}return this.each(("function"==typeof e?Io:e?Fo:Oo)(n,e))},text:function(t){return arguments.length?this.each(null==t?Uo:("function"==typeof t?$o:Ro)(t)):this.node().textContent},html:function(t){return arguments.length?this.each(null==t?Ho:("function"==typeof t?zo:Po)(t)):this.node().innerHTML},raise:function(){return this.each(qo)},lower:function(){return this.each(Yo)},append:function(t){var e="function"==typeof t?t:oo(t);return this.select((function(){return this.appendChild(e.apply(this,arguments))}))},insert:function(t,e){var n="function"==typeof t?t:oo(t),i=null==e?jo:"function"==typeof e?e:so(e);return this.select((function(){return this.insertBefore(n.apply(this,arguments),i.apply(this,arguments)||null)}))},remove:function(){return this.each(Bo)},clone:function(t){return this.select(t?Wo:Go)},datum:function(t){return arguments.length?this.property("__data__",t):this.node().__data__},on:function(t,e,n){var i,r,o=function(t){return t.trim().split(/^|\s+/).map((function(t){var e="",n=t.indexOf(".");return n>=0&&(e=t.slice(n+1),t=t.slice(0,n)),{type:t,name:e}}))}(t+""),a=o.length;if(!(arguments.length<2)){for(s=e?Jo:Qo,null==n&&(n=!1),i=0;i<a;++i)this.each(s(o[i],e,n));return this}var s=this.node().__on;if(s)for(var l,u=0,c=s.length;u<c;++u)for(i=0,l=s[u];i<a;++i)if((r=o[i]).type===l.type&&r.name===l.name)return l.value},dispatch:function(t,e){return this.each(("function"==typeof e?ia:na)(t,e))}};var sa=0;function la(){this._="@"+(++sa).toString(36)}function ua(){for(var t,e=Ko;t=e.sourceEvent;)e=t;return e}function ca(t,e){var n=t.ownerSVGElement||t;if(n.createSVGPoint){var i=n.createSVGPoint();return i.x=e.clientX,i.y=e.clientY,[(i=i.matrixTransform(t.getScreenCTM().inverse())).x,i.y]}var r=t.getBoundingClientRect();return[e.clientX-r.left-t.clientLeft,e.clientY-r.top-t.clientTop]}function da(t){var e=ua();return e.changedTouches&&(e=e.changedTouches[0]),ca(t,e)}function ha(t,e,n){arguments.length<3&&(n=e,e=ua().changedTouches);for(var i,r=0,o=e?e.length:0;r<o;++r)if((i=e[r]).identifier===n)return ca(t,i);return null}function pa(){Ko.stopImmediatePropagation()}function ga(){Ko.preventDefault(),Ko.stopImmediatePropagation()}function fa(t){return function(){return t}}function ma(t,e,n,i,r,o,a,s,l,u){this.target=t,this.type=e,this.subject=n,this.identifier=i,this.active=r,this.x=o,this.y=a,this.dx=s,this.dy=l,this._=u}function ba(){return!Ko.ctrlKey&&!Ko.button}function ya(){return this.parentNode}function va(t){return null==t?{x:Ko.x,y:Ko.y}:t}function wa(){return navigator.maxTouchPoints||"ontouchstart"in this}la.prototype={constructor:la,get:function(t){for(var e=this._;!(e in t);)if(!(t=t.parentNode))return;return t[e]},set:function(t,e){return t[this._]=e},remove:function(t){return this._ in t&&delete t[this._]},toString:function(){return this._}},ma.prototype.on=function(){var t=this._.on.apply(this._,arguments);return t===this._?this:t};const xa=s("d-slider","\n<style>\n  :host {\n    position: relative;\n    display: inline-block;\n  }\n\n  :host(:focus) {\n    outline: none;\n  }\n\n  .background {\n    padding: 9px 0;\n    color: white;\n    position: relative;\n  }\n\n  .track {\n    height: 3px;\n    width: 100%;\n    border-radius: 2px;\n    background-color: hsla(0, 0%, 0%, 0.2);\n  }\n\n  .track-fill {\n    position: absolute;\n    top: 9px;\n    height: 3px;\n    border-radius: 4px;\n    background-color: hsl(24, 100%, 50%);\n  }\n\n  .knob-container {\n    position: absolute;\n    top: 10px;\n  }\n\n  .knob {\n    position: absolute;\n    top: -6px;\n    left: -6px;\n    width: 13px;\n    height: 13px;\n    background-color: hsl(24, 100%, 50%);\n    border-radius: 50%;\n    transition-property: transform;\n    transition-duration: 0.18s;\n    transition-timing-function: ease;\n  }\n  .mousedown .knob {\n    transform: scale(1.5);\n  }\n\n  .knob-highlight {\n    position: absolute;\n    top: -6px;\n    left: -6px;\n    width: 13px;\n    height: 13px;\n    background-color: hsla(0, 0%, 0%, 0.1);\n    border-radius: 50%;\n    transition-property: transform;\n    transition-duration: 0.18s;\n    transition-timing-function: ease;\n  }\n\n  .focus .knob-highlight {\n    transform: scale(2);\n  }\n\n  .ticks {\n    position: absolute;\n    top: 16px;\n    height: 4px;\n    width: 100%;\n    z-index: -1;\n  }\n\n  .ticks .tick {\n    position: absolute;\n    height: 100%;\n    border-left: 1px solid hsla(0, 0%, 0%, 0.2);\n  }\n\n</style>\n\n  <div class='background'>\n    <div class='track'></div>\n    <div class='track-fill'></div>\n    <div class='knob-container'>\n      <div class='knob-highlight'></div>\n      <div class='knob'></div>\n    </div>\n    <div class='ticks'></div>\n  </div>\n");class ka extends(xa(HTMLElement)){connectedCallback(){this.connected=!0,this.setAttribute("role","slider"),this.hasAttribute("tabindex")||this.setAttribute("tabindex",0),this.mouseEvent=!1,this.knob=this.root.querySelector(".knob-container"),this.background=this.root.querySelector(".background"),this.trackFill=this.root.querySelector(".track-fill"),this.track=this.root.querySelector(".track"),this.min=this.min?this.min:0,this.max=this.max?this.max:100,this.scale=an().domain([this.min,this.max]).range([0,1]).clamp(!0),this.origin=void 0!==this.origin?this.origin:this.min,this.step=this.step?this.step:1,this.update(this.value?this.value:0),this.ticks=!!this.ticks&&this.ticks,this.renderTicks(),this.drag=function(){var t,e,n,i,r=ba,o=ya,a=va,s=wa,l={},u=Xr("start","drag","end"),c=0,d=0;function h(t){t.on("mousedown.drag",p).filter(s).on("touchstart.drag",m).on("touchmove.drag",b).on("touchend.drag touchcancel.drag",y).style("touch-action","none").style("-webkit-tap-highlight-color","rgba(0,0,0,0)")}function p(){if(!i&&r.apply(this,arguments)){var a=v("mouse",o.apply(this,arguments),da,this,arguments);a&&(aa(Ko.view).on("mousemove.drag",g,!0).on("mouseup.drag",f,!0),function(t){var e=t.document.documentElement,n=aa(t).on("dragstart.drag",ga,!0);"onselectstart"in e?n.on("selectstart.drag",ga,!0):(e.__noselect=e.style.MozUserSelect,e.style.MozUserSelect="none")}(Ko.view),pa(),n=!1,t=Ko.clientX,e=Ko.clientY,a("start"))}}function g(){if(ga(),!n){var i=Ko.clientX-t,r=Ko.clientY-e;n=i*i+r*r>d}l.mouse("drag")}function f(){aa(Ko.view).on("mousemove.drag mouseup.drag",null),function(t,e){var n=t.document.documentElement,i=aa(t).on("dragstart.drag",null);e&&(i.on("click.drag",ga,!0),setTimeout((function(){i.on("click.drag",null)}),0)),"onselectstart"in n?i.on("selectstart.drag",null):(n.style.MozUserSelect=n.__noselect,delete n.__noselect)}(Ko.view,n),ga(),l.mouse("end")}function m(){if(r.apply(this,arguments)){var t,e,n=Ko.changedTouches,i=o.apply(this,arguments),a=n.length;for(t=0;t<a;++t)(e=v(n[t].identifier,i,ha,this,arguments))&&(pa(),e("start"))}}function b(){var t,e,n=Ko.changedTouches,i=n.length;for(t=0;t<i;++t)(e=l[n[t].identifier])&&(ga(),e("drag"))}function y(){var t,e,n=Ko.changedTouches,r=n.length;for(i&&clearTimeout(i),i=setTimeout((function(){i=null}),500),t=0;t<r;++t)(e=l[n[t].identifier])&&(pa(),e("end"))}function v(t,e,n,i,r){var o,s,d,p=n(e,t),g=u.copy();if(ta(new ma(h,"beforestart",o,t,c,p[0],p[1],0,0,g),(function(){return null!=(Ko.subject=o=a.apply(i,r))&&(s=o.x-p[0]||0,d=o.y-p[1]||0,!0)})))return function a(u){var f,m=p;switch(u){case"start":l[t]=a,f=c++;break;case"end":delete l[t],--c;case"drag":p=n(e,t),f=c}ta(new ma(h,u,o,t,f,p[0]+s,p[1]+d,p[0]-m[0],p[1]-m[1],g),g.apply,g,[u,i,r])}}return h.filter=function(t){return arguments.length?(r="function"==typeof t?t:fa(!!t),h):r},h.container=function(t){return arguments.length?(o="function"==typeof t?t:fa(t),h):o},h.subject=function(t){return arguments.length?(a="function"==typeof t?t:fa(t),h):a},h.touchable=function(t){return arguments.length?(s="function"==typeof t?t:fa(!!t),h):s},h.on=function(){var t=u.on.apply(u,arguments);return t===u?h:t},h.clickDistance=function(t){return arguments.length?(d=(t=+t)*t,h):Math.sqrt(d)},h}().container(this.background).on("start",(()=>{this.mouseEvent=!0,this.background.classList.add("mousedown"),this.changeValue=this.value,this.dragUpdate()})).on("drag",(()=>{this.dragUpdate()})).on("end",(()=>{this.mouseEvent=!1,this.background.classList.remove("mousedown"),this.dragUpdate(),this.changeValue!==this.value&&this.dispatchChange(),this.changeValue=this.value})),this.drag(aa(this.background)),this.addEventListener("focusin",(()=>{this.mouseEvent||this.background.classList.add("focus")})),this.addEventListener("focusout",(()=>{this.background.classList.remove("focus")})),this.addEventListener("keydown",this.onKeyDown)}static get observedAttributes(){return["min","max","value","step","ticks","origin","tickValues","tickLabels"]}attributeChangedCallback(t,e,n){isNaN(n)||null==n||("min"==t&&(this.min=+n,this.setAttribute("aria-valuemin",this.min)),"max"==t&&(this.max=+n,this.setAttribute("aria-valuemax",this.max)),"value"==t&&this.update(+n),"origin"==t&&(this.origin=+n),"step"==t&&n>0&&(this.step=+n),"ticks"==t&&(this.ticks=""===n||n))}onKeyDown(t){this.changeValue=this.value;let e=!1;switch(t.keyCode){case 37:case 40:this.update(this.value-this.step),e=!0;break;case 39:case 38:this.update(this.value+this.step),e=!0;break;case 33:case 34:this.update(this.value+10*this.step),e=!0;break;case 36:this.update(this.min),e=!0;break;case 35:this.update(this.max),e=!0}e&&(this.background.classList.add("focus"),t.preventDefault(),t.stopPropagation(),this.changeValue!==this.value&&this.dispatchChange())}validateValueRange(t,e,n){return Math.max(Math.min(e,n),t)}quantizeValue(t,e){return Math.round(t/e)*e}dragUpdate(){const t=this.background.getBoundingClientRect(),e=Ko.x,n=t.width;this.update(this.scale.invert(e/n))}update(t){let e=t;"any"!==this.step&&(e=this.quantizeValue(t,this.step)),e=this.validateValueRange(this.min,this.max,e),this.connected&&(this.knob.style.left=100*this.scale(e)+"%",this.trackFill.style.width=100*this.scale(this.min+Math.abs(e-this.origin))+"%",this.trackFill.style.left=100*this.scale(Math.min(e,this.origin))+"%"),this.value!==e&&(this.value=e,this.setAttribute("aria-valuenow",this.value),this.dispatchInput())}dispatchChange(){const t=new Event("change");this.dispatchEvent(t,{})}dispatchInput(){const t=new Event("input");this.dispatchEvent(t,{})}renderTicks(){const t=this.root.querySelector(".ticks");if(!1!==this.ticks){let e=[];e=this.ticks>0?this.scale.ticks(this.ticks):"any"===this.step?this.scale.ticks():function(t,e,n){t=+t,e=+e,n=(r=arguments.length)<2?(e=t,t=0,1):r<3?1:+n;for(var i=-1,r=0|Math.max(0,Math.ceil((e-t)/n)),o=new Array(r);++i<r;)o[i]=t+i*n;return o}(this.min,this.max+1e-6,this.step),e.forEach((e=>{const n=document.createElement("div");n.classList.add("tick"),n.style.left=100*this.scale(e)+"%",t.appendChild(n)}))}else t.style.display="none"}}const Sa=s("distill-header",'\n<style>\ndistill-header {\n  position: relative;\n  height: 60px;\n  background-color: hsl(200, 60%, 15%);\n  width: 100%;\n  box-sizing: border-box;\n  z-index: 2;\n  color: rgba(0, 0, 0, 0.8);\n  border-bottom: 1px solid rgba(0, 0, 0, 0.08);\n  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);\n}\ndistill-header .content {\n  height: 70px;\n  grid-column: page;\n}\ndistill-header a {\n  font-size: 16px;\n  height: 60px;\n  line-height: 60px;\n  text-decoration: none;\n  color: rgba(255, 255, 255, 0.8);\n  padding: 22px 0;\n}\ndistill-header a:hover {\n  color: rgba(255, 255, 255, 1);\n}\ndistill-header svg {\n  width: 24px;\n  position: relative;\n  top: 4px;\n  margin-right: 2px;\n}\n@media(min-width: 1080px) {\n  distill-header {\n    height: 70px;\n  }\n  distill-header a {\n    height: 70px;\n    line-height: 70px;\n    padding: 28px 0;\n  }\n  distill-header .logo {\n  }\n}\ndistill-header svg path {\n  fill: none;\n  stroke: rgba(255, 255, 255, 0.8);\n  stroke-width: 3px;\n}\ndistill-header .logo {\n  font-size: 17px;\n  font-weight: 200;\n}\ndistill-header .nav {\n  float: right;\n  font-weight: 300;\n}\ndistill-header .nav a {\n  font-size: 12px;\n  margin-left: 24px;\n  text-transform: uppercase;\n}\n</style>\n<div class="content">\n  <nav class="nav">\n    <a href="https://github.com/mathadoor/TransformerExposition" target="_blank">GITHUB</a>\n    <a href="/prize/">VIDEO</a>\n  </nav>\n</div>\n',!1);class Ta extends(Sa(HTMLElement)){}class Ma extends HTMLElement{static get is(){return"distill-appendix"}set frontMatter(t){this.innerHTML=function(t){let e="\n<style>\n  distill-appendix {\n    contain: layout style;\n  }\n\n  distill-appendix .citation {\n    font-size: 11px;\n    line-height: 15px;\n    border-left: 1px solid rgba(0, 0, 0, 0.1);\n    padding-left: 18px;\n    border: 1px solid rgba(0,0,0,0.1);\n    background: rgba(0, 0, 0, 0.02);\n    padding: 10px 18px;\n    border-radius: 3px;\n    color: rgba(150, 150, 150, 1);\n    overflow: hidden;\n    margin-top: -12px;\n    white-space: pre-wrap;\n    word-wrap: break-word;\n  }\n\n  distill-appendix > * {\n    grid-column: text;\n  }\n</style>\n";void 0!==t.githubUrl&&(e+='\n    <h3 id="updates-and-corrections">Updates and Corrections</h3>\n    <p>',t.githubCompareUpdatesUrl&&(e+=`<a href="${t.githubCompareUpdatesUrl}">View all changes</a> to this article since it was first published.`),e+=`\n    If you see mistakes or want to suggest changes, please <a href="${t.githubUrl+"/issues/new"}">create an issue on GitHub</a>. </p>\n    `);const n=t.journal;return void 0!==n&&"Distill"===n.title&&(e+=`\n    <h3 id="reuse">Reuse</h3>\n    <p>Diagrams and text are licensed under Creative Commons Attribution <a href="https://creativecommons.org/licenses/by/4.0/">CC-BY 4.0</a> with the <a class="github" href="${t.githubUrl}">source available on GitHub</a>, unless noted otherwise. The figures that have been reused from other sources don’t fall under this license and can be recognized by a note in their caption: “Figure from …”.</p>\n    `),void 0!==t.publishedDate&&(e+=`\n    <h3 id="citation">Citation</h3>\n    <p>For attribution in academic contexts, please cite this work as</p>\n    <pre class="citation short">${t.concatenatedAuthors}, "${t.title}", Distill, ${t.publishedYear}.</pre>\n    <p>BibTeX citation</p>\n    <pre class="citation long">${function(t){return`@article{${t.slug},\n  author = {${t.bibtexAuthors}},\n  title = {${t.title}},\n  journal = {${t.journal.title}},\n  year = {${t.publishedYear}},\n  note = {${t.url}},\n  doi = {${t.doi}}\n}`}(t)}</pre>\n    `),e}(t)}}const Ca=s("distill-footer",'\n<style>\n\n:host {\n  color: rgba(255, 255, 255, 0.5);\n  font-weight: 300;\n  padding: 2rem 0;\n  border-top: 1px solid rgba(0, 0, 0, 0.1);\n  background-color: hsl(180, 5%, 15%); /*hsl(200, 60%, 15%);*/\n  text-align: left;\n  contain: content;\n}\n\n.footer-container .logo svg {\n  width: 24px;\n  position: relative;\n  top: 4px;\n  margin-right: 2px;\n}\n\n.footer-container .logo svg path {\n  fill: none;\n  stroke: rgba(255, 255, 255, 0.8);\n  stroke-width: 3px;\n}\n\n.footer-container .logo {\n  font-size: 17px;\n  font-weight: 200;\n  color: rgba(255, 255, 255, 0.8);\n  text-decoration: none;\n  margin-right: 6px;\n}\n\n.footer-container {\n  grid-column: text;\n}\n\n.footer-container .nav {\n  font-size: 0.9em;\n  margin-top: 1.5em;\n}\n\n.footer-container .nav a {\n  color: rgba(255, 255, 255, 0.8);\n  margin-right: 6px;\n  text-decoration: none;\n}\n\n</style>\n\n<div class=\'footer-container\'>\n\n  <a href="/" class="logo">\n    <svg viewBox="-607 419 64 64">\n  <path d="M-573.4,478.9c-8,0-14.6-6.4-14.6-14.5s14.6-25.9,14.6-40.8c0,14.9,14.6,32.8,14.6,40.8S-565.4,478.9-573.4,478.9z"/>\n</svg>\n\n    Distill\n  </a> is dedicated to clear explanations of machine learning\n\n  <div class="nav">\n    <a href="https://distill.pub/about/">About</a>\n    <a href="https://distill.pub/journal/">Submit</a>\n    <a href="https://distill.pub/prize/">Prize</a>\n    <a href="https://distill.pub/archive/">Archive</a>\n    <a href="https://distill.pub/rss.xml">RSS</a>\n    <a href="https://github.com/distillpub">GitHub</a>\n    <a href="https://twitter.com/distillpub">Twitter</a>\n    &nbsp;&nbsp;&nbsp;&nbsp; ISSN 2476-0757\n  </div>\n\n</div>\n\n');class _a extends(Ca(HTMLElement)){}window.distill={runlevel:0,initialize:function(){if(window.distill.runlevel<1)throw new Error("Insufficient Runlevel for Distill Template!");if("distill"in window&&window.distill.templateIsLoading)throw new Error("Runlevel 1: Distill Template is getting loaded more than once, aborting!");window.distill.templateIsLoading=!0,console.debug("Runlevel 1: Distill Template has started loading."),function(t){const e="distill-prerendered-styles";if(!t.getElementById(e)){const n=t.createElement("style");n.id=e,n.type="text/css";const i=t.createTextNode(E);n.appendChild(i);const r=t.head.querySelector("script");t.head.insertBefore(n,r)}}(document),console.debug("Runlevel 1: Static Distill styles have been added."),console.debug("Runlevel 1->2."),window.distill.runlevel+=1;for(const[t,e]of Object.entries(A.listeners))"function"==typeof e?document.addEventListener(t,e):console.error("Runlevel 2: Controller listeners need to be functions!");console.debug("Runlevel 2: We can now listen to controller events."),console.debug("Runlevel 2->3."),window.distill.runlevel+=1;const t=[O,U,$,j,B,W,V,Z,J,et,C,it,rt,m,at,st,lt,ka,ct],e=[Ta,Ma,_a];if(window.distill.runlevel<2)throw new Error("Insufficient Runlevel for adding custom elements!");const n=t.concat(e);for(const t of n)console.debug("Runlevel 2: Registering custom element: "+t.is),customElements.define(t.is,t);console.debug("Runlevel 3: Distill Template finished registering custom elements."),console.debug("Runlevel 3->4."),window.distill.runlevel+=1,T()&&A.listeners.DOMContentLoaded(),console.debug("Runlevel 4: Distill Template initialisation complete."),window.distill.templateIsLoading=!1,window.distill.templateHasLoaded=!0},templateIsLoading:!1},N.browserSupportsAllFeatures()?(console.debug("Runlevel 0: No need for polyfills."),console.debug("Runlevel 0->1."),window.distill.runlevel+=1,window.distill.initialize()):(console.debug("Runlevel 0: Distill Template is loading polyfills."),N.load(window.distill.initialize))}));
+   */
+  var Prism = (function (_self) {
+
+  	// Private helper vars
+  	var lang = /(?:^|\s)lang(?:uage)?-([\w-]+)(?=\s|$)/i;
+  	var uniqueId = 0;
+
+  	// The grammar object for plaintext
+  	var plainTextGrammar = {};
+
+
+  	var _ = {
+  		/**
+  		 * By default, Prism will attempt to highlight all code elements (by calling {@link Prism.highlightAll}) on the
+  		 * current page after the page finished loading. This might be a problem if e.g. you wanted to asynchronously load
+  		 * additional languages or plugins yourself.
+  		 *
+  		 * By setting this value to `true`, Prism will not automatically highlight all code elements on the page.
+  		 *
+  		 * You obviously have to change this value before the automatic highlighting started. To do this, you can add an
+  		 * empty Prism object into the global scope before loading the Prism script like this:
+  		 *
+  		 * ```js
+  		 * window.Prism = window.Prism || {};
+  		 * Prism.manual = true;
+  		 * // add a new <script> to load Prism's script
+  		 * ```
+  		 *
+  		 * @default false
+  		 * @type {boolean}
+  		 * @memberof Prism
+  		 * @public
+  		 */
+  		manual: _self.Prism && _self.Prism.manual,
+  		/**
+  		 * By default, if Prism is in a web worker, it assumes that it is in a worker it created itself, so it uses
+  		 * `addEventListener` to communicate with its parent instance. However, if you're using Prism manually in your
+  		 * own worker, you don't want it to do this.
+  		 *
+  		 * By setting this value to `true`, Prism will not add its own listeners to the worker.
+  		 *
+  		 * You obviously have to change this value before Prism executes. To do this, you can add an
+  		 * empty Prism object into the global scope before loading the Prism script like this:
+  		 *
+  		 * ```js
+  		 * window.Prism = window.Prism || {};
+  		 * Prism.disableWorkerMessageHandler = true;
+  		 * // Load Prism's script
+  		 * ```
+  		 *
+  		 * @default false
+  		 * @type {boolean}
+  		 * @memberof Prism
+  		 * @public
+  		 */
+  		disableWorkerMessageHandler: _self.Prism && _self.Prism.disableWorkerMessageHandler,
+
+  		/**
+  		 * A namespace for utility methods.
+  		 *
+  		 * All function in this namespace that are not explicitly marked as _public_ are for __internal use only__ and may
+  		 * change or disappear at any time.
+  		 *
+  		 * @namespace
+  		 * @memberof Prism
+  		 */
+  		util: {
+  			encode: function encode(tokens) {
+  				if (tokens instanceof Token) {
+  					return new Token(tokens.type, encode(tokens.content), tokens.alias);
+  				} else if (Array.isArray(tokens)) {
+  					return tokens.map(encode);
+  				} else {
+  					return tokens.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\u00a0/g, ' ');
+  				}
+  			},
+
+  			/**
+  			 * Returns the name of the type of the given value.
+  			 *
+  			 * @param {any} o
+  			 * @returns {string}
+  			 * @example
+  			 * type(null)      === 'Null'
+  			 * type(undefined) === 'Undefined'
+  			 * type(123)       === 'Number'
+  			 * type('foo')     === 'String'
+  			 * type(true)      === 'Boolean'
+  			 * type([1, 2])    === 'Array'
+  			 * type({})        === 'Object'
+  			 * type(String)    === 'Function'
+  			 * type(/abc+/)    === 'RegExp'
+  			 */
+  			type: function (o) {
+  				return Object.prototype.toString.call(o).slice(8, -1);
+  			},
+
+  			/**
+  			 * Returns a unique number for the given object. Later calls will still return the same number.
+  			 *
+  			 * @param {Object} obj
+  			 * @returns {number}
+  			 */
+  			objId: function (obj) {
+  				if (!obj['__id']) {
+  					Object.defineProperty(obj, '__id', { value: ++uniqueId });
+  				}
+  				return obj['__id'];
+  			},
+
+  			/**
+  			 * Creates a deep clone of the given object.
+  			 *
+  			 * The main intended use of this function is to clone language definitions.
+  			 *
+  			 * @param {T} o
+  			 * @param {Record<number, any>} [visited]
+  			 * @returns {T}
+  			 * @template T
+  			 */
+  			clone: function deepClone(o, visited) {
+  				visited = visited || {};
+
+  				var clone; var id;
+  				switch (_.util.type(o)) {
+  					case 'Object':
+  						id = _.util.objId(o);
+  						if (visited[id]) {
+  							return visited[id];
+  						}
+  						clone = /** @type {Record<string, any>} */ ({});
+  						visited[id] = clone;
+
+  						for (var key in o) {
+  							if (o.hasOwnProperty(key)) {
+  								clone[key] = deepClone(o[key], visited);
+  							}
+  						}
+
+  						return /** @type {any} */ (clone);
+
+  					case 'Array':
+  						id = _.util.objId(o);
+  						if (visited[id]) {
+  							return visited[id];
+  						}
+  						clone = [];
+  						visited[id] = clone;
+
+  						(/** @type {Array} */(/** @type {any} */(o))).forEach(function (v, i) {
+  							clone[i] = deepClone(v, visited);
+  						});
+
+  						return /** @type {any} */ (clone);
+
+  					default:
+  						return o;
+  				}
+  			},
+
+  			/**
+  			 * Returns the Prism language of the given element set by a `language-xxxx` or `lang-xxxx` class.
+  			 *
+  			 * If no language is set for the element or the element is `null` or `undefined`, `none` will be returned.
+  			 *
+  			 * @param {Element} element
+  			 * @returns {string}
+  			 */
+  			getLanguage: function (element) {
+  				while (element) {
+  					var m = lang.exec(element.className);
+  					if (m) {
+  						return m[1].toLowerCase();
+  					}
+  					element = element.parentElement;
+  				}
+  				return 'none';
+  			},
+
+  			/**
+  			 * Sets the Prism `language-xxxx` class of the given element.
+  			 *
+  			 * @param {Element} element
+  			 * @param {string} language
+  			 * @returns {void}
+  			 */
+  			setLanguage: function (element, language) {
+  				// remove all `language-xxxx` classes
+  				// (this might leave behind a leading space)
+  				element.className = element.className.replace(RegExp(lang, 'gi'), '');
+
+  				// add the new `language-xxxx` class
+  				// (using `classList` will automatically clean up spaces for us)
+  				element.classList.add('language-' + language);
+  			},
+
+  			/**
+  			 * Returns the script element that is currently executing.
+  			 *
+  			 * This does __not__ work for line script element.
+  			 *
+  			 * @returns {HTMLScriptElement | null}
+  			 */
+  			currentScript: function () {
+  				if (typeof document === 'undefined') {
+  					return null;
+  				}
+  				if ('currentScript' in document && 1 < 2 /* hack to trip TS' flow analysis */) {
+  					return /** @type {any} */ (document.currentScript);
+  				}
+
+  				// IE11 workaround
+  				// we'll get the src of the current script by parsing IE11's error stack trace
+  				// this will not work for inline scripts
+
+  				try {
+  					throw new Error();
+  				} catch (err) {
+  					// Get file src url from stack. Specifically works with the format of stack traces in IE.
+  					// A stack will look like this:
+  					//
+  					// Error
+  					//    at _.util.currentScript (http://localhost/components/prism-core.js:119:5)
+  					//    at Global code (http://localhost/components/prism-core.js:606:1)
+
+  					var src = (/at [^(\r\n]*\((.*):[^:]+:[^:]+\)$/i.exec(err.stack) || [])[1];
+  					if (src) {
+  						var scripts = document.getElementsByTagName('script');
+  						for (var i in scripts) {
+  							if (scripts[i].src == src) {
+  								return scripts[i];
+  							}
+  						}
+  					}
+  					return null;
+  				}
+  			},
+
+  			/**
+  			 * Returns whether a given class is active for `element`.
+  			 *
+  			 * The class can be activated if `element` or one of its ancestors has the given class and it can be deactivated
+  			 * if `element` or one of its ancestors has the negated version of the given class. The _negated version_ of the
+  			 * given class is just the given class with a `no-` prefix.
+  			 *
+  			 * Whether the class is active is determined by the closest ancestor of `element` (where `element` itself is
+  			 * closest ancestor) that has the given class or the negated version of it. If neither `element` nor any of its
+  			 * ancestors have the given class or the negated version of it, then the default activation will be returned.
+  			 *
+  			 * In the paradoxical situation where the closest ancestor contains __both__ the given class and the negated
+  			 * version of it, the class is considered active.
+  			 *
+  			 * @param {Element} element
+  			 * @param {string} className
+  			 * @param {boolean} [defaultActivation=false]
+  			 * @returns {boolean}
+  			 */
+  			isActive: function (element, className, defaultActivation) {
+  				var no = 'no-' + className;
+
+  				while (element) {
+  					var classList = element.classList;
+  					if (classList.contains(className)) {
+  						return true;
+  					}
+  					if (classList.contains(no)) {
+  						return false;
+  					}
+  					element = element.parentElement;
+  				}
+  				return !!defaultActivation;
+  			}
+  		},
+
+  		/**
+  		 * This namespace contains all currently loaded languages and the some helper functions to create and modify languages.
+  		 *
+  		 * @namespace
+  		 * @memberof Prism
+  		 * @public
+  		 */
+  		languages: {
+  			/**
+  			 * The grammar for plain, unformatted text.
+  			 */
+  			plain: plainTextGrammar,
+  			plaintext: plainTextGrammar,
+  			text: plainTextGrammar,
+  			txt: plainTextGrammar,
+
+  			/**
+  			 * Creates a deep copy of the language with the given id and appends the given tokens.
+  			 *
+  			 * If a token in `redef` also appears in the copied language, then the existing token in the copied language
+  			 * will be overwritten at its original position.
+  			 *
+  			 * ## Best practices
+  			 *
+  			 * Since the position of overwriting tokens (token in `redef` that overwrite tokens in the copied language)
+  			 * doesn't matter, they can technically be in any order. However, this can be confusing to others that trying to
+  			 * understand the language definition because, normally, the order of tokens matters in Prism grammars.
+  			 *
+  			 * Therefore, it is encouraged to order overwriting tokens according to the positions of the overwritten tokens.
+  			 * Furthermore, all non-overwriting tokens should be placed after the overwriting ones.
+  			 *
+  			 * @param {string} id The id of the language to extend. This has to be a key in `Prism.languages`.
+  			 * @param {Grammar} redef The new tokens to append.
+  			 * @returns {Grammar} The new language created.
+  			 * @public
+  			 * @example
+  			 * Prism.languages['css-with-colors'] = Prism.languages.extend('css', {
+  			 *     // Prism.languages.css already has a 'comment' token, so this token will overwrite CSS' 'comment' token
+  			 *     // at its original position
+  			 *     'comment': { ... },
+  			 *     // CSS doesn't have a 'color' token, so this token will be appended
+  			 *     'color': /\b(?:red|green|blue)\b/
+  			 * });
+  			 */
+  			extend: function (id, redef) {
+  				var lang = _.util.clone(_.languages[id]);
+
+  				for (var key in redef) {
+  					lang[key] = redef[key];
+  				}
+
+  				return lang;
+  			},
+
+  			/**
+  			 * Inserts tokens _before_ another token in a language definition or any other grammar.
+  			 *
+  			 * ## Usage
+  			 *
+  			 * This helper method makes it easy to modify existing languages. For example, the CSS language definition
+  			 * not only defines CSS highlighting for CSS documents, but also needs to define highlighting for CSS embedded
+  			 * in HTML through `<style>` elements. To do this, it needs to modify `Prism.languages.markup` and add the
+  			 * appropriate tokens. However, `Prism.languages.markup` is a regular JavaScript object literal, so if you do
+  			 * this:
+  			 *
+  			 * ```js
+  			 * Prism.languages.markup.style = {
+  			 *     // token
+  			 * };
+  			 * ```
+  			 *
+  			 * then the `style` token will be added (and processed) at the end. `insertBefore` allows you to insert tokens
+  			 * before existing tokens. For the CSS example above, you would use it like this:
+  			 *
+  			 * ```js
+  			 * Prism.languages.insertBefore('markup', 'cdata', {
+  			 *     'style': {
+  			 *         // token
+  			 *     }
+  			 * });
+  			 * ```
+  			 *
+  			 * ## Special cases
+  			 *
+  			 * If the grammars of `inside` and `insert` have tokens with the same name, the tokens in `inside`'s grammar
+  			 * will be ignored.
+  			 *
+  			 * This behavior can be used to insert tokens after `before`:
+  			 *
+  			 * ```js
+  			 * Prism.languages.insertBefore('markup', 'comment', {
+  			 *     'comment': Prism.languages.markup.comment,
+  			 *     // tokens after 'comment'
+  			 * });
+  			 * ```
+  			 *
+  			 * ## Limitations
+  			 *
+  			 * The main problem `insertBefore` has to solve is iteration order. Since ES2015, the iteration order for object
+  			 * properties is guaranteed to be the insertion order (except for integer keys) but some browsers behave
+  			 * differently when keys are deleted and re-inserted. So `insertBefore` can't be implemented by temporarily
+  			 * deleting properties which is necessary to insert at arbitrary positions.
+  			 *
+  			 * To solve this problem, `insertBefore` doesn't actually insert the given tokens into the target object.
+  			 * Instead, it will create a new object and replace all references to the target object with the new one. This
+  			 * can be done without temporarily deleting properties, so the iteration order is well-defined.
+  			 *
+  			 * However, only references that can be reached from `Prism.languages` or `insert` will be replaced. I.e. if
+  			 * you hold the target object in a variable, then the value of the variable will not change.
+  			 *
+  			 * ```js
+  			 * var oldMarkup = Prism.languages.markup;
+  			 * var newMarkup = Prism.languages.insertBefore('markup', 'comment', { ... });
+  			 *
+  			 * assert(oldMarkup !== Prism.languages.markup);
+  			 * assert(newMarkup === Prism.languages.markup);
+  			 * ```
+  			 *
+  			 * @param {string} inside The property of `root` (e.g. a language id in `Prism.languages`) that contains the
+  			 * object to be modified.
+  			 * @param {string} before The key to insert before.
+  			 * @param {Grammar} insert An object containing the key-value pairs to be inserted.
+  			 * @param {Object<string, any>} [root] The object containing `inside`, i.e. the object that contains the
+  			 * object to be modified.
+  			 *
+  			 * Defaults to `Prism.languages`.
+  			 * @returns {Grammar} The new grammar object.
+  			 * @public
+  			 */
+  			insertBefore: function (inside, before, insert, root) {
+  				root = root || /** @type {any} */ (_.languages);
+  				var grammar = root[inside];
+  				/** @type {Grammar} */
+  				var ret = {};
+
+  				for (var token in grammar) {
+  					if (grammar.hasOwnProperty(token)) {
+
+  						if (token == before) {
+  							for (var newToken in insert) {
+  								if (insert.hasOwnProperty(newToken)) {
+  									ret[newToken] = insert[newToken];
+  								}
+  							}
+  						}
+
+  						// Do not insert token which also occur in insert. See #1525
+  						if (!insert.hasOwnProperty(token)) {
+  							ret[token] = grammar[token];
+  						}
+  					}
+  				}
+
+  				var old = root[inside];
+  				root[inside] = ret;
+
+  				// Update references in other language definitions
+  				_.languages.DFS(_.languages, function (key, value) {
+  					if (value === old && key != inside) {
+  						this[key] = ret;
+  					}
+  				});
+
+  				return ret;
+  			},
+
+  			// Traverse a language definition with Depth First Search
+  			DFS: function DFS(o, callback, type, visited) {
+  				visited = visited || {};
+
+  				var objId = _.util.objId;
+
+  				for (var i in o) {
+  					if (o.hasOwnProperty(i)) {
+  						callback.call(o, i, o[i], type || i);
+
+  						var property = o[i];
+  						var propertyType = _.util.type(property);
+
+  						if (propertyType === 'Object' && !visited[objId(property)]) {
+  							visited[objId(property)] = true;
+  							DFS(property, callback, null, visited);
+  						} else if (propertyType === 'Array' && !visited[objId(property)]) {
+  							visited[objId(property)] = true;
+  							DFS(property, callback, i, visited);
+  						}
+  					}
+  				}
+  			}
+  		},
+
+  		plugins: {},
+
+  		/**
+  		 * This is the most high-level function in Prism’s API.
+  		 * It fetches all the elements that have a `.language-xxxx` class and then calls {@link Prism.highlightElement} on
+  		 * each one of them.
+  		 *
+  		 * This is equivalent to `Prism.highlightAllUnder(document, async, callback)`.
+  		 *
+  		 * @param {boolean} [async=false] Same as in {@link Prism.highlightAllUnder}.
+  		 * @param {HighlightCallback} [callback] Same as in {@link Prism.highlightAllUnder}.
+  		 * @memberof Prism
+  		 * @public
+  		 */
+  		highlightAll: function (async, callback) {
+  			_.highlightAllUnder(document, async, callback);
+  		},
+
+  		/**
+  		 * Fetches all the descendants of `container` that have a `.language-xxxx` class and then calls
+  		 * {@link Prism.highlightElement} on each one of them.
+  		 *
+  		 * The following hooks will be run:
+  		 * 1. `before-highlightall`
+  		 * 2. `before-all-elements-highlight`
+  		 * 3. All hooks of {@link Prism.highlightElement} for each element.
+  		 *
+  		 * @param {ParentNode} container The root element, whose descendants that have a `.language-xxxx` class will be highlighted.
+  		 * @param {boolean} [async=false] Whether each element is to be highlighted asynchronously using Web Workers.
+  		 * @param {HighlightCallback} [callback] An optional callback to be invoked on each element after its highlighting is done.
+  		 * @memberof Prism
+  		 * @public
+  		 */
+  		highlightAllUnder: function (container, async, callback) {
+  			var env = {
+  				callback: callback,
+  				container: container,
+  				selector: 'code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code'
+  			};
+
+  			_.hooks.run('before-highlightall', env);
+
+  			env.elements = Array.prototype.slice.apply(env.container.querySelectorAll(env.selector));
+
+  			_.hooks.run('before-all-elements-highlight', env);
+
+  			for (var i = 0, element; (element = env.elements[i++]);) {
+  				_.highlightElement(element, async === true, env.callback);
+  			}
+  		},
+
+  		/**
+  		 * Highlights the code inside a single element.
+  		 *
+  		 * The following hooks will be run:
+  		 * 1. `before-sanity-check`
+  		 * 2. `before-highlight`
+  		 * 3. All hooks of {@link Prism.highlight}. These hooks will be run by an asynchronous worker if `async` is `true`.
+  		 * 4. `before-insert`
+  		 * 5. `after-highlight`
+  		 * 6. `complete`
+  		 *
+  		 * Some the above hooks will be skipped if the element doesn't contain any text or there is no grammar loaded for
+  		 * the element's language.
+  		 *
+  		 * @param {Element} element The element containing the code.
+  		 * It must have a class of `language-xxxx` to be processed, where `xxxx` is a valid language identifier.
+  		 * @param {boolean} [async=false] Whether the element is to be highlighted asynchronously using Web Workers
+  		 * to improve performance and avoid blocking the UI when highlighting very large chunks of code. This option is
+  		 * [disabled by default](https://prismjs.com/faq.html#why-is-asynchronous-highlighting-disabled-by-default).
+  		 *
+  		 * Note: All language definitions required to highlight the code must be included in the main `prism.js` file for
+  		 * asynchronous highlighting to work. You can build your own bundle on the
+  		 * [Download page](https://prismjs.com/download.html).
+  		 * @param {HighlightCallback} [callback] An optional callback to be invoked after the highlighting is done.
+  		 * Mostly useful when `async` is `true`, since in that case, the highlighting is done asynchronously.
+  		 * @memberof Prism
+  		 * @public
+  		 */
+  		highlightElement: function (element, async, callback) {
+  			// Find language
+  			var language = _.util.getLanguage(element);
+  			var grammar = _.languages[language];
+
+  			// Set language on the element, if not present
+  			_.util.setLanguage(element, language);
+
+  			// Set language on the parent, for styling
+  			var parent = element.parentElement;
+  			if (parent && parent.nodeName.toLowerCase() === 'pre') {
+  				_.util.setLanguage(parent, language);
+  			}
+
+  			var code = element.textContent;
+
+  			var env = {
+  				element: element,
+  				language: language,
+  				grammar: grammar,
+  				code: code
+  			};
+
+  			function insertHighlightedCode(highlightedCode) {
+  				env.highlightedCode = highlightedCode;
+
+  				_.hooks.run('before-insert', env);
+
+  				env.element.innerHTML = env.highlightedCode;
+
+  				_.hooks.run('after-highlight', env);
+  				_.hooks.run('complete', env);
+  				callback && callback.call(env.element);
+  			}
+
+  			_.hooks.run('before-sanity-check', env);
+
+  			// plugins may change/add the parent/element
+  			parent = env.element.parentElement;
+  			if (parent && parent.nodeName.toLowerCase() === 'pre' && !parent.hasAttribute('tabindex')) {
+  				parent.setAttribute('tabindex', '0');
+  			}
+
+  			if (!env.code) {
+  				_.hooks.run('complete', env);
+  				callback && callback.call(env.element);
+  				return;
+  			}
+
+  			_.hooks.run('before-highlight', env);
+
+  			if (!env.grammar) {
+  				insertHighlightedCode(_.util.encode(env.code));
+  				return;
+  			}
+
+  			if (async && _self.Worker) {
+  				var worker = new Worker(_.filename);
+
+  				worker.onmessage = function (evt) {
+  					insertHighlightedCode(evt.data);
+  				};
+
+  				worker.postMessage(JSON.stringify({
+  					language: env.language,
+  					code: env.code,
+  					immediateClose: true
+  				}));
+  			} else {
+  				insertHighlightedCode(_.highlight(env.code, env.grammar, env.language));
+  			}
+  		},
+
+  		/**
+  		 * Low-level function, only use if you know what you’re doing. It accepts a string of text as input
+  		 * and the language definitions to use, and returns a string with the HTML produced.
+  		 *
+  		 * The following hooks will be run:
+  		 * 1. `before-tokenize`
+  		 * 2. `after-tokenize`
+  		 * 3. `wrap`: On each {@link Token}.
+  		 *
+  		 * @param {string} text A string with the code to be highlighted.
+  		 * @param {Grammar} grammar An object containing the tokens to use.
+  		 *
+  		 * Usually a language definition like `Prism.languages.markup`.
+  		 * @param {string} language The name of the language definition passed to `grammar`.
+  		 * @returns {string} The highlighted HTML.
+  		 * @memberof Prism
+  		 * @public
+  		 * @example
+  		 * Prism.highlight('var foo = true;', Prism.languages.javascript, 'javascript');
+  		 */
+  		highlight: function (text, grammar, language) {
+  			var env = {
+  				code: text,
+  				grammar: grammar,
+  				language: language
+  			};
+  			_.hooks.run('before-tokenize', env);
+  			if (!env.grammar) {
+  				throw new Error('The language "' + env.language + '" has no grammar.');
+  			}
+  			env.tokens = _.tokenize(env.code, env.grammar);
+  			_.hooks.run('after-tokenize', env);
+  			return Token.stringify(_.util.encode(env.tokens), env.language);
+  		},
+
+  		/**
+  		 * This is the heart of Prism, and the most low-level function you can use. It accepts a string of text as input
+  		 * and the language definitions to use, and returns an array with the tokenized code.
+  		 *
+  		 * When the language definition includes nested tokens, the function is called recursively on each of these tokens.
+  		 *
+  		 * This method could be useful in other contexts as well, as a very crude parser.
+  		 *
+  		 * @param {string} text A string with the code to be highlighted.
+  		 * @param {Grammar} grammar An object containing the tokens to use.
+  		 *
+  		 * Usually a language definition like `Prism.languages.markup`.
+  		 * @returns {TokenStream} An array of strings and tokens, a token stream.
+  		 * @memberof Prism
+  		 * @public
+  		 * @example
+  		 * let code = `var foo = 0;`;
+  		 * let tokens = Prism.tokenize(code, Prism.languages.javascript);
+  		 * tokens.forEach(token => {
+  		 *     if (token instanceof Prism.Token && token.type === 'number') {
+  		 *         console.log(`Found numeric literal: ${token.content}`);
+  		 *     }
+  		 * });
+  		 */
+  		tokenize: function (text, grammar) {
+  			var rest = grammar.rest;
+  			if (rest) {
+  				for (var token in rest) {
+  					grammar[token] = rest[token];
+  				}
+
+  				delete grammar.rest;
+  			}
+
+  			var tokenList = new LinkedList();
+  			addAfter(tokenList, tokenList.head, text);
+
+  			matchGrammar(text, tokenList, grammar, tokenList.head, 0);
+
+  			return toArray(tokenList);
+  		},
+
+  		/**
+  		 * @namespace
+  		 * @memberof Prism
+  		 * @public
+  		 */
+  		hooks: {
+  			all: {},
+
+  			/**
+  			 * Adds the given callback to the list of callbacks for the given hook.
+  			 *
+  			 * The callback will be invoked when the hook it is registered for is run.
+  			 * Hooks are usually directly run by a highlight function but you can also run hooks yourself.
+  			 *
+  			 * One callback function can be registered to multiple hooks and the same hook multiple times.
+  			 *
+  			 * @param {string} name The name of the hook.
+  			 * @param {HookCallback} callback The callback function which is given environment variables.
+  			 * @public
+  			 */
+  			add: function (name, callback) {
+  				var hooks = _.hooks.all;
+
+  				hooks[name] = hooks[name] || [];
+
+  				hooks[name].push(callback);
+  			},
+
+  			/**
+  			 * Runs a hook invoking all registered callbacks with the given environment variables.
+  			 *
+  			 * Callbacks will be invoked synchronously and in the order in which they were registered.
+  			 *
+  			 * @param {string} name The name of the hook.
+  			 * @param {Object<string, any>} env The environment variables of the hook passed to all callbacks registered.
+  			 * @public
+  			 */
+  			run: function (name, env) {
+  				var callbacks = _.hooks.all[name];
+
+  				if (!callbacks || !callbacks.length) {
+  					return;
+  				}
+
+  				for (var i = 0, callback; (callback = callbacks[i++]);) {
+  					callback(env);
+  				}
+  			}
+  		},
+
+  		Token: Token
+  	};
+  	_self.Prism = _;
+
+
+  	// Typescript note:
+  	// The following can be used to import the Token type in JSDoc:
+  	//
+  	//   @typedef {InstanceType<import("./prism-core")["Token"]>} Token
+
+  	/**
+  	 * Creates a new token.
+  	 *
+  	 * @param {string} type See {@link Token#type type}
+  	 * @param {string | TokenStream} content See {@link Token#content content}
+  	 * @param {string|string[]} [alias] The alias(es) of the token.
+  	 * @param {string} [matchedStr=""] A copy of the full string this token was created from.
+  	 * @class
+  	 * @global
+  	 * @public
+  	 */
+  	function Token(type, content, alias, matchedStr) {
+  		/**
+  		 * The type of the token.
+  		 *
+  		 * This is usually the key of a pattern in a {@link Grammar}.
+  		 *
+  		 * @type {string}
+  		 * @see GrammarToken
+  		 * @public
+  		 */
+  		this.type = type;
+  		/**
+  		 * The strings or tokens contained by this token.
+  		 *
+  		 * This will be a token stream if the pattern matched also defined an `inside` grammar.
+  		 *
+  		 * @type {string | TokenStream}
+  		 * @public
+  		 */
+  		this.content = content;
+  		/**
+  		 * The alias(es) of the token.
+  		 *
+  		 * @type {string|string[]}
+  		 * @see GrammarToken
+  		 * @public
+  		 */
+  		this.alias = alias;
+  		// Copy of the full string this token was created from
+  		this.length = (matchedStr || '').length | 0;
+  	}
+
+  	/**
+  	 * A token stream is an array of strings and {@link Token Token} objects.
+  	 *
+  	 * Token streams have to fulfill a few properties that are assumed by most functions (mostly internal ones) that process
+  	 * them.
+  	 *
+  	 * 1. No adjacent strings.
+  	 * 2. No empty strings.
+  	 *
+  	 *    The only exception here is the token stream that only contains the empty string and nothing else.
+  	 *
+  	 * @typedef {Array<string | Token>} TokenStream
+  	 * @global
+  	 * @public
+  	 */
+
+  	/**
+  	 * Converts the given token or token stream to an HTML representation.
+  	 *
+  	 * The following hooks will be run:
+  	 * 1. `wrap`: On each {@link Token}.
+  	 *
+  	 * @param {string | Token | TokenStream} o The token or token stream to be converted.
+  	 * @param {string} language The name of current language.
+  	 * @returns {string} The HTML representation of the token or token stream.
+  	 * @memberof Token
+  	 * @static
+  	 */
+  	Token.stringify = function stringify(o, language) {
+  		if (typeof o == 'string') {
+  			return o;
+  		}
+  		if (Array.isArray(o)) {
+  			var s = '';
+  			o.forEach(function (e) {
+  				s += stringify(e, language);
+  			});
+  			return s;
+  		}
+
+  		var env = {
+  			type: o.type,
+  			content: stringify(o.content, language),
+  			tag: 'span',
+  			classes: ['token', o.type],
+  			attributes: {},
+  			language: language
+  		};
+
+  		var aliases = o.alias;
+  		if (aliases) {
+  			if (Array.isArray(aliases)) {
+  				Array.prototype.push.apply(env.classes, aliases);
+  			} else {
+  				env.classes.push(aliases);
+  			}
+  		}
+
+  		_.hooks.run('wrap', env);
+
+  		var attributes = '';
+  		for (var name in env.attributes) {
+  			attributes += ' ' + name + '="' + (env.attributes[name] || '').replace(/"/g, '&quot;') + '"';
+  		}
+
+  		return '<' + env.tag + ' class="' + env.classes.join(' ') + '"' + attributes + '>' + env.content + '</' + env.tag + '>';
+  	};
+
+  	/**
+  	 * @param {RegExp} pattern
+  	 * @param {number} pos
+  	 * @param {string} text
+  	 * @param {boolean} lookbehind
+  	 * @returns {RegExpExecArray | null}
+  	 */
+  	function matchPattern(pattern, pos, text, lookbehind) {
+  		pattern.lastIndex = pos;
+  		var match = pattern.exec(text);
+  		if (match && lookbehind && match[1]) {
+  			// change the match to remove the text matched by the Prism lookbehind group
+  			var lookbehindLength = match[1].length;
+  			match.index += lookbehindLength;
+  			match[0] = match[0].slice(lookbehindLength);
+  		}
+  		return match;
+  	}
+
+  	/**
+  	 * @param {string} text
+  	 * @param {LinkedList<string | Token>} tokenList
+  	 * @param {any} grammar
+  	 * @param {LinkedListNode<string | Token>} startNode
+  	 * @param {number} startPos
+  	 * @param {RematchOptions} [rematch]
+  	 * @returns {void}
+  	 * @private
+  	 *
+  	 * @typedef RematchOptions
+  	 * @property {string} cause
+  	 * @property {number} reach
+  	 */
+  	function matchGrammar(text, tokenList, grammar, startNode, startPos, rematch) {
+  		for (var token in grammar) {
+  			if (!grammar.hasOwnProperty(token) || !grammar[token]) {
+  				continue;
+  			}
+
+  			var patterns = grammar[token];
+  			patterns = Array.isArray(patterns) ? patterns : [patterns];
+
+  			for (var j = 0; j < patterns.length; ++j) {
+  				if (rematch && rematch.cause == token + ',' + j) {
+  					return;
+  				}
+
+  				var patternObj = patterns[j];
+  				var inside = patternObj.inside;
+  				var lookbehind = !!patternObj.lookbehind;
+  				var greedy = !!patternObj.greedy;
+  				var alias = patternObj.alias;
+
+  				if (greedy && !patternObj.pattern.global) {
+  					// Without the global flag, lastIndex won't work
+  					var flags = patternObj.pattern.toString().match(/[imsuy]*$/)[0];
+  					patternObj.pattern = RegExp(patternObj.pattern.source, flags + 'g');
+  				}
+
+  				/** @type {RegExp} */
+  				var pattern = patternObj.pattern || patternObj;
+
+  				for ( // iterate the token list and keep track of the current token/string position
+  					var currentNode = startNode.next, pos = startPos;
+  					currentNode !== tokenList.tail;
+  					pos += currentNode.value.length, currentNode = currentNode.next
+  				) {
+
+  					if (rematch && pos >= rematch.reach) {
+  						break;
+  					}
+
+  					var str = currentNode.value;
+
+  					if (tokenList.length > text.length) {
+  						// Something went terribly wrong, ABORT, ABORT!
+  						return;
+  					}
+
+  					if (str instanceof Token) {
+  						continue;
+  					}
+
+  					var removeCount = 1; // this is the to parameter of removeBetween
+  					var match;
+
+  					if (greedy) {
+  						match = matchPattern(pattern, pos, text, lookbehind);
+  						if (!match || match.index >= text.length) {
+  							break;
+  						}
+
+  						var from = match.index;
+  						var to = match.index + match[0].length;
+  						var p = pos;
+
+  						// find the node that contains the match
+  						p += currentNode.value.length;
+  						while (from >= p) {
+  							currentNode = currentNode.next;
+  							p += currentNode.value.length;
+  						}
+  						// adjust pos (and p)
+  						p -= currentNode.value.length;
+  						pos = p;
+
+  						// the current node is a Token, then the match starts inside another Token, which is invalid
+  						if (currentNode.value instanceof Token) {
+  							continue;
+  						}
+
+  						// find the last node which is affected by this match
+  						for (
+  							var k = currentNode;
+  							k !== tokenList.tail && (p < to || typeof k.value === 'string');
+  							k = k.next
+  						) {
+  							removeCount++;
+  							p += k.value.length;
+  						}
+  						removeCount--;
+
+  						// replace with the new match
+  						str = text.slice(pos, p);
+  						match.index -= pos;
+  					} else {
+  						match = matchPattern(pattern, 0, str, lookbehind);
+  						if (!match) {
+  							continue;
+  						}
+  					}
+
+  					// eslint-disable-next-line no-redeclare
+  					var from = match.index;
+  					var matchStr = match[0];
+  					var before = str.slice(0, from);
+  					var after = str.slice(from + matchStr.length);
+
+  					var reach = pos + str.length;
+  					if (rematch && reach > rematch.reach) {
+  						rematch.reach = reach;
+  					}
+
+  					var removeFrom = currentNode.prev;
+
+  					if (before) {
+  						removeFrom = addAfter(tokenList, removeFrom, before);
+  						pos += before.length;
+  					}
+
+  					removeRange(tokenList, removeFrom, removeCount);
+
+  					var wrapped = new Token(token, inside ? _.tokenize(matchStr, inside) : matchStr, alias, matchStr);
+  					currentNode = addAfter(tokenList, removeFrom, wrapped);
+
+  					if (after) {
+  						addAfter(tokenList, currentNode, after);
+  					}
+
+  					if (removeCount > 1) {
+  						// at least one Token object was removed, so we have to do some rematching
+  						// this can only happen if the current pattern is greedy
+
+  						/** @type {RematchOptions} */
+  						var nestedRematch = {
+  							cause: token + ',' + j,
+  							reach: reach
+  						};
+  						matchGrammar(text, tokenList, grammar, currentNode.prev, pos, nestedRematch);
+
+  						// the reach might have been extended because of the rematching
+  						if (rematch && nestedRematch.reach > rematch.reach) {
+  							rematch.reach = nestedRematch.reach;
+  						}
+  					}
+  				}
+  			}
+  		}
+  	}
+
+  	/**
+  	 * @typedef LinkedListNode
+  	 * @property {T} value
+  	 * @property {LinkedListNode<T> | null} prev The previous node.
+  	 * @property {LinkedListNode<T> | null} next The next node.
+  	 * @template T
+  	 * @private
+  	 */
+
+  	/**
+  	 * @template T
+  	 * @private
+  	 */
+  	function LinkedList() {
+  		/** @type {LinkedListNode<T>} */
+  		var head = { value: null, prev: null, next: null };
+  		/** @type {LinkedListNode<T>} */
+  		var tail = { value: null, prev: head, next: null };
+  		head.next = tail;
+
+  		/** @type {LinkedListNode<T>} */
+  		this.head = head;
+  		/** @type {LinkedListNode<T>} */
+  		this.tail = tail;
+  		this.length = 0;
+  	}
+
+  	/**
+  	 * Adds a new node with the given value to the list.
+  	 *
+  	 * @param {LinkedList<T>} list
+  	 * @param {LinkedListNode<T>} node
+  	 * @param {T} value
+  	 * @returns {LinkedListNode<T>} The added node.
+  	 * @template T
+  	 */
+  	function addAfter(list, node, value) {
+  		// assumes that node != list.tail && values.length >= 0
+  		var next = node.next;
+
+  		var newNode = { value: value, prev: node, next: next };
+  		node.next = newNode;
+  		next.prev = newNode;
+  		list.length++;
+
+  		return newNode;
+  	}
+  	/**
+  	 * Removes `count` nodes after the given node. The given node will not be removed.
+  	 *
+  	 * @param {LinkedList<T>} list
+  	 * @param {LinkedListNode<T>} node
+  	 * @param {number} count
+  	 * @template T
+  	 */
+  	function removeRange(list, node, count) {
+  		var next = node.next;
+  		for (var i = 0; i < count && next !== list.tail; i++) {
+  			next = next.next;
+  		}
+  		node.next = next;
+  		next.prev = node;
+  		list.length -= i;
+  	}
+  	/**
+  	 * @param {LinkedList<T>} list
+  	 * @returns {T[]}
+  	 * @template T
+  	 */
+  	function toArray(list) {
+  		var array = [];
+  		var node = list.head.next;
+  		while (node !== list.tail) {
+  			array.push(node.value);
+  			node = node.next;
+  		}
+  		return array;
+  	}
+
+
+  	if (!_self.document) {
+  		if (!_self.addEventListener) {
+  			// in Node.js
+  			return _;
+  		}
+
+  		if (!_.disableWorkerMessageHandler) {
+  			// In worker
+  			_self.addEventListener('message', function (evt) {
+  				var message = JSON.parse(evt.data);
+  				var lang = message.language;
+  				var code = message.code;
+  				var immediateClose = message.immediateClose;
+
+  				_self.postMessage(_.highlight(code, _.languages[lang], lang));
+  				if (immediateClose) {
+  					_self.close();
+  				}
+  			}, false);
+  		}
+
+  		return _;
+  	}
+
+  	// Get current script and highlight
+  	var script = _.util.currentScript();
+
+  	if (script) {
+  		_.filename = script.src;
+
+  		if (script.hasAttribute('data-manual')) {
+  			_.manual = true;
+  		}
+  	}
+
+  	function highlightAutomaticallyCallback() {
+  		if (!_.manual) {
+  			_.highlightAll();
+  		}
+  	}
+
+  	if (!_.manual) {
+  		// If the document state is "loading", then we'll use DOMContentLoaded.
+  		// If the document state is "interactive" and the prism.js script is deferred, then we'll also use the
+  		// DOMContentLoaded event because there might be some plugins or languages which have also been deferred and they
+  		// might take longer one animation frame to execute which can create a race condition where only some plugins have
+  		// been loaded when Prism.highlightAll() is executed, depending on how fast resources are loaded.
+  		// See https://github.com/PrismJS/prism/issues/2102
+  		var readyState = document.readyState;
+  		if (readyState === 'loading' || readyState === 'interactive' && script && script.defer) {
+  			document.addEventListener('DOMContentLoaded', highlightAutomaticallyCallback);
+  		} else {
+  			if (window.requestAnimationFrame) {
+  				window.requestAnimationFrame(highlightAutomaticallyCallback);
+  			} else {
+  				window.setTimeout(highlightAutomaticallyCallback, 16);
+  			}
+  		}
+  	}
+
+  	return _;
+
+  }(_self));
+
+  if (module.exports) {
+  	module.exports = Prism;
+  }
+
+  // hack for components to work correctly in node.js
+  if (typeof commonjsGlobal !== 'undefined') {
+  	commonjsGlobal.Prism = Prism;
+  }
+
+  // some additional documentation/types
+
+  /**
+   * The expansion of a simple `RegExp` literal to support additional properties.
+   *
+   * @typedef GrammarToken
+   * @property {RegExp} pattern The regular expression of the token.
+   * @property {boolean} [lookbehind=false] If `true`, then the first capturing group of `pattern` will (effectively)
+   * behave as a lookbehind group meaning that the captured text will not be part of the matched text of the new token.
+   * @property {boolean} [greedy=false] Whether the token is greedy.
+   * @property {string|string[]} [alias] An optional alias or list of aliases.
+   * @property {Grammar} [inside] The nested grammar of this token.
+   *
+   * The `inside` grammar will be used to tokenize the text value of each token of this kind.
+   *
+   * This can be used to make nested and even recursive language definitions.
+   *
+   * Note: This can cause infinite recursion. Be careful when you embed different languages or even the same language into
+   * each another.
+   * @global
+   * @public
+   */
+
+  /**
+   * @typedef Grammar
+   * @type {Object<string, RegExp | GrammarToken | Array<RegExp | GrammarToken>>}
+   * @property {Grammar} [rest] An optional grammar object that will be appended to this grammar.
+   * @global
+   * @public
+   */
+
+  /**
+   * A function which will invoked after an element was successfully highlighted.
+   *
+   * @callback HighlightCallback
+   * @param {Element} element The element successfully highlighted.
+   * @returns {void}
+   * @global
+   * @public
+   */
+
+  /**
+   * @callback HookCallback
+   * @param {Object<string, any>} env The environment variables of the hook.
+   * @returns {void}
+   * @global
+   * @public
+   */
+
+
+  /* **********************************************
+       Begin prism-markup.js
+  ********************************************** */
+
+  Prism.languages.markup = {
+  	'comment': {
+  		pattern: /<!--(?:(?!<!--)[\s\S])*?-->/,
+  		greedy: true
+  	},
+  	'prolog': {
+  		pattern: /<\?[\s\S]+?\?>/,
+  		greedy: true
+  	},
+  	'doctype': {
+  		// https://www.w3.org/TR/xml/#NT-doctypedecl
+  		pattern: /<!DOCTYPE(?:[^>"'[\]]|"[^"]*"|'[^']*')+(?:\[(?:[^<"'\]]|"[^"]*"|'[^']*'|<(?!!--)|<!--(?:[^-]|-(?!->))*-->)*\]\s*)?>/i,
+  		greedy: true,
+  		inside: {
+  			'internal-subset': {
+  				pattern: /(^[^\[]*\[)[\s\S]+(?=\]>$)/,
+  				lookbehind: true,
+  				greedy: true,
+  				inside: null // see below
+  			},
+  			'string': {
+  				pattern: /"[^"]*"|'[^']*'/,
+  				greedy: true
+  			},
+  			'punctuation': /^<!|>$|[[\]]/,
+  			'doctype-tag': /^DOCTYPE/i,
+  			'name': /[^\s<>'"]+/
+  		}
+  	},
+  	'cdata': {
+  		pattern: /<!\[CDATA\[[\s\S]*?\]\]>/i,
+  		greedy: true
+  	},
+  	'tag': {
+  		pattern: /<\/?(?!\d)[^\s>\/=$<%]+(?:\s(?:\s*[^\s>\/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+(?=[\s>]))|(?=[\s/>])))+)?\s*\/?>/,
+  		greedy: true,
+  		inside: {
+  			'tag': {
+  				pattern: /^<\/?[^\s>\/]+/,
+  				inside: {
+  					'punctuation': /^<\/?/,
+  					'namespace': /^[^\s>\/:]+:/
+  				}
+  			},
+  			'special-attr': [],
+  			'attr-value': {
+  				pattern: /=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+)/,
+  				inside: {
+  					'punctuation': [
+  						{
+  							pattern: /^=/,
+  							alias: 'attr-equals'
+  						},
+  						{
+  							pattern: /^(\s*)["']|["']$/,
+  							lookbehind: true
+  						}
+  					]
+  				}
+  			},
+  			'punctuation': /\/?>/,
+  			'attr-name': {
+  				pattern: /[^\s>\/]+/,
+  				inside: {
+  					'namespace': /^[^\s>\/:]+:/
+  				}
+  			}
+
+  		}
+  	},
+  	'entity': [
+  		{
+  			pattern: /&[\da-z]{1,8};/i,
+  			alias: 'named-entity'
+  		},
+  		/&#x?[\da-f]{1,8};/i
+  	]
+  };
+
+  Prism.languages.markup['tag'].inside['attr-value'].inside['entity'] =
+  	Prism.languages.markup['entity'];
+  Prism.languages.markup['doctype'].inside['internal-subset'].inside = Prism.languages.markup;
+
+  // Plugin to make entity title show the real entity, idea by Roman Komarov
+  Prism.hooks.add('wrap', function (env) {
+
+  	if (env.type === 'entity') {
+  		env.attributes['title'] = env.content.replace(/&amp;/, '&');
+  	}
+  });
+
+  Object.defineProperty(Prism.languages.markup.tag, 'addInlined', {
+  	/**
+  	 * Adds an inlined language to markup.
+  	 *
+  	 * An example of an inlined language is CSS with `<style>` tags.
+  	 *
+  	 * @param {string} tagName The name of the tag that contains the inlined language. This name will be treated as
+  	 * case insensitive.
+  	 * @param {string} lang The language key.
+  	 * @example
+  	 * addInlined('style', 'css');
+  	 */
+  	value: function addInlined(tagName, lang) {
+  		var includedCdataInside = {};
+  		includedCdataInside['language-' + lang] = {
+  			pattern: /(^<!\[CDATA\[)[\s\S]+?(?=\]\]>$)/i,
+  			lookbehind: true,
+  			inside: Prism.languages[lang]
+  		};
+  		includedCdataInside['cdata'] = /^<!\[CDATA\[|\]\]>$/i;
+
+  		var inside = {
+  			'included-cdata': {
+  				pattern: /<!\[CDATA\[[\s\S]*?\]\]>/i,
+  				inside: includedCdataInside
+  			}
+  		};
+  		inside['language-' + lang] = {
+  			pattern: /[\s\S]+/,
+  			inside: Prism.languages[lang]
+  		};
+
+  		var def = {};
+  		def[tagName] = {
+  			pattern: RegExp(/(<__[^>]*>)(?:<!\[CDATA\[(?:[^\]]|\](?!\]>))*\]\]>|(?!<!\[CDATA\[)[\s\S])*?(?=<\/__>)/.source.replace(/__/g, function () { return tagName; }), 'i'),
+  			lookbehind: true,
+  			greedy: true,
+  			inside: inside
+  		};
+
+  		Prism.languages.insertBefore('markup', 'cdata', def);
+  	}
+  });
+  Object.defineProperty(Prism.languages.markup.tag, 'addAttribute', {
+  	/**
+  	 * Adds an pattern to highlight languages embedded in HTML attributes.
+  	 *
+  	 * An example of an inlined language is CSS with `style` attributes.
+  	 *
+  	 * @param {string} attrName The name of the tag that contains the inlined language. This name will be treated as
+  	 * case insensitive.
+  	 * @param {string} lang The language key.
+  	 * @example
+  	 * addAttribute('style', 'css');
+  	 */
+  	value: function (attrName, lang) {
+  		Prism.languages.markup.tag.inside['special-attr'].push({
+  			pattern: RegExp(
+  				/(^|["'\s])/.source + '(?:' + attrName + ')' + /\s*=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+(?=[\s>]))/.source,
+  				'i'
+  			),
+  			lookbehind: true,
+  			inside: {
+  				'attr-name': /^[^\s=]+/,
+  				'attr-value': {
+  					pattern: /=[\s\S]+/,
+  					inside: {
+  						'value': {
+  							pattern: /(^=\s*(["']|(?!["'])))\S[\s\S]*(?=\2$)/,
+  							lookbehind: true,
+  							alias: [lang, 'language-' + lang],
+  							inside: Prism.languages[lang]
+  						},
+  						'punctuation': [
+  							{
+  								pattern: /^=/,
+  								alias: 'attr-equals'
+  							},
+  							/"|'/
+  						]
+  					}
+  				}
+  			}
+  		});
+  	}
+  });
+
+  Prism.languages.html = Prism.languages.markup;
+  Prism.languages.mathml = Prism.languages.markup;
+  Prism.languages.svg = Prism.languages.markup;
+
+  Prism.languages.xml = Prism.languages.extend('markup', {});
+  Prism.languages.ssml = Prism.languages.xml;
+  Prism.languages.atom = Prism.languages.xml;
+  Prism.languages.rss = Prism.languages.xml;
+
+
+  /* **********************************************
+       Begin prism-css.js
+  ********************************************** */
+
+  (function (Prism) {
+
+  	var string = /(?:"(?:\\(?:\r\n|[\s\S])|[^"\\\r\n])*"|'(?:\\(?:\r\n|[\s\S])|[^'\\\r\n])*')/;
+
+  	Prism.languages.css = {
+  		'comment': /\/\*[\s\S]*?\*\//,
+  		'atrule': {
+  			pattern: RegExp('@[\\w-](?:' + /[^;{\s"']|\s+(?!\s)/.source + '|' + string.source + ')*?' + /(?:;|(?=\s*\{))/.source),
+  			inside: {
+  				'rule': /^@[\w-]+/,
+  				'selector-function-argument': {
+  					pattern: /(\bselector\s*\(\s*(?![\s)]))(?:[^()\s]|\s+(?![\s)])|\((?:[^()]|\([^()]*\))*\))+(?=\s*\))/,
+  					lookbehind: true,
+  					alias: 'selector'
+  				},
+  				'keyword': {
+  					pattern: /(^|[^\w-])(?:and|not|only|or)(?![\w-])/,
+  					lookbehind: true
+  				}
+  				// See rest below
+  			}
+  		},
+  		'url': {
+  			// https://drafts.csswg.org/css-values-3/#urls
+  			pattern: RegExp('\\burl\\((?:' + string.source + '|' + /(?:[^\\\r\n()"']|\\[\s\S])*/.source + ')\\)', 'i'),
+  			greedy: true,
+  			inside: {
+  				'function': /^url/i,
+  				'punctuation': /^\(|\)$/,
+  				'string': {
+  					pattern: RegExp('^' + string.source + '$'),
+  					alias: 'url'
+  				}
+  			}
+  		},
+  		'selector': {
+  			pattern: RegExp('(^|[{}\\s])[^{}\\s](?:[^{};"\'\\s]|\\s+(?![\\s{])|' + string.source + ')*(?=\\s*\\{)'),
+  			lookbehind: true
+  		},
+  		'string': {
+  			pattern: string,
+  			greedy: true
+  		},
+  		'property': {
+  			pattern: /(^|[^-\w\xA0-\uFFFF])(?!\s)[-_a-z\xA0-\uFFFF](?:(?!\s)[-\w\xA0-\uFFFF])*(?=\s*:)/i,
+  			lookbehind: true
+  		},
+  		'important': /!important\b/i,
+  		'function': {
+  			pattern: /(^|[^-a-z0-9])[-a-z0-9]+(?=\()/i,
+  			lookbehind: true
+  		},
+  		'punctuation': /[(){};:,]/
+  	};
+
+  	Prism.languages.css['atrule'].inside.rest = Prism.languages.css;
+
+  	var markup = Prism.languages.markup;
+  	if (markup) {
+  		markup.tag.addInlined('style', 'css');
+  		markup.tag.addAttribute('style', 'css');
+  	}
+
+  }(Prism));
+
+
+  /* **********************************************
+       Begin prism-clike.js
+  ********************************************** */
+
+  Prism.languages.clike = {
+  	'comment': [
+  		{
+  			pattern: /(^|[^\\])\/\*[\s\S]*?(?:\*\/|$)/,
+  			lookbehind: true,
+  			greedy: true
+  		},
+  		{
+  			pattern: /(^|[^\\:])\/\/.*/,
+  			lookbehind: true,
+  			greedy: true
+  		}
+  	],
+  	'string': {
+  		pattern: /(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,
+  		greedy: true
+  	},
+  	'class-name': {
+  		pattern: /(\b(?:class|extends|implements|instanceof|interface|new|trait)\s+|\bcatch\s+\()[\w.\\]+/i,
+  		lookbehind: true,
+  		inside: {
+  			'punctuation': /[.\\]/
+  		}
+  	},
+  	'keyword': /\b(?:break|catch|continue|do|else|finally|for|function|if|in|instanceof|new|null|return|throw|try|while)\b/,
+  	'boolean': /\b(?:false|true)\b/,
+  	'function': /\b\w+(?=\()/,
+  	'number': /\b0x[\da-f]+\b|(?:\b\d+(?:\.\d*)?|\B\.\d+)(?:e[+-]?\d+)?/i,
+  	'operator': /[<>]=?|[!=]=?=?|--?|\+\+?|&&?|\|\|?|[?*/~^%]/,
+  	'punctuation': /[{}[\];(),.:]/
+  };
+
+
+  /* **********************************************
+       Begin prism-javascript.js
+  ********************************************** */
+
+  Prism.languages.javascript = Prism.languages.extend('clike', {
+  	'class-name': [
+  		Prism.languages.clike['class-name'],
+  		{
+  			pattern: /(^|[^$\w\xA0-\uFFFF])(?!\s)[_$A-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\.(?:constructor|prototype))/,
+  			lookbehind: true
+  		}
+  	],
+  	'keyword': [
+  		{
+  			pattern: /((?:^|\})\s*)catch\b/,
+  			lookbehind: true
+  		},
+  		{
+  			pattern: /(^|[^.]|\.\.\.\s*)\b(?:as|assert(?=\s*\{)|async(?=\s*(?:function\b|\(|[$\w\xA0-\uFFFF]|$))|await|break|case|class|const|continue|debugger|default|delete|do|else|enum|export|extends|finally(?=\s*(?:\{|$))|for|from(?=\s*(?:['"]|$))|function|(?:get|set)(?=\s*(?:[#\[$\w\xA0-\uFFFF]|$))|if|implements|import|in|instanceof|interface|let|new|null|of|package|private|protected|public|return|static|super|switch|this|throw|try|typeof|undefined|var|void|while|with|yield)\b/,
+  			lookbehind: true
+  		},
+  	],
+  	// Allow for all non-ASCII characters (See http://stackoverflow.com/a/2008444)
+  	'function': /#?(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*(?:\.\s*(?:apply|bind|call)\s*)?\()/,
+  	'number': {
+  		pattern: RegExp(
+  			/(^|[^\w$])/.source +
+  			'(?:' +
+  			(
+  				// constant
+  				/NaN|Infinity/.source +
+  				'|' +
+  				// binary integer
+  				/0[bB][01]+(?:_[01]+)*n?/.source +
+  				'|' +
+  				// octal integer
+  				/0[oO][0-7]+(?:_[0-7]+)*n?/.source +
+  				'|' +
+  				// hexadecimal integer
+  				/0[xX][\dA-Fa-f]+(?:_[\dA-Fa-f]+)*n?/.source +
+  				'|' +
+  				// decimal bigint
+  				/\d+(?:_\d+)*n/.source +
+  				'|' +
+  				// decimal number (integer or float) but no bigint
+  				/(?:\d+(?:_\d+)*(?:\.(?:\d+(?:_\d+)*)?)?|\.\d+(?:_\d+)*)(?:[Ee][+-]?\d+(?:_\d+)*)?/.source
+  			) +
+  			')' +
+  			/(?![\w$])/.source
+  		),
+  		lookbehind: true
+  	},
+  	'operator': /--|\+\+|\*\*=?|=>|&&=?|\|\|=?|[!=]==|<<=?|>>>?=?|[-+*/%&|^!=<>]=?|\.{3}|\?\?=?|\?\.?|[~:]/
+  });
+
+  Prism.languages.javascript['class-name'][0].pattern = /(\b(?:class|extends|implements|instanceof|interface|new)\s+)[\w.\\]+/;
+
+  Prism.languages.insertBefore('javascript', 'keyword', {
+  	'regex': {
+  		pattern: RegExp(
+  			// lookbehind
+  			// eslint-disable-next-line regexp/no-dupe-characters-character-class
+  			/((?:^|[^$\w\xA0-\uFFFF."'\])\s]|\b(?:return|yield))\s*)/.source +
+  			// Regex pattern:
+  			// There are 2 regex patterns here. The RegExp set notation proposal added support for nested character
+  			// classes if the `v` flag is present. Unfortunately, nested CCs are both context-free and incompatible
+  			// with the only syntax, so we have to define 2 different regex patterns.
+  			/\//.source +
+  			'(?:' +
+  			/(?:\[(?:[^\]\\\r\n]|\\.)*\]|\\.|[^/\\\[\r\n])+\/[dgimyus]{0,7}/.source +
+  			'|' +
+  			// `v` flag syntax. This supports 3 levels of nested character classes.
+  			/(?:\[(?:[^[\]\\\r\n]|\\.|\[(?:[^[\]\\\r\n]|\\.|\[(?:[^[\]\\\r\n]|\\.)*\])*\])*\]|\\.|[^/\\\[\r\n])+\/[dgimyus]{0,7}v[dgimyus]{0,7}/.source +
+  			')' +
+  			// lookahead
+  			/(?=(?:\s|\/\*(?:[^*]|\*(?!\/))*\*\/)*(?:$|[\r\n,.;:})\]]|\/\/))/.source
+  		),
+  		lookbehind: true,
+  		greedy: true,
+  		inside: {
+  			'regex-source': {
+  				pattern: /^(\/)[\s\S]+(?=\/[a-z]*$)/,
+  				lookbehind: true,
+  				alias: 'language-regex',
+  				inside: Prism.languages.regex
+  			},
+  			'regex-delimiter': /^\/|\/$/,
+  			'regex-flags': /^[a-z]+$/,
+  		}
+  	},
+  	// This must be declared before keyword because we use "function" inside the look-forward
+  	'function-variable': {
+  		pattern: /#?(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*[=:]\s*(?:async\s*)?(?:\bfunction\b|(?:\((?:[^()]|\([^()]*\))*\)|(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*)\s*=>))/,
+  		alias: 'function'
+  	},
+  	'parameter': [
+  		{
+  			pattern: /(function(?:\s+(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*)?\s*\(\s*)(?!\s)(?:[^()\s]|\s+(?![\s)])|\([^()]*\))+(?=\s*\))/,
+  			lookbehind: true,
+  			inside: Prism.languages.javascript
+  		},
+  		{
+  			pattern: /(^|[^$\w\xA0-\uFFFF])(?!\s)[_$a-z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*=>)/i,
+  			lookbehind: true,
+  			inside: Prism.languages.javascript
+  		},
+  		{
+  			pattern: /(\(\s*)(?!\s)(?:[^()\s]|\s+(?![\s)])|\([^()]*\))+(?=\s*\)\s*=>)/,
+  			lookbehind: true,
+  			inside: Prism.languages.javascript
+  		},
+  		{
+  			pattern: /((?:\b|\s|^)(?!(?:as|async|await|break|case|catch|class|const|continue|debugger|default|delete|do|else|enum|export|extends|finally|for|from|function|get|if|implements|import|in|instanceof|interface|let|new|null|of|package|private|protected|public|return|set|static|super|switch|this|throw|try|typeof|undefined|var|void|while|with|yield)(?![$\w\xA0-\uFFFF]))(?:(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*\s*)\(\s*|\]\s*\(\s*)(?!\s)(?:[^()\s]|\s+(?![\s)])|\([^()]*\))+(?=\s*\)\s*\{)/,
+  			lookbehind: true,
+  			inside: Prism.languages.javascript
+  		}
+  	],
+  	'constant': /\b[A-Z](?:[A-Z_]|\dx?)*\b/
+  });
+
+  Prism.languages.insertBefore('javascript', 'string', {
+  	'hashbang': {
+  		pattern: /^#!.*/,
+  		greedy: true,
+  		alias: 'comment'
+  	},
+  	'template-string': {
+  		pattern: /`(?:\\[\s\S]|\$\{(?:[^{}]|\{(?:[^{}]|\{[^}]*\})*\})+\}|(?!\$\{)[^\\`])*`/,
+  		greedy: true,
+  		inside: {
+  			'template-punctuation': {
+  				pattern: /^`|`$/,
+  				alias: 'string'
+  			},
+  			'interpolation': {
+  				pattern: /((?:^|[^\\])(?:\\{2})*)\$\{(?:[^{}]|\{(?:[^{}]|\{[^}]*\})*\})+\}/,
+  				lookbehind: true,
+  				inside: {
+  					'interpolation-punctuation': {
+  						pattern: /^\$\{|\}$/,
+  						alias: 'punctuation'
+  					},
+  					rest: Prism.languages.javascript
+  				}
+  			},
+  			'string': /[\s\S]+/
+  		}
+  	},
+  	'string-property': {
+  		pattern: /((?:^|[,{])[ \t]*)(["'])(?:\\(?:\r\n|[\s\S])|(?!\2)[^\\\r\n])*\2(?=\s*:)/m,
+  		lookbehind: true,
+  		greedy: true,
+  		alias: 'property'
+  	}
+  });
+
+  Prism.languages.insertBefore('javascript', 'operator', {
+  	'literal-property': {
+  		pattern: /((?:^|[,{])[ \t]*)(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*:)/m,
+  		lookbehind: true,
+  		alias: 'property'
+  	},
+  });
+
+  if (Prism.languages.markup) {
+  	Prism.languages.markup.tag.addInlined('script', 'javascript');
+
+  	// add attribute support for all DOM events.
+  	// https://developer.mozilla.org/en-US/docs/Web/Events#Standard_events
+  	Prism.languages.markup.tag.addAttribute(
+  		/on(?:abort|blur|change|click|composition(?:end|start|update)|dblclick|error|focus(?:in|out)?|key(?:down|up)|load|mouse(?:down|enter|leave|move|out|over|up)|reset|resize|scroll|select|slotchange|submit|unload|wheel)/.source,
+  		'javascript'
+  	);
+  }
+
+  Prism.languages.js = Prism.languages.javascript;
+
+
+  /* **********************************************
+       Begin prism-file-highlight.js
+  ********************************************** */
+
+  (function () {
+
+  	if (typeof Prism === 'undefined' || typeof document === 'undefined') {
+  		return;
+  	}
+
+  	// https://developer.mozilla.org/en-US/docs/Web/API/Element/matches#Polyfill
+  	if (!Element.prototype.matches) {
+  		Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
+  	}
+
+  	var LOADING_MESSAGE = 'Loading…';
+  	var FAILURE_MESSAGE = function (status, message) {
+  		return '✖ Error ' + status + ' while fetching file: ' + message;
+  	};
+  	var FAILURE_EMPTY_MESSAGE = '✖ Error: File does not exist or is empty';
+
+  	var EXTENSIONS = {
+  		'js': 'javascript',
+  		'py': 'python',
+  		'rb': 'ruby',
+  		'ps1': 'powershell',
+  		'psm1': 'powershell',
+  		'sh': 'bash',
+  		'bat': 'batch',
+  		'h': 'c',
+  		'tex': 'latex'
+  	};
+
+  	var STATUS_ATTR = 'data-src-status';
+  	var STATUS_LOADING = 'loading';
+  	var STATUS_LOADED = 'loaded';
+  	var STATUS_FAILED = 'failed';
+
+  	var SELECTOR = 'pre[data-src]:not([' + STATUS_ATTR + '="' + STATUS_LOADED + '"])'
+  		+ ':not([' + STATUS_ATTR + '="' + STATUS_LOADING + '"])';
+
+  	/**
+  	 * Loads the given file.
+  	 *
+  	 * @param {string} src The URL or path of the source file to load.
+  	 * @param {(result: string) => void} success
+  	 * @param {(reason: string) => void} error
+  	 */
+  	function loadFile(src, success, error) {
+  		var xhr = new XMLHttpRequest();
+  		xhr.open('GET', src, true);
+  		xhr.onreadystatechange = function () {
+  			if (xhr.readyState == 4) {
+  				if (xhr.status < 400 && xhr.responseText) {
+  					success(xhr.responseText);
+  				} else {
+  					if (xhr.status >= 400) {
+  						error(FAILURE_MESSAGE(xhr.status, xhr.statusText));
+  					} else {
+  						error(FAILURE_EMPTY_MESSAGE);
+  					}
+  				}
+  			}
+  		};
+  		xhr.send(null);
+  	}
+
+  	/**
+  	 * Parses the given range.
+  	 *
+  	 * This returns a range with inclusive ends.
+  	 *
+  	 * @param {string | null | undefined} range
+  	 * @returns {[number, number | undefined] | undefined}
+  	 */
+  	function parseRange(range) {
+  		var m = /^\s*(\d+)\s*(?:(,)\s*(?:(\d+)\s*)?)?$/.exec(range || '');
+  		if (m) {
+  			var start = Number(m[1]);
+  			var comma = m[2];
+  			var end = m[3];
+
+  			if (!comma) {
+  				return [start, start];
+  			}
+  			if (!end) {
+  				return [start, undefined];
+  			}
+  			return [start, Number(end)];
+  		}
+  		return undefined;
+  	}
+
+  	Prism.hooks.add('before-highlightall', function (env) {
+  		env.selector += ', ' + SELECTOR;
+  	});
+
+  	Prism.hooks.add('before-sanity-check', function (env) {
+  		var pre = /** @type {HTMLPreElement} */ (env.element);
+  		if (pre.matches(SELECTOR)) {
+  			env.code = ''; // fast-path the whole thing and go to complete
+
+  			pre.setAttribute(STATUS_ATTR, STATUS_LOADING); // mark as loading
+
+  			// add code element with loading message
+  			var code = pre.appendChild(document.createElement('CODE'));
+  			code.textContent = LOADING_MESSAGE;
+
+  			var src = pre.getAttribute('data-src');
+
+  			var language = env.language;
+  			if (language === 'none') {
+  				// the language might be 'none' because there is no language set;
+  				// in this case, we want to use the extension as the language
+  				var extension = (/\.(\w+)$/.exec(src) || [, 'none'])[1];
+  				language = EXTENSIONS[extension] || extension;
+  			}
+
+  			// set language classes
+  			Prism.util.setLanguage(code, language);
+  			Prism.util.setLanguage(pre, language);
+
+  			// preload the language
+  			var autoloader = Prism.plugins.autoloader;
+  			if (autoloader) {
+  				autoloader.loadLanguages(language);
+  			}
+
+  			// load file
+  			loadFile(
+  				src,
+  				function (text) {
+  					// mark as loaded
+  					pre.setAttribute(STATUS_ATTR, STATUS_LOADED);
+
+  					// handle data-range
+  					var range = parseRange(pre.getAttribute('data-range'));
+  					if (range) {
+  						var lines = text.split(/\r\n?|\n/g);
+
+  						// the range is one-based and inclusive on both ends
+  						var start = range[0];
+  						var end = range[1] == null ? lines.length : range[1];
+
+  						if (start < 0) { start += lines.length; }
+  						start = Math.max(0, Math.min(start - 1, lines.length));
+  						if (end < 0) { end += lines.length; }
+  						end = Math.max(0, Math.min(end, lines.length));
+
+  						text = lines.slice(start, end).join('\n');
+
+  						// add data-start for line numbers
+  						if (!pre.hasAttribute('data-start')) {
+  							pre.setAttribute('data-start', String(start + 1));
+  						}
+  					}
+
+  					// highlight code
+  					code.textContent = text;
+  					Prism.highlightElement(code);
+  				},
+  				function (error) {
+  					// mark as failed
+  					pre.setAttribute(STATUS_ATTR, STATUS_FAILED);
+
+  					code.textContent = error;
+  				}
+  			);
+  		}
+  	});
+
+  	Prism.plugins.fileHighlight = {
+  		/**
+  		 * Executes the File Highlight plugin for all matching `pre` elements under the given container.
+  		 *
+  		 * Note: Elements which are already loaded or currently loading will not be touched by this method.
+  		 *
+  		 * @param {ParentNode} [container=document]
+  		 */
+  		highlight: function highlight(container) {
+  			var elements = (container || document).querySelectorAll(SELECTOR);
+
+  			for (var i = 0, element; (element = elements[i++]);) {
+  				Prism.highlightElement(element);
+  			}
+  		}
+  	};
+
+  	var logged = false;
+  	/** @deprecated Use `Prism.plugins.fileHighlight.highlight` instead. */
+  	Prism.fileHighlight = function () {
+  		if (!logged) {
+  			console.warn('Prism.fileHighlight is deprecated. Use `Prism.plugins.fileHighlight.highlight` instead.');
+  			logged = true;
+  		}
+  		Prism.plugins.fileHighlight.highlight.apply(this, arguments);
+  	};
+
+  }());
+  });
+
+  Prism.languages.python = {
+  	'comment': {
+  		pattern: /(^|[^\\])#.*/,
+  		lookbehind: true,
+  		greedy: true
+  	},
+  	'string-interpolation': {
+  		pattern: /(?:f|fr|rf)(?:("""|''')[\s\S]*?\1|("|')(?:\\.|(?!\2)[^\\\r\n])*\2)/i,
+  		greedy: true,
+  		inside: {
+  			'interpolation': {
+  				// "{" <expression> <optional "!s", "!r", or "!a"> <optional ":" format specifier> "}"
+  				pattern: /((?:^|[^{])(?:\{\{)*)\{(?!\{)(?:[^{}]|\{(?!\{)(?:[^{}]|\{(?!\{)(?:[^{}])+\})+\})+\}/,
+  				lookbehind: true,
+  				inside: {
+  					'format-spec': {
+  						pattern: /(:)[^:(){}]+(?=\}$)/,
+  						lookbehind: true
+  					},
+  					'conversion-option': {
+  						pattern: /![sra](?=[:}]$)/,
+  						alias: 'punctuation'
+  					},
+  					rest: null
+  				}
+  			},
+  			'string': /[\s\S]+/
+  		}
+  	},
+  	'triple-quoted-string': {
+  		pattern: /(?:[rub]|br|rb)?("""|''')[\s\S]*?\1/i,
+  		greedy: true,
+  		alias: 'string'
+  	},
+  	'string': {
+  		pattern: /(?:[rub]|br|rb)?("|')(?:\\.|(?!\1)[^\\\r\n])*\1/i,
+  		greedy: true
+  	},
+  	'function': {
+  		pattern: /((?:^|\s)def[ \t]+)[a-zA-Z_]\w*(?=\s*\()/g,
+  		lookbehind: true
+  	},
+  	'class-name': {
+  		pattern: /(\bclass\s+)\w+/i,
+  		lookbehind: true
+  	},
+  	'decorator': {
+  		pattern: /(^[\t ]*)@\w+(?:\.\w+)*/m,
+  		lookbehind: true,
+  		alias: ['annotation', 'punctuation'],
+  		inside: {
+  			'punctuation': /\./
+  		}
+  	},
+  	'keyword': /\b(?:_(?=\s*:)|and|as|assert|async|await|break|case|class|continue|def|del|elif|else|except|exec|finally|for|from|global|if|import|in|is|lambda|match|nonlocal|not|or|pass|print|raise|return|try|while|with|yield)\b/,
+  	'builtin': /\b(?:__import__|abs|all|any|apply|ascii|basestring|bin|bool|buffer|bytearray|bytes|callable|chr|classmethod|cmp|coerce|compile|complex|delattr|dict|dir|divmod|enumerate|eval|execfile|file|filter|float|format|frozenset|getattr|globals|hasattr|hash|help|hex|id|input|int|intern|isinstance|issubclass|iter|len|list|locals|long|map|max|memoryview|min|next|object|oct|open|ord|pow|property|range|raw_input|reduce|reload|repr|reversed|round|set|setattr|slice|sorted|staticmethod|str|sum|super|tuple|type|unichr|unicode|vars|xrange|zip)\b/,
+  	'boolean': /\b(?:False|None|True)\b/,
+  	'number': /\b0(?:b(?:_?[01])+|o(?:_?[0-7])+|x(?:_?[a-f0-9])+)\b|(?:\b\d+(?:_\d+)*(?:\.(?:\d+(?:_\d+)*)?)?|\B\.\d+(?:_\d+)*)(?:e[+-]?\d+(?:_\d+)*)?j?(?!\w)/i,
+  	'operator': /[-+%=]=?|!=|:=|\*\*?=?|\/\/?=?|<[<=>]?|>[=>]?|[&|^~]/,
+  	'punctuation': /[{}[\];(),.:]/
+  };
+
+  Prism.languages.python['string-interpolation'].inside['interpolation'].inside.rest = Prism.languages.python;
+
+  Prism.languages.py = Prism.languages.python;
+
+  Prism.languages.clike = {
+  	'comment': [
+  		{
+  			pattern: /(^|[^\\])\/\*[\s\S]*?(?:\*\/|$)/,
+  			lookbehind: true,
+  			greedy: true
+  		},
+  		{
+  			pattern: /(^|[^\\:])\/\/.*/,
+  			lookbehind: true,
+  			greedy: true
+  		}
+  	],
+  	'string': {
+  		pattern: /(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,
+  		greedy: true
+  	},
+  	'class-name': {
+  		pattern: /(\b(?:class|extends|implements|instanceof|interface|new|trait)\s+|\bcatch\s+\()[\w.\\]+/i,
+  		lookbehind: true,
+  		inside: {
+  			'punctuation': /[.\\]/
+  		}
+  	},
+  	'keyword': /\b(?:break|catch|continue|do|else|finally|for|function|if|in|instanceof|new|null|return|throw|try|while)\b/,
+  	'boolean': /\b(?:false|true)\b/,
+  	'function': /\b\w+(?=\()/,
+  	'number': /\b0x[\da-f]+\b|(?:\b\d+(?:\.\d*)?|\B\.\d+)(?:e[+-]?\d+)?/i,
+  	'operator': /[<>]=?|[!=]=?=?|--?|\+\+?|&&?|\|\|?|[?*/~^%]/,
+  	'punctuation': /[{}[\];(),.:]/
+  };
+
+  Prism.languages.lua = {
+  	'comment': /^#!.+|--(?:\[(=*)\[[\s\S]*?\]\1\]|.*)/m,
+  	// \z may be used to skip the following space
+  	'string': {
+  		pattern: /(["'])(?:(?!\1)[^\\\r\n]|\\z(?:\r\n|\s)|\\(?:\r\n|[^z]))*\1|\[(=*)\[[\s\S]*?\]\2\]/,
+  		greedy: true
+  	},
+  	'number': /\b0x[a-f\d]+(?:\.[a-f\d]*)?(?:p[+-]?\d+)?\b|\b\d+(?:\.\B|(?:\.\d*)?(?:e[+-]?\d+)?\b)|\B\.\d+(?:e[+-]?\d+)?\b/i,
+  	'keyword': /\b(?:and|break|do|else|elseif|end|false|for|function|goto|if|in|local|nil|not|or|repeat|return|then|true|until|while)\b/,
+  	'function': /(?!\d)\w+(?=\s*(?:[({]))/,
+  	'operator': [
+  		/[-+*%^&|#]|\/\/?|<[<=]?|>[>=]?|[=~]=?/,
+  		{
+  			// Match ".." but don't break "..."
+  			pattern: /(^|[^.])\.\.(?!\.)/,
+  			lookbehind: true
+  		}
+  	],
+  	'punctuation': /[\[\](){},;]|\.+|:+/
+  };
+
+  (function (Prism) {
+  	// $ set | grep '^[A-Z][^[:space:]]*=' | cut -d= -f1 | tr '\n' '|'
+  	// + LC_ALL, RANDOM, REPLY, SECONDS.
+  	// + make sure PS1..4 are here as they are not always set,
+  	// - some useless things.
+  	var envVars = '\\b(?:BASH|BASHOPTS|BASH_ALIASES|BASH_ARGC|BASH_ARGV|BASH_CMDS|BASH_COMPLETION_COMPAT_DIR|BASH_LINENO|BASH_REMATCH|BASH_SOURCE|BASH_VERSINFO|BASH_VERSION|COLORTERM|COLUMNS|COMP_WORDBREAKS|DBUS_SESSION_BUS_ADDRESS|DEFAULTS_PATH|DESKTOP_SESSION|DIRSTACK|DISPLAY|EUID|GDMSESSION|GDM_LANG|GNOME_KEYRING_CONTROL|GNOME_KEYRING_PID|GPG_AGENT_INFO|GROUPS|HISTCONTROL|HISTFILE|HISTFILESIZE|HISTSIZE|HOME|HOSTNAME|HOSTTYPE|IFS|INSTANCE|JOB|LANG|LANGUAGE|LC_ADDRESS|LC_ALL|LC_IDENTIFICATION|LC_MEASUREMENT|LC_MONETARY|LC_NAME|LC_NUMERIC|LC_PAPER|LC_TELEPHONE|LC_TIME|LESSCLOSE|LESSOPEN|LINES|LOGNAME|LS_COLORS|MACHTYPE|MAILCHECK|MANDATORY_PATH|NO_AT_BRIDGE|OLDPWD|OPTERR|OPTIND|ORBIT_SOCKETDIR|OSTYPE|PAPERSIZE|PATH|PIPESTATUS|PPID|PS1|PS2|PS3|PS4|PWD|RANDOM|REPLY|SECONDS|SELINUX_INIT|SESSION|SESSIONTYPE|SESSION_MANAGER|SHELL|SHELLOPTS|SHLVL|SSH_AUTH_SOCK|TERM|UID|UPSTART_EVENTS|UPSTART_INSTANCE|UPSTART_JOB|UPSTART_SESSION|USER|WINDOWID|XAUTHORITY|XDG_CONFIG_DIRS|XDG_CURRENT_DESKTOP|XDG_DATA_DIRS|XDG_GREETER_DATA_DIR|XDG_MENU_PREFIX|XDG_RUNTIME_DIR|XDG_SEAT|XDG_SEAT_PATH|XDG_SESSION_DESKTOP|XDG_SESSION_ID|XDG_SESSION_PATH|XDG_SESSION_TYPE|XDG_VTNR|XMODIFIERS)\\b';
+
+  	var commandAfterHeredoc = {
+  		pattern: /(^(["']?)\w+\2)[ \t]+\S.*/,
+  		lookbehind: true,
+  		alias: 'punctuation', // this looks reasonably well in all themes
+  		inside: null // see below
+  	};
+
+  	var insideString = {
+  		'bash': commandAfterHeredoc,
+  		'environment': {
+  			pattern: RegExp('\\$' + envVars),
+  			alias: 'constant'
+  		},
+  		'variable': [
+  			// [0]: Arithmetic Environment
+  			{
+  				pattern: /\$?\(\([\s\S]+?\)\)/,
+  				greedy: true,
+  				inside: {
+  					// If there is a $ sign at the beginning highlight $(( and )) as variable
+  					'variable': [
+  						{
+  							pattern: /(^\$\(\([\s\S]+)\)\)/,
+  							lookbehind: true
+  						},
+  						/^\$\(\(/
+  					],
+  					'number': /\b0x[\dA-Fa-f]+\b|(?:\b\d+(?:\.\d*)?|\B\.\d+)(?:[Ee]-?\d+)?/,
+  					// Operators according to https://www.gnu.org/software/bash/manual/bashref.html#Shell-Arithmetic
+  					'operator': /--|\+\+|\*\*=?|<<=?|>>=?|&&|\|\||[=!+\-*/%<>^&|]=?|[?~:]/,
+  					// If there is no $ sign at the beginning highlight (( and )) as punctuation
+  					'punctuation': /\(\(?|\)\)?|,|;/
+  				}
+  			},
+  			// [1]: Command Substitution
+  			{
+  				pattern: /\$\((?:\([^)]+\)|[^()])+\)|`[^`]+`/,
+  				greedy: true,
+  				inside: {
+  					'variable': /^\$\(|^`|\)$|`$/
+  				}
+  			},
+  			// [2]: Brace expansion
+  			{
+  				pattern: /\$\{[^}]+\}/,
+  				greedy: true,
+  				inside: {
+  					'operator': /:[-=?+]?|[!\/]|##?|%%?|\^\^?|,,?/,
+  					'punctuation': /[\[\]]/,
+  					'environment': {
+  						pattern: RegExp('(\\{)' + envVars),
+  						lookbehind: true,
+  						alias: 'constant'
+  					}
+  				}
+  			},
+  			/\$(?:\w+|[#?*!@$])/
+  		],
+  		// Escape sequences from echo and printf's manuals, and escaped quotes.
+  		'entity': /\\(?:[abceEfnrtv\\"]|O?[0-7]{1,3}|U[0-9a-fA-F]{8}|u[0-9a-fA-F]{4}|x[0-9a-fA-F]{1,2})/
+  	};
+
+  	Prism.languages.bash = {
+  		'shebang': {
+  			pattern: /^#!\s*\/.*/,
+  			alias: 'important'
+  		},
+  		'comment': {
+  			pattern: /(^|[^"{\\$])#.*/,
+  			lookbehind: true
+  		},
+  		'function-name': [
+  			// a) function foo {
+  			// b) foo() {
+  			// c) function foo() {
+  			// but not “foo {”
+  			{
+  				// a) and c)
+  				pattern: /(\bfunction\s+)[\w-]+(?=(?:\s*\(?:\s*\))?\s*\{)/,
+  				lookbehind: true,
+  				alias: 'function'
+  			},
+  			{
+  				// b)
+  				pattern: /\b[\w-]+(?=\s*\(\s*\)\s*\{)/,
+  				alias: 'function'
+  			}
+  		],
+  		// Highlight variable names as variables in for and select beginnings.
+  		'for-or-select': {
+  			pattern: /(\b(?:for|select)\s+)\w+(?=\s+in\s)/,
+  			alias: 'variable',
+  			lookbehind: true
+  		},
+  		// Highlight variable names as variables in the left-hand part
+  		// of assignments (“=” and “+=”).
+  		'assign-left': {
+  			pattern: /(^|[\s;|&]|[<>]\()\w+(?:\.\w+)*(?=\+?=)/,
+  			inside: {
+  				'environment': {
+  					pattern: RegExp('(^|[\\s;|&]|[<>]\\()' + envVars),
+  					lookbehind: true,
+  					alias: 'constant'
+  				}
+  			},
+  			alias: 'variable',
+  			lookbehind: true
+  		},
+  		// Highlight parameter names as variables
+  		'parameter': {
+  			pattern: /(^|\s)-{1,2}(?:\w+:[+-]?)?\w+(?:\.\w+)*(?=[=\s]|$)/,
+  			alias: 'variable',
+  			lookbehind: true
+  		},
+  		'string': [
+  			// Support for Here-documents https://en.wikipedia.org/wiki/Here_document
+  			{
+  				pattern: /((?:^|[^<])<<-?\s*)(\w+)\s[\s\S]*?(?:\r?\n|\r)\2/,
+  				lookbehind: true,
+  				greedy: true,
+  				inside: insideString
+  			},
+  			// Here-document with quotes around the tag
+  			// → No expansion (so no “inside”).
+  			{
+  				pattern: /((?:^|[^<])<<-?\s*)(["'])(\w+)\2\s[\s\S]*?(?:\r?\n|\r)\3/,
+  				lookbehind: true,
+  				greedy: true,
+  				inside: {
+  					'bash': commandAfterHeredoc
+  				}
+  			},
+  			// “Normal” string
+  			{
+  				// https://www.gnu.org/software/bash/manual/html_node/Double-Quotes.html
+  				pattern: /(^|[^\\](?:\\\\)*)"(?:\\[\s\S]|\$\([^)]+\)|\$(?!\()|`[^`]+`|[^"\\`$])*"/,
+  				lookbehind: true,
+  				greedy: true,
+  				inside: insideString
+  			},
+  			{
+  				// https://www.gnu.org/software/bash/manual/html_node/Single-Quotes.html
+  				pattern: /(^|[^$\\])'[^']*'/,
+  				lookbehind: true,
+  				greedy: true
+  			},
+  			{
+  				// https://www.gnu.org/software/bash/manual/html_node/ANSI_002dC-Quoting.html
+  				pattern: /\$'(?:[^'\\]|\\[\s\S])*'/,
+  				greedy: true,
+  				inside: {
+  					'entity': insideString.entity
+  				}
+  			}
+  		],
+  		'environment': {
+  			pattern: RegExp('\\$?' + envVars),
+  			alias: 'constant'
+  		},
+  		'variable': insideString.variable,
+  		'function': {
+  			pattern: /(^|[\s;|&]|[<>]\()(?:add|apropos|apt|apt-cache|apt-get|aptitude|aspell|automysqlbackup|awk|basename|bash|bc|bconsole|bg|bzip2|cal|cargo|cat|cfdisk|chgrp|chkconfig|chmod|chown|chroot|cksum|clear|cmp|column|comm|composer|cp|cron|crontab|csplit|curl|cut|date|dc|dd|ddrescue|debootstrap|df|diff|diff3|dig|dir|dircolors|dirname|dirs|dmesg|docker|docker-compose|du|egrep|eject|env|ethtool|expand|expect|expr|fdformat|fdisk|fg|fgrep|file|find|fmt|fold|format|free|fsck|ftp|fuser|gawk|git|gparted|grep|groupadd|groupdel|groupmod|groups|grub-mkconfig|gzip|halt|head|hg|history|host|hostname|htop|iconv|id|ifconfig|ifdown|ifup|import|install|ip|java|jobs|join|kill|killall|less|link|ln|locate|logname|logrotate|look|lpc|lpr|lprint|lprintd|lprintq|lprm|ls|lsof|lynx|make|man|mc|mdadm|mkconfig|mkdir|mke2fs|mkfifo|mkfs|mkisofs|mknod|mkswap|mmv|more|most|mount|mtools|mtr|mutt|mv|nano|nc|netstat|nice|nl|node|nohup|notify-send|npm|nslookup|op|open|parted|passwd|paste|pathchk|ping|pkill|pnpm|podman|podman-compose|popd|pr|printcap|printenv|ps|pushd|pv|quota|quotacheck|quotactl|ram|rar|rcp|reboot|remsync|rename|renice|rev|rm|rmdir|rpm|rsync|scp|screen|sdiff|sed|sendmail|seq|service|sftp|sh|shellcheck|shuf|shutdown|sleep|slocate|sort|split|ssh|stat|strace|su|sudo|sum|suspend|swapon|sync|sysctl|tac|tail|tar|tee|time|timeout|top|touch|tr|traceroute|tsort|tty|umount|uname|unexpand|uniq|units|unrar|unshar|unzip|update-grub|uptime|useradd|userdel|usermod|users|uudecode|uuencode|v|vcpkg|vdir|vi|vim|virsh|vmstat|wait|watch|wc|wget|whereis|which|who|whoami|write|xargs|xdg-open|yarn|yes|zenity|zip|zsh|zypper)(?=$|[)\s;|&])/,
+  			lookbehind: true
+  		},
+  		'keyword': {
+  			pattern: /(^|[\s;|&]|[<>]\()(?:case|do|done|elif|else|esac|fi|for|function|if|in|select|then|until|while)(?=$|[)\s;|&])/,
+  			lookbehind: true
+  		},
+  		// https://www.gnu.org/software/bash/manual/html_node/Shell-Builtin-Commands.html
+  		'builtin': {
+  			pattern: /(^|[\s;|&]|[<>]\()(?:\.|:|alias|bind|break|builtin|caller|cd|command|continue|declare|echo|enable|eval|exec|exit|export|getopts|hash|help|let|local|logout|mapfile|printf|pwd|read|readarray|readonly|return|set|shift|shopt|source|test|times|trap|type|typeset|ulimit|umask|unalias|unset)(?=$|[)\s;|&])/,
+  			lookbehind: true,
+  			// Alias added to make those easier to distinguish from strings.
+  			alias: 'class-name'
+  		},
+  		'boolean': {
+  			pattern: /(^|[\s;|&]|[<>]\()(?:false|true)(?=$|[)\s;|&])/,
+  			lookbehind: true
+  		},
+  		'file-descriptor': {
+  			pattern: /\B&\d\b/,
+  			alias: 'important'
+  		},
+  		'operator': {
+  			// Lots of redirections here, but not just that.
+  			pattern: /\d?<>|>\||\+=|=[=~]?|!=?|<<[<-]?|[&\d]?>>|\d[<>]&?|[<>][&=]?|&[>&]?|\|[&|]?/,
+  			inside: {
+  				'file-descriptor': {
+  					pattern: /^\d/,
+  					alias: 'important'
+  				}
+  			}
+  		},
+  		'punctuation': /\$?\(\(?|\)\)?|\.\.|[{}[\];\\]/,
+  		'number': {
+  			pattern: /(^|\s)(?:[1-9]\d*|0)(?:[.,]\d+)?\b/,
+  			lookbehind: true
+  		}
+  	};
+
+  	commandAfterHeredoc.inside = Prism.languages.bash;
+
+  	/* Patterns in command substitution. */
+  	var toBeCopied = [
+  		'comment',
+  		'function-name',
+  		'for-or-select',
+  		'assign-left',
+  		'parameter',
+  		'string',
+  		'environment',
+  		'function',
+  		'keyword',
+  		'builtin',
+  		'boolean',
+  		'file-descriptor',
+  		'operator',
+  		'punctuation',
+  		'number'
+  	];
+  	var inside = insideString.variable[1].inside;
+  	for (var i = 0; i < toBeCopied.length; i++) {
+  		inside[toBeCopied[i]] = Prism.languages.bash[toBeCopied[i]];
+  	}
+
+  	Prism.languages.sh = Prism.languages.bash;
+  	Prism.languages.shell = Prism.languages.bash;
+  }(Prism));
+
+  Prism.languages.go = Prism.languages.extend('clike', {
+  	'string': {
+  		pattern: /(^|[^\\])"(?:\\.|[^"\\\r\n])*"|`[^`]*`/,
+  		lookbehind: true,
+  		greedy: true
+  	},
+  	'keyword': /\b(?:break|case|chan|const|continue|default|defer|else|fallthrough|for|func|go(?:to)?|if|import|interface|map|package|range|return|select|struct|switch|type|var)\b/,
+  	'boolean': /\b(?:_|false|iota|nil|true)\b/,
+  	'number': [
+  		// binary and octal integers
+  		/\b0(?:b[01_]+|o[0-7_]+)i?\b/i,
+  		// hexadecimal integers and floats
+  		/\b0x(?:[a-f\d_]+(?:\.[a-f\d_]*)?|\.[a-f\d_]+)(?:p[+-]?\d+(?:_\d+)*)?i?(?!\w)/i,
+  		// decimal integers and floats
+  		/(?:\b\d[\d_]*(?:\.[\d_]*)?|\B\.\d[\d_]*)(?:e[+-]?[\d_]+)?i?(?!\w)/i
+  	],
+  	'operator': /[*\/%^!=]=?|\+[=+]?|-[=-]?|\|[=|]?|&(?:=|&|\^=?)?|>(?:>=?|=)?|<(?:<=?|=|-)?|:=|\.\.\./,
+  	'builtin': /\b(?:append|bool|byte|cap|close|complex|complex(?:64|128)|copy|delete|error|float(?:32|64)|u?int(?:8|16|32|64)?|imag|len|make|new|panic|print(?:ln)?|real|recover|rune|string|uintptr)\b/
+  });
+
+  Prism.languages.insertBefore('go', 'string', {
+  	'char': {
+  		pattern: /'(?:\\.|[^'\\\r\n]){0,10}'/,
+  		greedy: true
+  	}
+  });
+
+  delete Prism.languages.go['class-name'];
+
+  (function (Prism) {
+
+  	// Allow only one line break
+  	var inner = /(?:\\.|[^\\\n\r]|(?:\n|\r\n?)(?![\r\n]))/.source;
+
+  	/**
+  	 * This function is intended for the creation of the bold or italic pattern.
+  	 *
+  	 * This also adds a lookbehind group to the given pattern to ensure that the pattern is not backslash-escaped.
+  	 *
+  	 * _Note:_ Keep in mind that this adds a capturing group.
+  	 *
+  	 * @param {string} pattern
+  	 * @returns {RegExp}
+  	 */
+  	function createInline(pattern) {
+  		pattern = pattern.replace(/<inner>/g, function () { return inner; });
+  		return RegExp(/((?:^|[^\\])(?:\\{2})*)/.source + '(?:' + pattern + ')');
+  	}
+
+
+  	var tableCell = /(?:\\.|``(?:[^`\r\n]|`(?!`))+``|`[^`\r\n]+`|[^\\|\r\n`])+/.source;
+  	var tableRow = /\|?__(?:\|__)+\|?(?:(?:\n|\r\n?)|(?![\s\S]))/.source.replace(/__/g, function () { return tableCell; });
+  	var tableLine = /\|?[ \t]*:?-{3,}:?[ \t]*(?:\|[ \t]*:?-{3,}:?[ \t]*)+\|?(?:\n|\r\n?)/.source;
+
+
+  	Prism.languages.markdown = Prism.languages.extend('markup', {});
+  	Prism.languages.insertBefore('markdown', 'prolog', {
+  		'front-matter-block': {
+  			pattern: /(^(?:\s*[\r\n])?)---(?!.)[\s\S]*?[\r\n]---(?!.)/,
+  			lookbehind: true,
+  			greedy: true,
+  			inside: {
+  				'punctuation': /^---|---$/,
+  				'front-matter': {
+  					pattern: /\S+(?:\s+\S+)*/,
+  					alias: ['yaml', 'language-yaml'],
+  					inside: Prism.languages.yaml
+  				}
+  			}
+  		},
+  		'blockquote': {
+  			// > ...
+  			pattern: /^>(?:[\t ]*>)*/m,
+  			alias: 'punctuation'
+  		},
+  		'table': {
+  			pattern: RegExp('^' + tableRow + tableLine + '(?:' + tableRow + ')*', 'm'),
+  			inside: {
+  				'table-data-rows': {
+  					pattern: RegExp('^(' + tableRow + tableLine + ')(?:' + tableRow + ')*$'),
+  					lookbehind: true,
+  					inside: {
+  						'table-data': {
+  							pattern: RegExp(tableCell),
+  							inside: Prism.languages.markdown
+  						},
+  						'punctuation': /\|/
+  					}
+  				},
+  				'table-line': {
+  					pattern: RegExp('^(' + tableRow + ')' + tableLine + '$'),
+  					lookbehind: true,
+  					inside: {
+  						'punctuation': /\||:?-{3,}:?/
+  					}
+  				},
+  				'table-header-row': {
+  					pattern: RegExp('^' + tableRow + '$'),
+  					inside: {
+  						'table-header': {
+  							pattern: RegExp(tableCell),
+  							alias: 'important',
+  							inside: Prism.languages.markdown
+  						},
+  						'punctuation': /\|/
+  					}
+  				}
+  			}
+  		},
+  		'code': [
+  			{
+  				// Prefixed by 4 spaces or 1 tab and preceded by an empty line
+  				pattern: /((?:^|\n)[ \t]*\n|(?:^|\r\n?)[ \t]*\r\n?)(?: {4}|\t).+(?:(?:\n|\r\n?)(?: {4}|\t).+)*/,
+  				lookbehind: true,
+  				alias: 'keyword'
+  			},
+  			{
+  				// ```optional language
+  				// code block
+  				// ```
+  				pattern: /^```[\s\S]*?^```$/m,
+  				greedy: true,
+  				inside: {
+  					'code-block': {
+  						pattern: /^(```.*(?:\n|\r\n?))[\s\S]+?(?=(?:\n|\r\n?)^```$)/m,
+  						lookbehind: true
+  					},
+  					'code-language': {
+  						pattern: /^(```).+/,
+  						lookbehind: true
+  					},
+  					'punctuation': /```/
+  				}
+  			}
+  		],
+  		'title': [
+  			{
+  				// title 1
+  				// =======
+
+  				// title 2
+  				// -------
+  				pattern: /\S.*(?:\n|\r\n?)(?:==+|--+)(?=[ \t]*$)/m,
+  				alias: 'important',
+  				inside: {
+  					punctuation: /==+$|--+$/
+  				}
+  			},
+  			{
+  				// # title 1
+  				// ###### title 6
+  				pattern: /(^\s*)#.+/m,
+  				lookbehind: true,
+  				alias: 'important',
+  				inside: {
+  					punctuation: /^#+|#+$/
+  				}
+  			}
+  		],
+  		'hr': {
+  			// ***
+  			// ---
+  			// * * *
+  			// -----------
+  			pattern: /(^\s*)([*-])(?:[\t ]*\2){2,}(?=\s*$)/m,
+  			lookbehind: true,
+  			alias: 'punctuation'
+  		},
+  		'list': {
+  			// * item
+  			// + item
+  			// - item
+  			// 1. item
+  			pattern: /(^\s*)(?:[*+-]|\d+\.)(?=[\t ].)/m,
+  			lookbehind: true,
+  			alias: 'punctuation'
+  		},
+  		'url-reference': {
+  			// [id]: http://example.com "Optional title"
+  			// [id]: http://example.com 'Optional title'
+  			// [id]: http://example.com (Optional title)
+  			// [id]: <http://example.com> "Optional title"
+  			pattern: /!?\[[^\]]+\]:[\t ]+(?:\S+|<(?:\\.|[^>\\])+>)(?:[\t ]+(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\((?:\\.|[^)\\])*\)))?/,
+  			inside: {
+  				'variable': {
+  					pattern: /^(!?\[)[^\]]+/,
+  					lookbehind: true
+  				},
+  				'string': /(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\((?:\\.|[^)\\])*\))$/,
+  				'punctuation': /^[\[\]!:]|[<>]/
+  			},
+  			alias: 'url'
+  		},
+  		'bold': {
+  			// **strong**
+  			// __strong__
+
+  			// allow one nested instance of italic text using the same delimiter
+  			pattern: createInline(/\b__(?:(?!_)<inner>|_(?:(?!_)<inner>)+_)+__\b|\*\*(?:(?!\*)<inner>|\*(?:(?!\*)<inner>)+\*)+\*\*/.source),
+  			lookbehind: true,
+  			greedy: true,
+  			inside: {
+  				'content': {
+  					pattern: /(^..)[\s\S]+(?=..$)/,
+  					lookbehind: true,
+  					inside: {} // see below
+  				},
+  				'punctuation': /\*\*|__/
+  			}
+  		},
+  		'italic': {
+  			// *em*
+  			// _em_
+
+  			// allow one nested instance of bold text using the same delimiter
+  			pattern: createInline(/\b_(?:(?!_)<inner>|__(?:(?!_)<inner>)+__)+_\b|\*(?:(?!\*)<inner>|\*\*(?:(?!\*)<inner>)+\*\*)+\*/.source),
+  			lookbehind: true,
+  			greedy: true,
+  			inside: {
+  				'content': {
+  					pattern: /(^.)[\s\S]+(?=.$)/,
+  					lookbehind: true,
+  					inside: {} // see below
+  				},
+  				'punctuation': /[*_]/
+  			}
+  		},
+  		'strike': {
+  			// ~~strike through~~
+  			// ~strike~
+  			// eslint-disable-next-line regexp/strict
+  			pattern: createInline(/(~~?)(?:(?!~)<inner>)+\2/.source),
+  			lookbehind: true,
+  			greedy: true,
+  			inside: {
+  				'content': {
+  					pattern: /(^~~?)[\s\S]+(?=\1$)/,
+  					lookbehind: true,
+  					inside: {} // see below
+  				},
+  				'punctuation': /~~?/
+  			}
+  		},
+  		'code-snippet': {
+  			// `code`
+  			// ``code``
+  			pattern: /(^|[^\\`])(?:``[^`\r\n]+(?:`[^`\r\n]+)*``(?!`)|`[^`\r\n]+`(?!`))/,
+  			lookbehind: true,
+  			greedy: true,
+  			alias: ['code', 'keyword']
+  		},
+  		'url': {
+  			// [example](http://example.com "Optional title")
+  			// [example][id]
+  			// [example] [id]
+  			pattern: createInline(/!?\[(?:(?!\])<inner>)+\](?:\([^\s)]+(?:[\t ]+"(?:\\.|[^"\\])*")?\)|[ \t]?\[(?:(?!\])<inner>)+\])/.source),
+  			lookbehind: true,
+  			greedy: true,
+  			inside: {
+  				'operator': /^!/,
+  				'content': {
+  					pattern: /(^\[)[^\]]+(?=\])/,
+  					lookbehind: true,
+  					inside: {} // see below
+  				},
+  				'variable': {
+  					pattern: /(^\][ \t]?\[)[^\]]+(?=\]$)/,
+  					lookbehind: true
+  				},
+  				'url': {
+  					pattern: /(^\]\()[^\s)]+/,
+  					lookbehind: true
+  				},
+  				'string': {
+  					pattern: /(^[ \t]+)"(?:\\.|[^"\\])*"(?=\)$)/,
+  					lookbehind: true
+  				}
+  			}
+  		}
+  	});
+
+  	['url', 'bold', 'italic', 'strike'].forEach(function (token) {
+  		['url', 'bold', 'italic', 'strike', 'code-snippet'].forEach(function (inside) {
+  			if (token !== inside) {
+  				Prism.languages.markdown[token].inside.content.inside[inside] = Prism.languages.markdown[inside];
+  			}
+  		});
+  	});
+
+  	Prism.hooks.add('after-tokenize', function (env) {
+  		if (env.language !== 'markdown' && env.language !== 'md') {
+  			return;
+  		}
+
+  		function walkTokens(tokens) {
+  			if (!tokens || typeof tokens === 'string') {
+  				return;
+  			}
+
+  			for (var i = 0, l = tokens.length; i < l; i++) {
+  				var token = tokens[i];
+
+  				if (token.type !== 'code') {
+  					walkTokens(token.content);
+  					continue;
+  				}
+
+  				/*
+  				 * Add the correct `language-xxxx` class to this code block. Keep in mind that the `code-language` token
+  				 * is optional. But the grammar is defined so that there is only one case we have to handle:
+  				 *
+  				 * token.content = [
+  				 *     <span class="punctuation">```</span>,
+  				 *     <span class="code-language">xxxx</span>,
+  				 *     '\n', // exactly one new lines (\r or \n or \r\n)
+  				 *     <span class="code-block">...</span>,
+  				 *     '\n', // exactly one new lines again
+  				 *     <span class="punctuation">```</span>
+  				 * ];
+  				 */
+
+  				var codeLang = token.content[1];
+  				var codeBlock = token.content[3];
+
+  				if (codeLang && codeBlock &&
+  					codeLang.type === 'code-language' && codeBlock.type === 'code-block' &&
+  					typeof codeLang.content === 'string') {
+
+  					// this might be a language that Prism does not support
+
+  					// do some replacements to support C++, C#, and F#
+  					var lang = codeLang.content.replace(/\b#/g, 'sharp').replace(/\b\+\+/g, 'pp');
+  					// only use the first word
+  					lang = (/[a-z][\w-]*/i.exec(lang) || [''])[0].toLowerCase();
+  					var alias = 'language-' + lang;
+
+  					// add alias
+  					if (!codeBlock.alias) {
+  						codeBlock.alias = [alias];
+  					} else if (typeof codeBlock.alias === 'string') {
+  						codeBlock.alias = [codeBlock.alias, alias];
+  					} else {
+  						codeBlock.alias.push(alias);
+  					}
+  				}
+  			}
+  		}
+
+  		walkTokens(env.tokens);
+  	});
+
+  	Prism.hooks.add('wrap', function (env) {
+  		if (env.type !== 'code-block') {
+  			return;
+  		}
+
+  		var codeLang = '';
+  		for (var i = 0, l = env.classes.length; i < l; i++) {
+  			var cls = env.classes[i];
+  			var match = /language-(.+)/.exec(cls);
+  			if (match) {
+  				codeLang = match[1];
+  				break;
+  			}
+  		}
+
+  		var grammar = Prism.languages[codeLang];
+
+  		if (!grammar) {
+  			if (codeLang && codeLang !== 'none' && Prism.plugins.autoloader) {
+  				var id = 'md-' + new Date().valueOf() + '-' + Math.floor(Math.random() * 1e16);
+  				env.attributes['id'] = id;
+
+  				Prism.plugins.autoloader.loadLanguages(codeLang, function () {
+  					var ele = document.getElementById(id);
+  					if (ele) {
+  						ele.innerHTML = Prism.highlight(ele.textContent, Prism.languages[codeLang], codeLang);
+  					}
+  				});
+  			}
+  		} else {
+  			env.content = Prism.highlight(textContent(env.content), grammar, codeLang);
+  		}
+  	});
+
+  	var tagPattern = RegExp(Prism.languages.markup.tag.pattern.source, 'gi');
+
+  	/**
+  	 * A list of known entity names.
+  	 *
+  	 * This will always be incomplete to save space. The current list is the one used by lowdash's unescape function.
+  	 *
+  	 * @see {@link https://github.com/lodash/lodash/blob/2da024c3b4f9947a48517639de7560457cd4ec6c/unescape.js#L2}
+  	 */
+  	var KNOWN_ENTITY_NAMES = {
+  		'amp': '&',
+  		'lt': '<',
+  		'gt': '>',
+  		'quot': '"',
+  	};
+
+  	// IE 11 doesn't support `String.fromCodePoint`
+  	var fromCodePoint = String.fromCodePoint || String.fromCharCode;
+
+  	/**
+  	 * Returns the text content of a given HTML source code string.
+  	 *
+  	 * @param {string} html
+  	 * @returns {string}
+  	 */
+  	function textContent(html) {
+  		// remove all tags
+  		var text = html.replace(tagPattern, '');
+
+  		// decode known entities
+  		text = text.replace(/&(\w{1,8}|#x?[\da-f]{1,8});/gi, function (m, code) {
+  			code = code.toLowerCase();
+
+  			if (code[0] === '#') {
+  				var value;
+  				if (code[1] === 'x') {
+  					value = parseInt(code.slice(2), 16);
+  				} else {
+  					value = Number(code.slice(1));
+  				}
+
+  				return fromCodePoint(value);
+  			} else {
+  				var known = KNOWN_ENTITY_NAMES[code];
+  				if (known) {
+  					return known;
+  				}
+
+  				// unable to decode
+  				return m;
+  			}
+  		});
+
+  		return text;
+  	}
+
+  	Prism.languages.md = Prism.languages.markdown;
+
+  }(Prism));
+
+  Prism.languages.julia = {
+  	'comment': {
+  		// support one level of nested comments
+  		// https://github.com/JuliaLang/julia/pull/6128
+  		pattern: /(^|[^\\])(?:#=(?:[^#=]|=(?!#)|#(?!=)|#=(?:[^#=]|=(?!#)|#(?!=))*=#)*=#|#.*)/,
+  		lookbehind: true
+  	},
+  	'regex': {
+  		// https://docs.julialang.org/en/v1/manual/strings/#Regular-Expressions-1
+  		pattern: /r"(?:\\.|[^"\\\r\n])*"[imsx]{0,4}/,
+  		greedy: true
+  	},
+  	'string': {
+  		// https://docs.julialang.org/en/v1/manual/strings/#String-Basics-1
+  		// https://docs.julialang.org/en/v1/manual/strings/#non-standard-string-literals-1
+  		// https://docs.julialang.org/en/v1/manual/running-external-programs/#Running-External-Programs-1
+  		pattern: /"""[\s\S]+?"""|(?:\b\w+)?"(?:\\.|[^"\\\r\n])*"|`(?:[^\\`\r\n]|\\.)*`/,
+  		greedy: true
+  	},
+  	'char': {
+  		// https://docs.julialang.org/en/v1/manual/strings/#man-characters-1
+  		pattern: /(^|[^\w'])'(?:\\[^\r\n][^'\r\n]*|[^\\\r\n])'/,
+  		lookbehind: true,
+  		greedy: true
+  	},
+  	'keyword': /\b(?:abstract|baremodule|begin|bitstype|break|catch|ccall|const|continue|do|else|elseif|end|export|finally|for|function|global|if|immutable|import|importall|in|let|local|macro|module|print|println|quote|return|struct|try|type|typealias|using|while)\b/,
+  	'boolean': /\b(?:false|true)\b/,
+  	'number': /(?:\b(?=\d)|\B(?=\.))(?:0[box])?(?:[\da-f]+(?:_[\da-f]+)*(?:\.(?:\d+(?:_\d+)*)?)?|\.\d+(?:_\d+)*)(?:[efp][+-]?\d+(?:_\d+)*)?j?/i,
+  	// https://docs.julialang.org/en/v1/manual/mathematical-operations/
+  	// https://docs.julialang.org/en/v1/manual/mathematical-operations/#Operator-Precedence-and-Associativity-1
+  	'operator': /&&|\|\||[-+*^%÷⊻&$\\]=?|\/[\/=]?|!=?=?|\|[=>]?|<(?:<=?|[=:|])?|>(?:=|>>?=?)?|==?=?|[~≠≤≥'√∛]/,
+  	'punctuation': /::?|[{}[\]();,.?]/,
+  	// https://docs.julialang.org/en/v1/base/numbers/#Base.im
+  	'constant': /\b(?:(?:Inf|NaN)(?:16|32|64)?|im|pi)\b|[πℯ]/
+  };
+
+  var css = "/**\n * prism.js default theme for JavaScript, CSS and HTML\n * Based on dabblet (http://dabblet.com)\n * @author Lea Verou\n */\n\ncode[class*=\"language-\"],\npre[class*=\"language-\"] {\n\tcolor: black;\n\tbackground: none;\n\ttext-shadow: 0 1px white;\n\tfont-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;\n\tfont-size: 1em;\n\ttext-align: left;\n\twhite-space: pre;\n\tword-spacing: normal;\n\tword-break: normal;\n\tword-wrap: normal;\n\tline-height: 1.5;\n\n\t-moz-tab-size: 4;\n\t-o-tab-size: 4;\n\ttab-size: 4;\n\n\t-webkit-hyphens: none;\n\t-moz-hyphens: none;\n\t-ms-hyphens: none;\n\thyphens: none;\n}\n\npre[class*=\"language-\"]::-moz-selection, pre[class*=\"language-\"] ::-moz-selection,\ncode[class*=\"language-\"]::-moz-selection, code[class*=\"language-\"] ::-moz-selection {\n\ttext-shadow: none;\n\tbackground: #b3d4fc;\n}\n\npre[class*=\"language-\"]::selection, pre[class*=\"language-\"] ::selection,\ncode[class*=\"language-\"]::selection, code[class*=\"language-\"] ::selection {\n\ttext-shadow: none;\n\tbackground: #b3d4fc;\n}\n\n@media print {\n\tcode[class*=\"language-\"],\n\tpre[class*=\"language-\"] {\n\t\ttext-shadow: none;\n\t}\n}\n\n/* Code blocks */\npre[class*=\"language-\"] {\n\tpadding: 1em;\n\tmargin: .5em 0;\n\toverflow: auto;\n}\n\n:not(pre) > code[class*=\"language-\"],\npre[class*=\"language-\"] {\n\tbackground: #f5f2f0;\n}\n\n/* Inline code */\n:not(pre) > code[class*=\"language-\"] {\n\tpadding: .1em;\n\tborder-radius: .3em;\n\twhite-space: normal;\n}\n\n.token.comment,\n.token.prolog,\n.token.doctype,\n.token.cdata {\n\tcolor: slategray;\n}\n\n.token.punctuation {\n\tcolor: #999;\n}\n\n.token.namespace {\n\topacity: .7;\n}\n\n.token.property,\n.token.tag,\n.token.boolean,\n.token.number,\n.token.constant,\n.token.symbol,\n.token.deleted {\n\tcolor: #905;\n}\n\n.token.selector,\n.token.attr-name,\n.token.string,\n.token.char,\n.token.builtin,\n.token.inserted {\n\tcolor: #690;\n}\n\n.token.operator,\n.token.entity,\n.token.url,\n.language-css .token.string,\n.style .token.string {\n\tcolor: #9a6e3a;\n\t/* This background color was intended by the author of this theme. */\n\tbackground: hsla(0, 0%, 100%, .5);\n}\n\n.token.atrule,\n.token.attr-value,\n.token.keyword {\n\tcolor: #07a;\n}\n\n.token.function,\n.token.class-name {\n\tcolor: #DD4A68;\n}\n\n.token.regex,\n.token.important,\n.token.variable {\n\tcolor: #e90;\n}\n\n.token.important,\n.token.bold {\n\tfont-weight: bold;\n}\n.token.italic {\n\tfont-style: italic;\n}\n\n.token.entity {\n\tcursor: help;\n}\n";
+
+  // Copyright 2018 The Distill Template Authors
+
+  const T$8 = Template('d-code', `
+<style>
+
+code {
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 2px;
+  padding: 4px 7px;
+  font-size: 15px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+pre code {
+  display: block;
+  border-left: 2px solid rgba(0, 0, 0, .1);
+  padding: 0 0 0 36px;
+}
+
+${css}
+</style>
+
+<code id="code-container"></code>
+
+`);
+
+  class Code extends Mutating(T$8(HTMLElement)) {
+
+    renderContent() {
+
+      // check if language can be highlighted
+      this.languageName = this.getAttribute('language');
+      if (!this.languageName) {
+        console.warn('You need to provide a language attribute to your <d-code> block to let us know how to highlight your code; e.g.:\n <d-code language="python">zeros = np.zeros(shape)</d-code>.');
+        return;
+      }
+      const language = prism.languages[this.languageName];
+      if (language == undefined) {
+        console.warn(`Distill does not yet support highlighting your code block in "${this.languageName}'.`);
+        return;
+      }
+
+      let content = this.textContent;
+      const codeTag = this.shadowRoot.querySelector('#code-container');
+
+      if (this.hasAttribute('block')) {
+        // normalize the tab indents
+        content = content.replace(/\n/, '');
+        const tabs = content.match(/\s*/);
+        content = content.replace(new RegExp('\n' + tabs, 'g'), '\n');
+        content = content.trim();
+        // wrap code block in pre tag if needed
+        if (codeTag.parentNode instanceof ShadowRoot) {
+          const preTag = document.createElement('pre');
+          this.shadowRoot.removeChild(codeTag);
+          preTag.appendChild(codeTag);
+          this.shadowRoot.appendChild(preTag);
+        }
+
+      }
+
+      codeTag.className = `language-${this.languageName}`;
+      codeTag.innerHTML = prism.highlight(content, language);
+    }
+
+  }
+
+  // Copyright 2018 The Distill Template Authors
+
+  const T$7 = Template('d-footnote', `
+<style>
+
+d-math[block] {
+  display: block;
+}
+
+:host {
+
+}
+
+sup {
+  line-height: 1em;
+  font-size: 0.75em;
+  position: relative;
+  top: -.5em;
+  vertical-align: baseline;
+}
+
+span {
+  color: hsla(206, 90%, 20%, 0.7);
+  cursor: default;
+}
+
+.footnote-container {
+  padding: 10px;
+}
+
+</style>
+
+<d-hover-box>
+  <div class="footnote-container">
+    <slot id="slot"></slot>
+  </div>
+</d-hover-box>
+
+<sup>
+  <span id="fn-" data-hover-ref=""></span>
+</sup>
+
+`);
+
+  class Footnote extends T$7(HTMLElement) {
+
+    constructor() {
+      super();
+
+      const options = {childList: true, characterData: true, subtree: true};
+      const observer = new MutationObserver(this.notify);
+      observer.observe(this, options);
+    }
+
+    notify() {
+      const options = { detail: this, bubbles: true };
+      const event = new CustomEvent('onFootnoteChanged', options);
+      document.dispatchEvent(event);
+    }
+
+    connectedCallback() {
+      // listen and notify about changes to slotted content
+      // const slot = this.shadowRoot.querySelector('#slot');
+      // console.warn(slot.textContent);
+      // slot.addEventListener('slotchange', this.notify);
+      this.hoverBox = this.root.querySelector('d-hover-box');
+      window.customElements.whenDefined('d-hover-box').then(() => {
+        this.hoverBox.listen(this);
+      });
+      // create numeric ID
+      Footnote.currentFootnoteId += 1;
+      const IdString = Footnote.currentFootnoteId.toString();
+      this.root.host.id = 'd-footnote-' + IdString;
+
+      // set up hidden hover box
+      const id = 'dt-fn-hover-box-' + IdString;
+      this.hoverBox.id = id;
+
+      // set up visible footnote marker
+      const span = this.root.querySelector('#fn-');
+      span.setAttribute('id', 'fn-' + IdString);
+      span.setAttribute('data-hover-ref', id);
+      span.textContent = IdString;
+    }
+
+  }
+
+  Footnote.currentFootnoteId = 0;
+
+  // Copyright 2018 The Distill Template Authors
+
+  const T$6 = Template('d-footnote-list', `
+<style>
+
+d-footnote-list {
+  contain: layout style;
+}
+
+d-footnote-list > * {
+  grid-column: text;
+}
+
+d-footnote-list a.footnote-backlink {
+  color: rgba(0,0,0,0.3);
+  padding-left: 0.5em;
+}
+
+</style>
+
+<h3>Footnotes</h3>
+<ol></ol>
+`, false);
+
+  class FootnoteList extends T$6(HTMLElement) {
+
+    connectedCallback() {
+      super.connectedCallback();
+
+      this.list = this.root.querySelector('ol');
+      // footnotes list is initially hidden
+      this.root.style.display = 'none';
+      // look through document and register existing footnotes
+      // Store.subscribeTo('footnotes', (footnote) => {
+      //   this.renderFootnote(footnote);
+      // });
+    }
+
+    // TODO: could optimize this to accept individual footnotes?
+    set footnotes(footnotes) {
+      this.list.innerHTML = '';
+      if (footnotes.length) {
+        // ensure footnote list is visible
+        this.root.style.display = '';
+
+        for (const footnote of footnotes) {
+          // construct and append list item to show footnote
+          const listItem = document.createElement('li');
+          listItem.id = footnote.id + '-listing';
+          listItem.innerHTML = footnote.innerHTML;
+
+          const backlink = document.createElement('a');
+          backlink.setAttribute('class', 'footnote-backlink');
+          backlink.textContent = '[↩]';
+          backlink.href = '#' + footnote.id;
+
+          listItem.appendChild(backlink);
+          this.list.appendChild(listItem);
+        }
+      } else {
+        // ensure footnote list is invisible
+        this.root.style.display = 'none';
+      }
+    }
+
+  }
+
+  // Copyright 2018 The Distill Template Authors
+
+  const T$5 = Template('d-hover-box', `
+<style>
+
+:host {
+  position: absolute;
+  width: 100%;
+  left: 0px;
+  z-index: 10000;
+  display: none;
+  white-space: normal
+}
+
+.container {
+  position: relative;
+  width: 704px;
+  max-width: 100vw;
+  margin: 0 auto;
+}
+
+.panel {
+  position: absolute;
+  font-size: 1rem;
+  line-height: 1.5em;
+  top: 0;
+  left: 0;
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: rgba(250, 250, 250, 0.95);
+  box-shadow: 0 0 7px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  box-sizing: border-box;
+
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+</style>
+
+<div class="container">
+  <div class="panel">
+    <slot></slot>
+  </div>
+</div>
+`);
+
+  class HoverBox extends T$5(HTMLElement) {
+
+    constructor() {
+      super();
+    }
+
+    connectedCallback() {
+
+    }
+
+    listen(element) {
+      // console.log(element)
+      this.bindDivEvents(this);
+      this.bindTriggerEvents(element);
+      // this.style.display = "block";
+    }
+
+    bindDivEvents(element) {
+      // For mice, same behavior as hovering on links
+      element.addEventListener('mouseover', () => {
+        if (!this.visible) this.showAtNode(element);
+        this.stopTimeout();
+      });
+      element.addEventListener('mouseout', () => {
+        this.extendTimeout(500);
+      });
+      // Don't trigger body touchstart event when touching within box
+      element.addEventListener('touchstart', (event) => {
+        event.stopPropagation();
+      }, {passive: true});
+      // Close box when touching outside box
+      document.body.addEventListener('touchstart', () => {
+        this.hide();
+      }, {passive: true});
+    }
+
+    bindTriggerEvents(node) {
+      node.addEventListener('mouseover', () => {
+        if (!this.visible) {
+          this.showAtNode(node);
+        }
+        this.stopTimeout();
+      });
+
+      node.addEventListener('mouseout', () => {
+        this.extendTimeout(300);
+      });
+
+      node.addEventListener('touchstart', (event) => {
+        if (this.visible) {
+          this.hide();
+        } else {
+          this.showAtNode(node);
+        }
+        // Don't trigger body touchstart event when touching link
+        event.stopPropagation();
+      }, {passive: true});
+    }
+
+    show(position) {
+      this.visible = true;
+      this.style.display = 'block';
+      // 10px extra offset from element
+      this.style.top = Math.round(position[1] + 10) + 'px';
+    }
+
+    showAtNode(node) {
+      // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetTop
+      const bbox = node.getBoundingClientRect();
+      this.show([node.offsetLeft + bbox.width, node.offsetTop + bbox.height]);
+    }
+
+    hide() {
+      this.visible = false;
+      this.style.display = 'none';
+      this.stopTimeout();
+    }
+
+    stopTimeout() {
+      if (this.timeout) {
+        clearTimeout(this.timeout);
+      }
+    }
+
+    extendTimeout(time) {
+      this.stopTimeout();
+      this.timeout = setTimeout(() => {
+        this.hide();
+      }, time);
+    }
+
+  }
+
+  // Copyright 2018 The Distill Template Authors
+  //
+  // Licensed under the Apache License, Version 2.0 (the "License");
+  // you may not use this file except in compliance with the License.
+  // You may obtain a copy of the License at
+  //
+  //      http://www.apache.org/licenses/LICENSE-2.0
+  //
+  // Unless required by applicable law or agreed to in writing, software
+  // distributed under the License is distributed on an "AS IS" BASIS,
+  // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  // See the License for the specific language governing permissions and
+  // limitations under the License.
+
+  class Title extends HTMLElement {
+    static get is() { return 'd-title'; }
+  }
+
+  // Copyright 2018 The Distill Template Authors
+
+  const T$4 = Template('d-references', `
+<style>
+d-references {
+  display: block;
+}
+</style>
+`, false);
+
+  class References extends T$4(HTMLElement) {
+
+  }
+
+  // Copyright 2018 The Distill Template Authors
+  //
+  // Licensed under the Apache License, Version 2.0 (the "License");
+  // you may not use this file except in compliance with the License.
+  // You may obtain a copy of the License at
+  //
+  //      http://www.apache.org/licenses/LICENSE-2.0
+  //
+  // Unless required by applicable law or agreed to in writing, software
+  // distributed under the License is distributed on an "AS IS" BASIS,
+  // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  // See the License for the specific language governing permissions and
+  // limitations under the License.
+
+  class TOC extends HTMLElement {
+
+    static get is() { return 'd-toc'; }
+
+    connectedCallback() {
+      if (!this.getAttribute('prerendered')) {
+        window.onload = () => {
+          const article = document.querySelector('d-article');
+          const headings = article.querySelectorAll('h2, h3');
+          renderTOC(this, headings);
+        };
+      }
+    }
+
+  }
+
+  function renderTOC(element, headings) {
+
+    let ToC =`
+  <style>
+
+  d-toc {
+    contain: layout style;
+    display: block;
+  }
+
+  d-toc ul {
+    padding-left: 0;
+  }
+
+  d-toc ul > ul {
+    padding-left: 24px;
+  }
+
+  d-toc a {
+    border-bottom: none;
+    text-decoration: none;
+  }
+
+  </style>
+  <nav role="navigation" class="table-of-contents"></nav>
+  <h2>Table of contents</h2>
+  <ul>`;
+
+    for (const el of headings) {
+      // should element be included in TOC?
+      const isInTitle = el.parentElement.tagName == 'D-TITLE';
+      const isException = el.getAttribute('no-toc');
+      if (isInTitle || isException) continue;
+      // create TOC entry
+      const title = el.textContent;
+      const link = '#' + el.getAttribute('id');
+
+      let newLine = '<li>' + '<a href="' + link + '">' + title + '</a>' + '</li>';
+      if (el.tagName == 'H3') {
+        newLine = '<ul>' + newLine + '</ul>';
+      } else {
+        newLine += '<br>';
+      }
+      ToC += newLine;
+
+    }
+
+    ToC += '</ul></nav>';
+    element.innerHTML = ToC;
+  }
+
+  // Copyright 2018 The Distill Template Authors
+  //
+  // Licensed under the Apache License, Version 2.0 (the "License");
+  // you may not use this file except in compliance with the License.
+  // You may obtain a copy of the License at
+  //
+  //      http://www.apache.org/licenses/LICENSE-2.0
+  //
+  // Unless required by applicable law or agreed to in writing, software
+  // distributed under the License is distributed on an "AS IS" BASIS,
+  // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  // See the License for the specific language governing permissions and
+  // limitations under the License.
+
+  // Figure
+  //
+  // d-figure provides a state-machine of visibility events:
+  //
+  //                         scroll out of view
+  //                         +----------------+
+  //   *do work here*        |                |
+  // +----------------+    +-+---------+    +-v---------+
+  // | ready          +----> onscreen  |    | offscreen |
+  // +----------------+    +---------^-+    +---------+-+
+  //                                 |                |
+  //                                 +----------------+
+  //                                  scroll into view
+  //
+
+  class Figure extends HTMLElement {
+
+    static get is() { return 'd-figure'; }
+
+    static get readyQueue() {
+      if (!Figure._readyQueue) {
+        Figure._readyQueue = [];
+      }
+      return Figure._readyQueue;
+    }
+
+    static addToReadyQueue(figure) {
+      if (Figure.readyQueue.indexOf(figure) === -1) {
+        Figure.readyQueue.push(figure);
+        Figure.runReadyQueue();
+      }
+    }
+
+    static runReadyQueue() {
+      // console.log("Checking to run readyQueue, length: " + Figure.readyQueue.length + ", scrolling: " + Figure.isScrolling);
+      // if (Figure.isScrolling) return;
+      // console.log("Running ready Queue");
+      const figure = Figure.readyQueue
+        .sort((a,b) => a._seenOnScreen - b._seenOnScreen )
+        .filter((figure) => !figure._ready)
+        .pop();
+      if (figure) {
+        figure.ready();
+        requestAnimationFrame(Figure.runReadyQueue);
+      }
+
+    }
+
+    constructor() {
+      super();
+      // debugger
+      this._ready = false;
+      this._onscreen = false;
+      this._offscreen = true;
+    }
+
+    connectedCallback() {
+      this.loadsWhileScrolling = this.hasAttribute('loadsWhileScrolling');
+      Figure.marginObserver.observe(this);
+      Figure.directObserver.observe(this);
+    }
+
+    disconnectedCallback() {
+      Figure.marginObserver.unobserve(this);
+      Figure.directObserver.unobserve(this);
+    }
+
+    // We use two separate observers:
+    // One with an extra 1000px margin to warn if the viewpoint gets close,
+    // And one for the actual on/off screen events
+
+    static get marginObserver() {
+      if (!Figure._marginObserver) {
+        // if (!('IntersectionObserver' in window)) {
+        //   throw new Error('no interscetionobbserver!');
+        // }
+        const viewportHeight = window.innerHeight;
+        const margin = Math.floor(2 * viewportHeight);
+        const options = {rootMargin: margin + 'px 0px ' + margin + 'px 0px', threshold: 0.01};
+        const callback = Figure.didObserveMarginIntersection;
+        const observer = new IntersectionObserver(callback, options);
+        Figure._marginObserver = observer;
+      }
+      return Figure._marginObserver;
+    }
+
+    static didObserveMarginIntersection(entries) {
+      for (const entry of entries) {
+        const figure = entry.target;
+        if (entry.isIntersecting && !figure._ready) {
+          Figure.addToReadyQueue(figure);
+        }
+      }
+    }
+
+    static get directObserver() {
+      if (!Figure._directObserver) {
+        Figure._directObserver = new IntersectionObserver(
+          Figure.didObserveDirectIntersection, {
+            rootMargin: '0px', threshold: [0, 1.0],
+          }
+        );
+      }
+      return Figure._directObserver;
+    }
+
+    static didObserveDirectIntersection(entries) {
+      for (const entry of entries) {
+        const figure = entry.target;
+        if (entry.isIntersecting) {
+          figure._seenOnScreen = new Date();
+          // if (!figure._ready) { figure.ready(); }
+          if (figure._offscreen) { figure.onscreen(); }
+        } else {
+          if (figure._onscreen) { figure.offscreen(); }
+        }
+      }
+    }
+
+    // Notify listeners that registered late, too:
+
+    addEventListener(eventName, callback) {
+      super.addEventListener(eventName, callback);
+      // if we had already dispatched something while presumingly no one was listening, we do so again
+      // debugger
+      if (eventName === 'ready') {
+        if (Figure.readyQueue.indexOf(this) !== -1) {
+          this._ready = false;
+          Figure.runReadyQueue();
+        }
+      }
+      if (eventName === 'onscreen') {
+        this.onscreen();
+      }
+    }
+
+    // Custom Events
+
+    ready() {
+      // debugger
+      this._ready = true;
+      Figure.marginObserver.unobserve(this);
+      const event = new CustomEvent('ready');
+      this.dispatchEvent(event);
+    }
+
+    onscreen() {
+      this._onscreen = true;
+      this._offscreen = false;
+      const event = new CustomEvent('onscreen');
+      this.dispatchEvent(event);
+    }
+
+    offscreen() {
+      this._onscreen = false;
+      this._offscreen = true;
+      const event = new CustomEvent('offscreen');
+      this.dispatchEvent(event);
+    }
+
+  }
+
+  if (typeof window !== 'undefined') {
+
+    Figure.isScrolling = false;
+    let timeout;
+    const resetTimer = () => {
+      Figure.isScrolling = true;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        Figure.isScrolling = false;
+        Figure.runReadyQueue();
+      }, 500);
+    };
+    window.addEventListener('scroll', resetTimer, true);
+
+  }
+
+  // Copyright 2018 The Distill Template Authors
+
+  // This overlay is not secure.
+  // It is only meant as a social deterrent.
+
+  const productionHostname = 'distill.pub';
+  const T$3 = Template('d-interstitial', `
+<style>
+
+.overlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: white;
+
+  opacity: 1;
+  visibility: visible;
+
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  z-index: 2147483647 /* MaxInt32 */
+
+}
+
+.container {
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 420px;
+  padding: 2em;
+}
+
+h1 {
+  text-decoration: underline;
+  text-decoration-color: hsl(0,100%,40%);
+  -webkit-text-decoration-color: hsl(0,100%,40%);
+  margin-bottom: 1em;
+  line-height: 1.5em;
+}
+
+input[type="password"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  -webkit-border-radius: none;
+  -moz-border-radius: none;
+  -ms-border-radius: none;
+  -o-border-radius: none;
+  border-radius: none;
+  outline: none;
+
+  font-size: 18px;
+  background: none;
+  width: 25%;
+  padding: 10px;
+  border: none;
+  border-bottom: solid 2px #999;
+  transition: border .3s;
+}
+
+input[type="password"]:focus {
+  border-bottom: solid 2px #333;
+}
+
+input[type="password"].wrong {
+  border-bottom: solid 2px hsl(0,100%,40%);
+}
+
+p small {
+  color: #888;
+}
+
+.logo {
+  position: relative;
+  font-size: 1.5em;
+  margin-bottom: 3em;
+}
+
+.logo svg {
+  width: 36px;
+  position: relative;
+  top: 6px;
+  margin-right: 2px;
+}
+
+.logo svg path {
+  fill: none;
+  stroke: black;
+  stroke-width: 2px;
+}
+
+</style>
+
+<div class="overlay">
+  <div class="container">
+    <h1>This article is in review.</h1>
+    <p>Do not share this URL or the contents of this article. Thank you!</p>
+    <input id="interstitial-password-input" type="password" name="password" autofocus/>
+    <p><small>Enter the password we shared with you as part of the review process to view the article.</small></p>
+  </div>
+</div>
+`);
+
+  class Interstitial extends T$3(HTMLElement) {
+
+    connectedCallback() {
+      if (this.shouldRemoveSelf()) {
+        this.parentElement.removeChild(this);
+      } else {
+        const passwordInput = this.root.querySelector('#interstitial-password-input');
+        passwordInput.oninput = (event) => this.passwordChanged(event);
+      }
+    }
+
+    passwordChanged(event) {
+      const entered = event.target.value;
+      if (entered === this.password) {
+        console.log('Correct password entered.');
+        this.parentElement.removeChild(this);
+        if (typeof(Storage) !== 'undefined') {
+          console.log('Saved that correct password was entered.');
+          localStorage.setItem(this.localStorageIdentifier(), 'true');
+        }
+      }
+    }
+
+    shouldRemoveSelf() {
+      // should never be visible in production
+      if (window && window.location.hostname === productionHostname) {
+        console.warn('Interstitial found on production, hiding it.');
+        return true
+      }
+      // should only have to enter password once
+      if (typeof(Storage) !== 'undefined') {
+        if (localStorage.getItem(this.localStorageIdentifier()) === 'true') {
+          console.log('Loaded that correct password was entered before; skipping interstitial.');
+          return true;
+        }
+      }
+      // otherwise, leave visible
+      return false;
+    }
+
+    localStorageIdentifier() {
+      const prefix = 'distill-drafts';
+      const suffix = 'interstitial-password-correct';
+      return prefix + (window ? window.location.pathname : '-') + suffix
+    }
+
+  }
+
+  function ascending$1(a, b) {
+    return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
+  }
+
+  function bisector(f) {
+    let delta = f;
+    let compare = f;
+
+    if (f.length === 1) {
+      delta = (d, x) => f(d) - x;
+      compare = ascendingComparator(f);
+    }
+
+    function left(a, x, lo, hi) {
+      if (lo == null) lo = 0;
+      if (hi == null) hi = a.length;
+      while (lo < hi) {
+        const mid = (lo + hi) >>> 1;
+        if (compare(a[mid], x) < 0) lo = mid + 1;
+        else hi = mid;
+      }
+      return lo;
+    }
+
+    function right(a, x, lo, hi) {
+      if (lo == null) lo = 0;
+      if (hi == null) hi = a.length;
+      while (lo < hi) {
+        const mid = (lo + hi) >>> 1;
+        if (compare(a[mid], x) > 0) hi = mid;
+        else lo = mid + 1;
+      }
+      return lo;
+    }
+
+    function center(a, x, lo, hi) {
+      if (lo == null) lo = 0;
+      if (hi == null) hi = a.length;
+      const i = left(a, x, lo, hi - 1);
+      return i > lo && delta(a[i - 1], x) > -delta(a[i], x) ? i - 1 : i;
+    }
+
+    return {left, center, right};
+  }
+
+  function ascendingComparator(f) {
+    return (d, x) => ascending$1(f(d), x);
+  }
+
+  function number$1(x) {
+    return x === null ? NaN : +x;
+  }
+
+  const ascendingBisect = bisector(ascending$1);
+  const bisectRight = ascendingBisect.right;
+  bisector(number$1).center;
+
+  var e10 = Math.sqrt(50),
+      e5 = Math.sqrt(10),
+      e2 = Math.sqrt(2);
+
+  function ticks(start, stop, count) {
+    var reverse,
+        i = -1,
+        n,
+        ticks,
+        step;
+
+    stop = +stop, start = +start, count = +count;
+    if (start === stop && count > 0) return [start];
+    if (reverse = stop < start) n = start, start = stop, stop = n;
+    if ((step = tickIncrement(start, stop, count)) === 0 || !isFinite(step)) return [];
+
+    if (step > 0) {
+      let r0 = Math.round(start / step), r1 = Math.round(stop / step);
+      if (r0 * step < start) ++r0;
+      if (r1 * step > stop) --r1;
+      ticks = new Array(n = r1 - r0 + 1);
+      while (++i < n) ticks[i] = (r0 + i) * step;
+    } else {
+      step = -step;
+      let r0 = Math.round(start * step), r1 = Math.round(stop * step);
+      if (r0 / step < start) ++r0;
+      if (r1 / step > stop) --r1;
+      ticks = new Array(n = r1 - r0 + 1);
+      while (++i < n) ticks[i] = (r0 + i) / step;
+    }
+
+    if (reverse) ticks.reverse();
+
+    return ticks;
+  }
+
+  function tickIncrement(start, stop, count) {
+    var step = (stop - start) / Math.max(0, count),
+        power = Math.floor(Math.log(step) / Math.LN10),
+        error = step / Math.pow(10, power);
+    return power >= 0
+        ? (error >= e10 ? 10 : error >= e5 ? 5 : error >= e2 ? 2 : 1) * Math.pow(10, power)
+        : -Math.pow(10, -power) / (error >= e10 ? 10 : error >= e5 ? 5 : error >= e2 ? 2 : 1);
+  }
+
+  function tickStep(start, stop, count) {
+    var step0 = Math.abs(stop - start) / Math.max(0, count),
+        step1 = Math.pow(10, Math.floor(Math.log(step0) / Math.LN10)),
+        error = step0 / step1;
+    if (error >= e10) step1 *= 10;
+    else if (error >= e5) step1 *= 5;
+    else if (error >= e2) step1 *= 2;
+    return stop < start ? -step1 : step1;
+  }
+
+  function range(start, stop, step) {
+    start = +start, stop = +stop, step = (n = arguments.length) < 2 ? (stop = start, start = 0, 1) : n < 3 ? 1 : +step;
+
+    var i = -1,
+        n = Math.max(0, Math.ceil((stop - start) / step)) | 0,
+        range = new Array(n);
+
+    while (++i < n) {
+      range[i] = start + i * step;
+    }
+
+    return range;
+  }
+
+  function initRange(domain, range) {
+    switch (arguments.length) {
+      case 0: break;
+      case 1: this.range(domain); break;
+      default: this.range(range).domain(domain); break;
+    }
+    return this;
+  }
+
+  function define(constructor, factory, prototype) {
+    constructor.prototype = factory.prototype = prototype;
+    prototype.constructor = constructor;
+  }
+
+  function extend(parent, definition) {
+    var prototype = Object.create(parent.prototype);
+    for (var key in definition) prototype[key] = definition[key];
+    return prototype;
+  }
+
+  function Color() {}
+
+  var darker = 0.7;
+  var brighter = 1 / darker;
+
+  var reI = "\\s*([+-]?\\d+)\\s*",
+      reN = "\\s*([+-]?\\d*\\.?\\d+(?:[eE][+-]?\\d+)?)\\s*",
+      reP = "\\s*([+-]?\\d*\\.?\\d+(?:[eE][+-]?\\d+)?)%\\s*",
+      reHex = /^#([0-9a-f]{3,8})$/,
+      reRgbInteger = new RegExp("^rgb\\(" + [reI, reI, reI] + "\\)$"),
+      reRgbPercent = new RegExp("^rgb\\(" + [reP, reP, reP] + "\\)$"),
+      reRgbaInteger = new RegExp("^rgba\\(" + [reI, reI, reI, reN] + "\\)$"),
+      reRgbaPercent = new RegExp("^rgba\\(" + [reP, reP, reP, reN] + "\\)$"),
+      reHslPercent = new RegExp("^hsl\\(" + [reN, reP, reP] + "\\)$"),
+      reHslaPercent = new RegExp("^hsla\\(" + [reN, reP, reP, reN] + "\\)$");
+
+  var named = {
+    aliceblue: 0xf0f8ff,
+    antiquewhite: 0xfaebd7,
+    aqua: 0x00ffff,
+    aquamarine: 0x7fffd4,
+    azure: 0xf0ffff,
+    beige: 0xf5f5dc,
+    bisque: 0xffe4c4,
+    black: 0x000000,
+    blanchedalmond: 0xffebcd,
+    blue: 0x0000ff,
+    blueviolet: 0x8a2be2,
+    brown: 0xa52a2a,
+    burlywood: 0xdeb887,
+    cadetblue: 0x5f9ea0,
+    chartreuse: 0x7fff00,
+    chocolate: 0xd2691e,
+    coral: 0xff7f50,
+    cornflowerblue: 0x6495ed,
+    cornsilk: 0xfff8dc,
+    crimson: 0xdc143c,
+    cyan: 0x00ffff,
+    darkblue: 0x00008b,
+    darkcyan: 0x008b8b,
+    darkgoldenrod: 0xb8860b,
+    darkgray: 0xa9a9a9,
+    darkgreen: 0x006400,
+    darkgrey: 0xa9a9a9,
+    darkkhaki: 0xbdb76b,
+    darkmagenta: 0x8b008b,
+    darkolivegreen: 0x556b2f,
+    darkorange: 0xff8c00,
+    darkorchid: 0x9932cc,
+    darkred: 0x8b0000,
+    darksalmon: 0xe9967a,
+    darkseagreen: 0x8fbc8f,
+    darkslateblue: 0x483d8b,
+    darkslategray: 0x2f4f4f,
+    darkslategrey: 0x2f4f4f,
+    darkturquoise: 0x00ced1,
+    darkviolet: 0x9400d3,
+    deeppink: 0xff1493,
+    deepskyblue: 0x00bfff,
+    dimgray: 0x696969,
+    dimgrey: 0x696969,
+    dodgerblue: 0x1e90ff,
+    firebrick: 0xb22222,
+    floralwhite: 0xfffaf0,
+    forestgreen: 0x228b22,
+    fuchsia: 0xff00ff,
+    gainsboro: 0xdcdcdc,
+    ghostwhite: 0xf8f8ff,
+    gold: 0xffd700,
+    goldenrod: 0xdaa520,
+    gray: 0x808080,
+    green: 0x008000,
+    greenyellow: 0xadff2f,
+    grey: 0x808080,
+    honeydew: 0xf0fff0,
+    hotpink: 0xff69b4,
+    indianred: 0xcd5c5c,
+    indigo: 0x4b0082,
+    ivory: 0xfffff0,
+    khaki: 0xf0e68c,
+    lavender: 0xe6e6fa,
+    lavenderblush: 0xfff0f5,
+    lawngreen: 0x7cfc00,
+    lemonchiffon: 0xfffacd,
+    lightblue: 0xadd8e6,
+    lightcoral: 0xf08080,
+    lightcyan: 0xe0ffff,
+    lightgoldenrodyellow: 0xfafad2,
+    lightgray: 0xd3d3d3,
+    lightgreen: 0x90ee90,
+    lightgrey: 0xd3d3d3,
+    lightpink: 0xffb6c1,
+    lightsalmon: 0xffa07a,
+    lightseagreen: 0x20b2aa,
+    lightskyblue: 0x87cefa,
+    lightslategray: 0x778899,
+    lightslategrey: 0x778899,
+    lightsteelblue: 0xb0c4de,
+    lightyellow: 0xffffe0,
+    lime: 0x00ff00,
+    limegreen: 0x32cd32,
+    linen: 0xfaf0e6,
+    magenta: 0xff00ff,
+    maroon: 0x800000,
+    mediumaquamarine: 0x66cdaa,
+    mediumblue: 0x0000cd,
+    mediumorchid: 0xba55d3,
+    mediumpurple: 0x9370db,
+    mediumseagreen: 0x3cb371,
+    mediumslateblue: 0x7b68ee,
+    mediumspringgreen: 0x00fa9a,
+    mediumturquoise: 0x48d1cc,
+    mediumvioletred: 0xc71585,
+    midnightblue: 0x191970,
+    mintcream: 0xf5fffa,
+    mistyrose: 0xffe4e1,
+    moccasin: 0xffe4b5,
+    navajowhite: 0xffdead,
+    navy: 0x000080,
+    oldlace: 0xfdf5e6,
+    olive: 0x808000,
+    olivedrab: 0x6b8e23,
+    orange: 0xffa500,
+    orangered: 0xff4500,
+    orchid: 0xda70d6,
+    palegoldenrod: 0xeee8aa,
+    palegreen: 0x98fb98,
+    paleturquoise: 0xafeeee,
+    palevioletred: 0xdb7093,
+    papayawhip: 0xffefd5,
+    peachpuff: 0xffdab9,
+    peru: 0xcd853f,
+    pink: 0xffc0cb,
+    plum: 0xdda0dd,
+    powderblue: 0xb0e0e6,
+    purple: 0x800080,
+    rebeccapurple: 0x663399,
+    red: 0xff0000,
+    rosybrown: 0xbc8f8f,
+    royalblue: 0x4169e1,
+    saddlebrown: 0x8b4513,
+    salmon: 0xfa8072,
+    sandybrown: 0xf4a460,
+    seagreen: 0x2e8b57,
+    seashell: 0xfff5ee,
+    sienna: 0xa0522d,
+    silver: 0xc0c0c0,
+    skyblue: 0x87ceeb,
+    slateblue: 0x6a5acd,
+    slategray: 0x708090,
+    slategrey: 0x708090,
+    snow: 0xfffafa,
+    springgreen: 0x00ff7f,
+    steelblue: 0x4682b4,
+    tan: 0xd2b48c,
+    teal: 0x008080,
+    thistle: 0xd8bfd8,
+    tomato: 0xff6347,
+    turquoise: 0x40e0d0,
+    violet: 0xee82ee,
+    wheat: 0xf5deb3,
+    white: 0xffffff,
+    whitesmoke: 0xf5f5f5,
+    yellow: 0xffff00,
+    yellowgreen: 0x9acd32
+  };
+
+  define(Color, color, {
+    copy: function(channels) {
+      return Object.assign(new this.constructor, this, channels);
+    },
+    displayable: function() {
+      return this.rgb().displayable();
+    },
+    hex: color_formatHex, // Deprecated! Use color.formatHex.
+    formatHex: color_formatHex,
+    formatHsl: color_formatHsl,
+    formatRgb: color_formatRgb,
+    toString: color_formatRgb
+  });
+
+  function color_formatHex() {
+    return this.rgb().formatHex();
+  }
+
+  function color_formatHsl() {
+    return hslConvert(this).formatHsl();
+  }
+
+  function color_formatRgb() {
+    return this.rgb().formatRgb();
+  }
+
+  function color(format) {
+    var m, l;
+    format = (format + "").trim().toLowerCase();
+    return (m = reHex.exec(format)) ? (l = m[1].length, m = parseInt(m[1], 16), l === 6 ? rgbn(m) // #ff0000
+        : l === 3 ? new Rgb((m >> 8 & 0xf) | (m >> 4 & 0xf0), (m >> 4 & 0xf) | (m & 0xf0), ((m & 0xf) << 4) | (m & 0xf), 1) // #f00
+        : l === 8 ? rgba(m >> 24 & 0xff, m >> 16 & 0xff, m >> 8 & 0xff, (m & 0xff) / 0xff) // #ff000000
+        : l === 4 ? rgba((m >> 12 & 0xf) | (m >> 8 & 0xf0), (m >> 8 & 0xf) | (m >> 4 & 0xf0), (m >> 4 & 0xf) | (m & 0xf0), (((m & 0xf) << 4) | (m & 0xf)) / 0xff) // #f000
+        : null) // invalid hex
+        : (m = reRgbInteger.exec(format)) ? new Rgb(m[1], m[2], m[3], 1) // rgb(255, 0, 0)
+        : (m = reRgbPercent.exec(format)) ? new Rgb(m[1] * 255 / 100, m[2] * 255 / 100, m[3] * 255 / 100, 1) // rgb(100%, 0%, 0%)
+        : (m = reRgbaInteger.exec(format)) ? rgba(m[1], m[2], m[3], m[4]) // rgba(255, 0, 0, 1)
+        : (m = reRgbaPercent.exec(format)) ? rgba(m[1] * 255 / 100, m[2] * 255 / 100, m[3] * 255 / 100, m[4]) // rgb(100%, 0%, 0%, 1)
+        : (m = reHslPercent.exec(format)) ? hsla(m[1], m[2] / 100, m[3] / 100, 1) // hsl(120, 50%, 50%)
+        : (m = reHslaPercent.exec(format)) ? hsla(m[1], m[2] / 100, m[3] / 100, m[4]) // hsla(120, 50%, 50%, 1)
+        : named.hasOwnProperty(format) ? rgbn(named[format]) // eslint-disable-line no-prototype-builtins
+        : format === "transparent" ? new Rgb(NaN, NaN, NaN, 0)
+        : null;
+  }
+
+  function rgbn(n) {
+    return new Rgb(n >> 16 & 0xff, n >> 8 & 0xff, n & 0xff, 1);
+  }
+
+  function rgba(r, g, b, a) {
+    if (a <= 0) r = g = b = NaN;
+    return new Rgb(r, g, b, a);
+  }
+
+  function rgbConvert(o) {
+    if (!(o instanceof Color)) o = color(o);
+    if (!o) return new Rgb;
+    o = o.rgb();
+    return new Rgb(o.r, o.g, o.b, o.opacity);
+  }
+
+  function rgb$1(r, g, b, opacity) {
+    return arguments.length === 1 ? rgbConvert(r) : new Rgb(r, g, b, opacity == null ? 1 : opacity);
+  }
+
+  function Rgb(r, g, b, opacity) {
+    this.r = +r;
+    this.g = +g;
+    this.b = +b;
+    this.opacity = +opacity;
+  }
+
+  define(Rgb, rgb$1, extend(Color, {
+    brighter: function(k) {
+      k = k == null ? brighter : Math.pow(brighter, k);
+      return new Rgb(this.r * k, this.g * k, this.b * k, this.opacity);
+    },
+    darker: function(k) {
+      k = k == null ? darker : Math.pow(darker, k);
+      return new Rgb(this.r * k, this.g * k, this.b * k, this.opacity);
+    },
+    rgb: function() {
+      return this;
+    },
+    displayable: function() {
+      return (-0.5 <= this.r && this.r < 255.5)
+          && (-0.5 <= this.g && this.g < 255.5)
+          && (-0.5 <= this.b && this.b < 255.5)
+          && (0 <= this.opacity && this.opacity <= 1);
+    },
+    hex: rgb_formatHex, // Deprecated! Use color.formatHex.
+    formatHex: rgb_formatHex,
+    formatRgb: rgb_formatRgb,
+    toString: rgb_formatRgb
+  }));
+
+  function rgb_formatHex() {
+    return "#" + hex(this.r) + hex(this.g) + hex(this.b);
+  }
+
+  function rgb_formatRgb() {
+    var a = this.opacity; a = isNaN(a) ? 1 : Math.max(0, Math.min(1, a));
+    return (a === 1 ? "rgb(" : "rgba(")
+        + Math.max(0, Math.min(255, Math.round(this.r) || 0)) + ", "
+        + Math.max(0, Math.min(255, Math.round(this.g) || 0)) + ", "
+        + Math.max(0, Math.min(255, Math.round(this.b) || 0))
+        + (a === 1 ? ")" : ", " + a + ")");
+  }
+
+  function hex(value) {
+    value = Math.max(0, Math.min(255, Math.round(value) || 0));
+    return (value < 16 ? "0" : "") + value.toString(16);
+  }
+
+  function hsla(h, s, l, a) {
+    if (a <= 0) h = s = l = NaN;
+    else if (l <= 0 || l >= 1) h = s = NaN;
+    else if (s <= 0) h = NaN;
+    return new Hsl(h, s, l, a);
+  }
+
+  function hslConvert(o) {
+    if (o instanceof Hsl) return new Hsl(o.h, o.s, o.l, o.opacity);
+    if (!(o instanceof Color)) o = color(o);
+    if (!o) return new Hsl;
+    if (o instanceof Hsl) return o;
+    o = o.rgb();
+    var r = o.r / 255,
+        g = o.g / 255,
+        b = o.b / 255,
+        min = Math.min(r, g, b),
+        max = Math.max(r, g, b),
+        h = NaN,
+        s = max - min,
+        l = (max + min) / 2;
+    if (s) {
+      if (r === max) h = (g - b) / s + (g < b) * 6;
+      else if (g === max) h = (b - r) / s + 2;
+      else h = (r - g) / s + 4;
+      s /= l < 0.5 ? max + min : 2 - max - min;
+      h *= 60;
+    } else {
+      s = l > 0 && l < 1 ? 0 : h;
+    }
+    return new Hsl(h, s, l, o.opacity);
+  }
+
+  function hsl(h, s, l, opacity) {
+    return arguments.length === 1 ? hslConvert(h) : new Hsl(h, s, l, opacity == null ? 1 : opacity);
+  }
+
+  function Hsl(h, s, l, opacity) {
+    this.h = +h;
+    this.s = +s;
+    this.l = +l;
+    this.opacity = +opacity;
+  }
+
+  define(Hsl, hsl, extend(Color, {
+    brighter: function(k) {
+      k = k == null ? brighter : Math.pow(brighter, k);
+      return new Hsl(this.h, this.s, this.l * k, this.opacity);
+    },
+    darker: function(k) {
+      k = k == null ? darker : Math.pow(darker, k);
+      return new Hsl(this.h, this.s, this.l * k, this.opacity);
+    },
+    rgb: function() {
+      var h = this.h % 360 + (this.h < 0) * 360,
+          s = isNaN(h) || isNaN(this.s) ? 0 : this.s,
+          l = this.l,
+          m2 = l + (l < 0.5 ? l : 1 - l) * s,
+          m1 = 2 * l - m2;
+      return new Rgb(
+        hsl2rgb(h >= 240 ? h - 240 : h + 120, m1, m2),
+        hsl2rgb(h, m1, m2),
+        hsl2rgb(h < 120 ? h + 240 : h - 120, m1, m2),
+        this.opacity
+      );
+    },
+    displayable: function() {
+      return (0 <= this.s && this.s <= 1 || isNaN(this.s))
+          && (0 <= this.l && this.l <= 1)
+          && (0 <= this.opacity && this.opacity <= 1);
+    },
+    formatHsl: function() {
+      var a = this.opacity; a = isNaN(a) ? 1 : Math.max(0, Math.min(1, a));
+      return (a === 1 ? "hsl(" : "hsla(")
+          + (this.h || 0) + ", "
+          + (this.s || 0) * 100 + "%, "
+          + (this.l || 0) * 100 + "%"
+          + (a === 1 ? ")" : ", " + a + ")");
+    }
+  }));
+
+  /* From FvD 13.37, CSS Color Module Level 3 */
+  function hsl2rgb(h, m1, m2) {
+    return (h < 60 ? m1 + (m2 - m1) * h / 60
+        : h < 180 ? m2
+        : h < 240 ? m1 + (m2 - m1) * (240 - h) / 60
+        : m1) * 255;
+  }
+
+  const radians = Math.PI / 180;
+  const degrees = 180 / Math.PI;
+
+  // https://observablehq.com/@mbostock/lab-and-rgb
+  const K = 18,
+      Xn = 0.96422,
+      Yn = 1,
+      Zn = 0.82521,
+      t0$2 = 4 / 29,
+      t1$2 = 6 / 29,
+      t2 = 3 * t1$2 * t1$2,
+      t3 = t1$2 * t1$2 * t1$2;
+
+  function labConvert(o) {
+    if (o instanceof Lab) return new Lab(o.l, o.a, o.b, o.opacity);
+    if (o instanceof Hcl) return hcl2lab(o);
+    if (!(o instanceof Rgb)) o = rgbConvert(o);
+    var r = rgb2lrgb(o.r),
+        g = rgb2lrgb(o.g),
+        b = rgb2lrgb(o.b),
+        y = xyz2lab((0.2225045 * r + 0.7168786 * g + 0.0606169 * b) / Yn), x, z;
+    if (r === g && g === b) x = z = y; else {
+      x = xyz2lab((0.4360747 * r + 0.3850649 * g + 0.1430804 * b) / Xn);
+      z = xyz2lab((0.0139322 * r + 0.0971045 * g + 0.7141733 * b) / Zn);
+    }
+    return new Lab(116 * y - 16, 500 * (x - y), 200 * (y - z), o.opacity);
+  }
+
+  function lab(l, a, b, opacity) {
+    return arguments.length === 1 ? labConvert(l) : new Lab(l, a, b, opacity == null ? 1 : opacity);
+  }
+
+  function Lab(l, a, b, opacity) {
+    this.l = +l;
+    this.a = +a;
+    this.b = +b;
+    this.opacity = +opacity;
+  }
+
+  define(Lab, lab, extend(Color, {
+    brighter: function(k) {
+      return new Lab(this.l + K * (k == null ? 1 : k), this.a, this.b, this.opacity);
+    },
+    darker: function(k) {
+      return new Lab(this.l - K * (k == null ? 1 : k), this.a, this.b, this.opacity);
+    },
+    rgb: function() {
+      var y = (this.l + 16) / 116,
+          x = isNaN(this.a) ? y : y + this.a / 500,
+          z = isNaN(this.b) ? y : y - this.b / 200;
+      x = Xn * lab2xyz(x);
+      y = Yn * lab2xyz(y);
+      z = Zn * lab2xyz(z);
+      return new Rgb(
+        lrgb2rgb( 3.1338561 * x - 1.6168667 * y - 0.4906146 * z),
+        lrgb2rgb(-0.9787684 * x + 1.9161415 * y + 0.0334540 * z),
+        lrgb2rgb( 0.0719453 * x - 0.2289914 * y + 1.4052427 * z),
+        this.opacity
+      );
+    }
+  }));
+
+  function xyz2lab(t) {
+    return t > t3 ? Math.pow(t, 1 / 3) : t / t2 + t0$2;
+  }
+
+  function lab2xyz(t) {
+    return t > t1$2 ? t * t * t : t2 * (t - t0$2);
+  }
+
+  function lrgb2rgb(x) {
+    return 255 * (x <= 0.0031308 ? 12.92 * x : 1.055 * Math.pow(x, 1 / 2.4) - 0.055);
+  }
+
+  function rgb2lrgb(x) {
+    return (x /= 255) <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+  }
+
+  function hclConvert(o) {
+    if (o instanceof Hcl) return new Hcl(o.h, o.c, o.l, o.opacity);
+    if (!(o instanceof Lab)) o = labConvert(o);
+    if (o.a === 0 && o.b === 0) return new Hcl(NaN, 0 < o.l && o.l < 100 ? 0 : NaN, o.l, o.opacity);
+    var h = Math.atan2(o.b, o.a) * degrees;
+    return new Hcl(h < 0 ? h + 360 : h, Math.sqrt(o.a * o.a + o.b * o.b), o.l, o.opacity);
+  }
+
+  function hcl(h, c, l, opacity) {
+    return arguments.length === 1 ? hclConvert(h) : new Hcl(h, c, l, opacity == null ? 1 : opacity);
+  }
+
+  function Hcl(h, c, l, opacity) {
+    this.h = +h;
+    this.c = +c;
+    this.l = +l;
+    this.opacity = +opacity;
+  }
+
+  function hcl2lab(o) {
+    if (isNaN(o.h)) return new Lab(o.l, 0, 0, o.opacity);
+    var h = o.h * radians;
+    return new Lab(o.l, Math.cos(h) * o.c, Math.sin(h) * o.c, o.opacity);
+  }
+
+  define(Hcl, hcl, extend(Color, {
+    brighter: function(k) {
+      return new Hcl(this.h, this.c, this.l + K * (k == null ? 1 : k), this.opacity);
+    },
+    darker: function(k) {
+      return new Hcl(this.h, this.c, this.l - K * (k == null ? 1 : k), this.opacity);
+    },
+    rgb: function() {
+      return hcl2lab(this).rgb();
+    }
+  }));
+
+  var A = -0.14861,
+      B = +1.78277,
+      C = -0.29227,
+      D = -0.90649,
+      E = +1.97294,
+      ED = E * D,
+      EB = E * B,
+      BC_DA = B * C - D * A;
+
+  function cubehelixConvert(o) {
+    if (o instanceof Cubehelix) return new Cubehelix(o.h, o.s, o.l, o.opacity);
+    if (!(o instanceof Rgb)) o = rgbConvert(o);
+    var r = o.r / 255,
+        g = o.g / 255,
+        b = o.b / 255,
+        l = (BC_DA * b + ED * r - EB * g) / (BC_DA + ED - EB),
+        bl = b - l,
+        k = (E * (g - l) - C * bl) / D,
+        s = Math.sqrt(k * k + bl * bl) / (E * l * (1 - l)), // NaN if l=0 or l=1
+        h = s ? Math.atan2(k, bl) * degrees - 120 : NaN;
+    return new Cubehelix(h < 0 ? h + 360 : h, s, l, o.opacity);
+  }
+
+  function cubehelix$1(h, s, l, opacity) {
+    return arguments.length === 1 ? cubehelixConvert(h) : new Cubehelix(h, s, l, opacity == null ? 1 : opacity);
+  }
+
+  function Cubehelix(h, s, l, opacity) {
+    this.h = +h;
+    this.s = +s;
+    this.l = +l;
+    this.opacity = +opacity;
+  }
+
+  define(Cubehelix, cubehelix$1, extend(Color, {
+    brighter: function(k) {
+      k = k == null ? brighter : Math.pow(brighter, k);
+      return new Cubehelix(this.h, this.s, this.l * k, this.opacity);
+    },
+    darker: function(k) {
+      k = k == null ? darker : Math.pow(darker, k);
+      return new Cubehelix(this.h, this.s, this.l * k, this.opacity);
+    },
+    rgb: function() {
+      var h = isNaN(this.h) ? 0 : (this.h + 120) * radians,
+          l = +this.l,
+          a = isNaN(this.s) ? 0 : this.s * l * (1 - l),
+          cosh = Math.cos(h),
+          sinh = Math.sin(h);
+      return new Rgb(
+        255 * (l + a * (A * cosh + B * sinh)),
+        255 * (l + a * (C * cosh + D * sinh)),
+        255 * (l + a * (E * cosh)),
+        this.opacity
+      );
+    }
+  }));
+
+  var constant$2 = x => () => x;
+
+  function linear$1(a, d) {
+    return function(t) {
+      return a + t * d;
+    };
+  }
+
+  function exponential(a, b, y) {
+    return a = Math.pow(a, y), b = Math.pow(b, y) - a, y = 1 / y, function(t) {
+      return Math.pow(a + t * b, y);
+    };
+  }
+
+  function hue(a, b) {
+    var d = b - a;
+    return d ? linear$1(a, d > 180 || d < -180 ? d - 360 * Math.round(d / 360) : d) : constant$2(isNaN(a) ? b : a);
+  }
+
+  function gamma(y) {
+    return (y = +y) === 1 ? nogamma : function(a, b) {
+      return b - a ? exponential(a, b, y) : constant$2(isNaN(a) ? b : a);
+    };
+  }
+
+  function nogamma(a, b) {
+    var d = b - a;
+    return d ? linear$1(a, d) : constant$2(isNaN(a) ? b : a);
+  }
+
+  var rgb = (function rgbGamma(y) {
+    var color = gamma(y);
+
+    function rgb(start, end) {
+      var r = color((start = rgb$1(start)).r, (end = rgb$1(end)).r),
+          g = color(start.g, end.g),
+          b = color(start.b, end.b),
+          opacity = nogamma(start.opacity, end.opacity);
+      return function(t) {
+        start.r = r(t);
+        start.g = g(t);
+        start.b = b(t);
+        start.opacity = opacity(t);
+        return start + "";
+      };
+    }
+
+    rgb.gamma = rgbGamma;
+
+    return rgb;
+  })(1);
+
+  function numberArray(a, b) {
+    if (!b) b = [];
+    var n = a ? Math.min(b.length, a.length) : 0,
+        c = b.slice(),
+        i;
+    return function(t) {
+      for (i = 0; i < n; ++i) c[i] = a[i] * (1 - t) + b[i] * t;
+      return c;
+    };
+  }
+
+  function isNumberArray(x) {
+    return ArrayBuffer.isView(x) && !(x instanceof DataView);
+  }
+
+  function genericArray(a, b) {
+    var nb = b ? b.length : 0,
+        na = a ? Math.min(nb, a.length) : 0,
+        x = new Array(na),
+        c = new Array(nb),
+        i;
+
+    for (i = 0; i < na; ++i) x[i] = interpolate(a[i], b[i]);
+    for (; i < nb; ++i) c[i] = b[i];
+
+    return function(t) {
+      for (i = 0; i < na; ++i) c[i] = x[i](t);
+      return c;
+    };
+  }
+
+  function date(a, b) {
+    var d = new Date;
+    return a = +a, b = +b, function(t) {
+      return d.setTime(a * (1 - t) + b * t), d;
+    };
+  }
+
+  function interpolateNumber(a, b) {
+    return a = +a, b = +b, function(t) {
+      return a * (1 - t) + b * t;
+    };
+  }
+
+  function object(a, b) {
+    var i = {},
+        c = {},
+        k;
+
+    if (a === null || typeof a !== "object") a = {};
+    if (b === null || typeof b !== "object") b = {};
+
+    for (k in b) {
+      if (k in a) {
+        i[k] = interpolate(a[k], b[k]);
+      } else {
+        c[k] = b[k];
+      }
+    }
+
+    return function(t) {
+      for (k in i) c[k] = i[k](t);
+      return c;
+    };
+  }
+
+  var reA = /[-+]?(?:\d+\.?\d*|\.?\d+)(?:[eE][-+]?\d+)?/g,
+      reB = new RegExp(reA.source, "g");
+
+  function zero(b) {
+    return function() {
+      return b;
+    };
+  }
+
+  function one(b) {
+    return function(t) {
+      return b(t) + "";
+    };
+  }
+
+  function string(a, b) {
+    var bi = reA.lastIndex = reB.lastIndex = 0, // scan index for next number in b
+        am, // current match in a
+        bm, // current match in b
+        bs, // string preceding current number in b, if any
+        i = -1, // index in s
+        s = [], // string constants and placeholders
+        q = []; // number interpolators
+
+    // Coerce inputs to strings.
+    a = a + "", b = b + "";
+
+    // Interpolate pairs of numbers in a & b.
+    while ((am = reA.exec(a))
+        && (bm = reB.exec(b))) {
+      if ((bs = bm.index) > bi) { // a string precedes the next number in b
+        bs = b.slice(bi, bs);
+        if (s[i]) s[i] += bs; // coalesce with previous string
+        else s[++i] = bs;
+      }
+      if ((am = am[0]) === (bm = bm[0])) { // numbers in a & b match
+        if (s[i]) s[i] += bm; // coalesce with previous string
+        else s[++i] = bm;
+      } else { // interpolate non-matching numbers
+        s[++i] = null;
+        q.push({i: i, x: interpolateNumber(am, bm)});
+      }
+      bi = reB.lastIndex;
+    }
+
+    // Add remains of b.
+    if (bi < b.length) {
+      bs = b.slice(bi);
+      if (s[i]) s[i] += bs; // coalesce with previous string
+      else s[++i] = bs;
+    }
+
+    // Special optimization for only a single match.
+    // Otherwise, interpolate each of the numbers and rejoin the string.
+    return s.length < 2 ? (q[0]
+        ? one(q[0].x)
+        : zero(b))
+        : (b = q.length, function(t) {
+            for (var i = 0, o; i < b; ++i) s[(o = q[i]).i] = o.x(t);
+            return s.join("");
+          });
+  }
+
+  function interpolate(a, b) {
+    var t = typeof b, c;
+    return b == null || t === "boolean" ? constant$2(b)
+        : (t === "number" ? interpolateNumber
+        : t === "string" ? ((c = color(b)) ? (b = c, rgb) : string)
+        : b instanceof color ? rgb
+        : b instanceof Date ? date
+        : isNumberArray(b) ? numberArray
+        : Array.isArray(b) ? genericArray
+        : typeof b.valueOf !== "function" && typeof b.toString !== "function" || isNaN(b) ? object
+        : interpolateNumber)(a, b);
+  }
+
+  function interpolateRound(a, b) {
+    return a = +a, b = +b, function(t) {
+      return Math.round(a * (1 - t) + b * t);
+    };
+  }
+
+  var epsilon2 = 1e-12;
+
+  function cosh(x) {
+    return ((x = Math.exp(x)) + 1 / x) / 2;
+  }
+
+  function sinh(x) {
+    return ((x = Math.exp(x)) - 1 / x) / 2;
+  }
+
+  function tanh(x) {
+    return ((x = Math.exp(2 * x)) - 1) / (x + 1);
+  }
+
+  ((function zoomRho(rho, rho2, rho4) {
+
+    // p0 = [ux0, uy0, w0]
+    // p1 = [ux1, uy1, w1]
+    function zoom(p0, p1) {
+      var ux0 = p0[0], uy0 = p0[1], w0 = p0[2],
+          ux1 = p1[0], uy1 = p1[1], w1 = p1[2],
+          dx = ux1 - ux0,
+          dy = uy1 - uy0,
+          d2 = dx * dx + dy * dy,
+          i,
+          S;
+
+      // Special case for u0 ≅ u1.
+      if (d2 < epsilon2) {
+        S = Math.log(w1 / w0) / rho;
+        i = function(t) {
+          return [
+            ux0 + t * dx,
+            uy0 + t * dy,
+            w0 * Math.exp(rho * t * S)
+          ];
+        };
+      }
+
+      // General case.
+      else {
+        var d1 = Math.sqrt(d2),
+            b0 = (w1 * w1 - w0 * w0 + rho4 * d2) / (2 * w0 * rho2 * d1),
+            b1 = (w1 * w1 - w0 * w0 - rho4 * d2) / (2 * w1 * rho2 * d1),
+            r0 = Math.log(Math.sqrt(b0 * b0 + 1) - b0),
+            r1 = Math.log(Math.sqrt(b1 * b1 + 1) - b1);
+        S = (r1 - r0) / rho;
+        i = function(t) {
+          var s = t * S,
+              coshr0 = cosh(r0),
+              u = w0 / (rho2 * d1) * (coshr0 * tanh(rho * s + r0) - sinh(r0));
+          return [
+            ux0 + u * dx,
+            uy0 + u * dy,
+            w0 * coshr0 / cosh(rho * s + r0)
+          ];
+        };
+      }
+
+      i.duration = S * 1000 * rho / Math.SQRT2;
+
+      return i;
+    }
+
+    zoom.rho = function(_) {
+      var _1 = Math.max(1e-3, +_), _2 = _1 * _1, _4 = _2 * _2;
+      return zoomRho(_1, _2, _4);
+    };
+
+    return zoom;
+  }))(Math.SQRT2, 2, 4);
+
+  function cubehelix(hue) {
+    return (function cubehelixGamma(y) {
+      y = +y;
+
+      function cubehelix(start, end) {
+        var h = hue((start = cubehelix$1(start)).h, (end = cubehelix$1(end)).h),
+            s = nogamma(start.s, end.s),
+            l = nogamma(start.l, end.l),
+            opacity = nogamma(start.opacity, end.opacity);
+        return function(t) {
+          start.h = h(t);
+          start.s = s(t);
+          start.l = l(Math.pow(t, y));
+          start.opacity = opacity(t);
+          return start + "";
+        };
+      }
+
+      cubehelix.gamma = cubehelixGamma;
+
+      return cubehelix;
+    })(1);
+  }
+
+  cubehelix(hue);
+  cubehelix(nogamma);
+
+  function constants(x) {
+    return function() {
+      return x;
+    };
+  }
+
+  function number(x) {
+    return +x;
+  }
+
+  var unit = [0, 1];
+
+  function identity$1(x) {
+    return x;
+  }
+
+  function normalize(a, b) {
+    return (b -= (a = +a))
+        ? function(x) { return (x - a) / b; }
+        : constants(isNaN(b) ? NaN : 0.5);
+  }
+
+  function clamper(a, b) {
+    var t;
+    if (a > b) t = a, a = b, b = t;
+    return function(x) { return Math.max(a, Math.min(b, x)); };
+  }
+
+  // normalize(a, b)(x) takes a domain value x in [a,b] and returns the corresponding parameter t in [0,1].
+  // interpolate(a, b)(t) takes a parameter t in [0,1] and returns the corresponding range value x in [a,b].
+  function bimap(domain, range, interpolate) {
+    var d0 = domain[0], d1 = domain[1], r0 = range[0], r1 = range[1];
+    if (d1 < d0) d0 = normalize(d1, d0), r0 = interpolate(r1, r0);
+    else d0 = normalize(d0, d1), r0 = interpolate(r0, r1);
+    return function(x) { return r0(d0(x)); };
+  }
+
+  function polymap(domain, range, interpolate) {
+    var j = Math.min(domain.length, range.length) - 1,
+        d = new Array(j),
+        r = new Array(j),
+        i = -1;
+
+    // Reverse descending domains.
+    if (domain[j] < domain[0]) {
+      domain = domain.slice().reverse();
+      range = range.slice().reverse();
+    }
+
+    while (++i < j) {
+      d[i] = normalize(domain[i], domain[i + 1]);
+      r[i] = interpolate(range[i], range[i + 1]);
+    }
+
+    return function(x) {
+      var i = bisectRight(domain, x, 1, j) - 1;
+      return r[i](d[i](x));
+    };
+  }
+
+  function copy(source, target) {
+    return target
+        .domain(source.domain())
+        .range(source.range())
+        .interpolate(source.interpolate())
+        .clamp(source.clamp())
+        .unknown(source.unknown());
+  }
+
+  function transformer() {
+    var domain = unit,
+        range = unit,
+        interpolate$1 = interpolate,
+        transform,
+        untransform,
+        unknown,
+        clamp = identity$1,
+        piecewise,
+        output,
+        input;
+
+    function rescale() {
+      var n = Math.min(domain.length, range.length);
+      if (clamp !== identity$1) clamp = clamper(domain[0], domain[n - 1]);
+      piecewise = n > 2 ? polymap : bimap;
+      output = input = null;
+      return scale;
+    }
+
+    function scale(x) {
+      return x == null || isNaN(x = +x) ? unknown : (output || (output = piecewise(domain.map(transform), range, interpolate$1)))(transform(clamp(x)));
+    }
+
+    scale.invert = function(y) {
+      return clamp(untransform((input || (input = piecewise(range, domain.map(transform), interpolateNumber)))(y)));
+    };
+
+    scale.domain = function(_) {
+      return arguments.length ? (domain = Array.from(_, number), rescale()) : domain.slice();
+    };
+
+    scale.range = function(_) {
+      return arguments.length ? (range = Array.from(_), rescale()) : range.slice();
+    };
+
+    scale.rangeRound = function(_) {
+      return range = Array.from(_), interpolate$1 = interpolateRound, rescale();
+    };
+
+    scale.clamp = function(_) {
+      return arguments.length ? (clamp = _ ? true : identity$1, rescale()) : clamp !== identity$1;
+    };
+
+    scale.interpolate = function(_) {
+      return arguments.length ? (interpolate$1 = _, rescale()) : interpolate$1;
+    };
+
+    scale.unknown = function(_) {
+      return arguments.length ? (unknown = _, scale) : unknown;
+    };
+
+    return function(t, u) {
+      transform = t, untransform = u;
+      return rescale();
+    };
+  }
+
+  function continuous() {
+    return transformer()(identity$1, identity$1);
+  }
+
+  function formatDecimal(x) {
+    return Math.abs(x = Math.round(x)) >= 1e21
+        ? x.toLocaleString("en").replace(/,/g, "")
+        : x.toString(10);
+  }
+
+  // Computes the decimal coefficient and exponent of the specified number x with
+  // significant digits p, where x is positive and p is in [1, 21] or undefined.
+  // For example, formatDecimalParts(1.23) returns ["123", 0].
+  function formatDecimalParts(x, p) {
+    if ((i = (x = p ? x.toExponential(p - 1) : x.toExponential()).indexOf("e")) < 0) return null; // NaN, ±Infinity
+    var i, coefficient = x.slice(0, i);
+
+    // The string returned by toExponential either has the form \d\.\d+e[-+]\d+
+    // (e.g., 1.2e+3) or the form \de[-+]\d+ (e.g., 1e+3).
+    return [
+      coefficient.length > 1 ? coefficient[0] + coefficient.slice(2) : coefficient,
+      +x.slice(i + 1)
+    ];
+  }
+
+  function exponent(x) {
+    return x = formatDecimalParts(Math.abs(x)), x ? x[1] : NaN;
+  }
+
+  function formatGroup(grouping, thousands) {
+    return function(value, width) {
+      var i = value.length,
+          t = [],
+          j = 0,
+          g = grouping[0],
+          length = 0;
+
+      while (i > 0 && g > 0) {
+        if (length + g + 1 > width) g = Math.max(1, width - length);
+        t.push(value.substring(i -= g, i + g));
+        if ((length += g + 1) > width) break;
+        g = grouping[j = (j + 1) % grouping.length];
+      }
+
+      return t.reverse().join(thousands);
+    };
+  }
+
+  function formatNumerals(numerals) {
+    return function(value) {
+      return value.replace(/[0-9]/g, function(i) {
+        return numerals[+i];
+      });
+    };
+  }
+
+  // [[fill]align][sign][symbol][0][width][,][.precision][~][type]
+  var re = /^(?:(.)?([<>=^]))?([+\-( ])?([$#])?(0)?(\d+)?(,)?(\.\d+)?(~)?([a-z%])?$/i;
+
+  function formatSpecifier(specifier) {
+    if (!(match = re.exec(specifier))) throw new Error("invalid format: " + specifier);
+    var match;
+    return new FormatSpecifier({
+      fill: match[1],
+      align: match[2],
+      sign: match[3],
+      symbol: match[4],
+      zero: match[5],
+      width: match[6],
+      comma: match[7],
+      precision: match[8] && match[8].slice(1),
+      trim: match[9],
+      type: match[10]
+    });
+  }
+
+  formatSpecifier.prototype = FormatSpecifier.prototype; // instanceof
+
+  function FormatSpecifier(specifier) {
+    this.fill = specifier.fill === undefined ? " " : specifier.fill + "";
+    this.align = specifier.align === undefined ? ">" : specifier.align + "";
+    this.sign = specifier.sign === undefined ? "-" : specifier.sign + "";
+    this.symbol = specifier.symbol === undefined ? "" : specifier.symbol + "";
+    this.zero = !!specifier.zero;
+    this.width = specifier.width === undefined ? undefined : +specifier.width;
+    this.comma = !!specifier.comma;
+    this.precision = specifier.precision === undefined ? undefined : +specifier.precision;
+    this.trim = !!specifier.trim;
+    this.type = specifier.type === undefined ? "" : specifier.type + "";
+  }
+
+  FormatSpecifier.prototype.toString = function() {
+    return this.fill
+        + this.align
+        + this.sign
+        + this.symbol
+        + (this.zero ? "0" : "")
+        + (this.width === undefined ? "" : Math.max(1, this.width | 0))
+        + (this.comma ? "," : "")
+        + (this.precision === undefined ? "" : "." + Math.max(0, this.precision | 0))
+        + (this.trim ? "~" : "")
+        + this.type;
+  };
+
+  // Trims insignificant zeros, e.g., replaces 1.2000k with 1.2k.
+  function formatTrim(s) {
+    out: for (var n = s.length, i = 1, i0 = -1, i1; i < n; ++i) {
+      switch (s[i]) {
+        case ".": i0 = i1 = i; break;
+        case "0": if (i0 === 0) i0 = i; i1 = i; break;
+        default: if (!+s[i]) break out; if (i0 > 0) i0 = 0; break;
+      }
+    }
+    return i0 > 0 ? s.slice(0, i0) + s.slice(i1 + 1) : s;
+  }
+
+  var prefixExponent;
+
+  function formatPrefixAuto(x, p) {
+    var d = formatDecimalParts(x, p);
+    if (!d) return x + "";
+    var coefficient = d[0],
+        exponent = d[1],
+        i = exponent - (prefixExponent = Math.max(-8, Math.min(8, Math.floor(exponent / 3))) * 3) + 1,
+        n = coefficient.length;
+    return i === n ? coefficient
+        : i > n ? coefficient + new Array(i - n + 1).join("0")
+        : i > 0 ? coefficient.slice(0, i) + "." + coefficient.slice(i)
+        : "0." + new Array(1 - i).join("0") + formatDecimalParts(x, Math.max(0, p + i - 1))[0]; // less than 1y!
+  }
+
+  function formatRounded(x, p) {
+    var d = formatDecimalParts(x, p);
+    if (!d) return x + "";
+    var coefficient = d[0],
+        exponent = d[1];
+    return exponent < 0 ? "0." + new Array(-exponent).join("0") + coefficient
+        : coefficient.length > exponent + 1 ? coefficient.slice(0, exponent + 1) + "." + coefficient.slice(exponent + 1)
+        : coefficient + new Array(exponent - coefficient.length + 2).join("0");
+  }
+
+  var formatTypes = {
+    "%": (x, p) => (x * 100).toFixed(p),
+    "b": (x) => Math.round(x).toString(2),
+    "c": (x) => x + "",
+    "d": formatDecimal,
+    "e": (x, p) => x.toExponential(p),
+    "f": (x, p) => x.toFixed(p),
+    "g": (x, p) => x.toPrecision(p),
+    "o": (x) => Math.round(x).toString(8),
+    "p": (x, p) => formatRounded(x * 100, p),
+    "r": formatRounded,
+    "s": formatPrefixAuto,
+    "X": (x) => Math.round(x).toString(16).toUpperCase(),
+    "x": (x) => Math.round(x).toString(16)
+  };
+
+  function identity(x) {
+    return x;
+  }
+
+  var map = Array.prototype.map,
+      prefixes = ["y","z","a","f","p","n","µ","m","","k","M","G","T","P","E","Z","Y"];
+
+  function formatLocale$1(locale) {
+    var group = locale.grouping === undefined || locale.thousands === undefined ? identity : formatGroup(map.call(locale.grouping, Number), locale.thousands + ""),
+        currencyPrefix = locale.currency === undefined ? "" : locale.currency[0] + "",
+        currencySuffix = locale.currency === undefined ? "" : locale.currency[1] + "",
+        decimal = locale.decimal === undefined ? "." : locale.decimal + "",
+        numerals = locale.numerals === undefined ? identity : formatNumerals(map.call(locale.numerals, String)),
+        percent = locale.percent === undefined ? "%" : locale.percent + "",
+        minus = locale.minus === undefined ? "−" : locale.minus + "",
+        nan = locale.nan === undefined ? "NaN" : locale.nan + "";
+
+    function newFormat(specifier) {
+      specifier = formatSpecifier(specifier);
+
+      var fill = specifier.fill,
+          align = specifier.align,
+          sign = specifier.sign,
+          symbol = specifier.symbol,
+          zero = specifier.zero,
+          width = specifier.width,
+          comma = specifier.comma,
+          precision = specifier.precision,
+          trim = specifier.trim,
+          type = specifier.type;
+
+      // The "n" type is an alias for ",g".
+      if (type === "n") comma = true, type = "g";
+
+      // The "" type, and any invalid type, is an alias for ".12~g".
+      else if (!formatTypes[type]) precision === undefined && (precision = 12), trim = true, type = "g";
+
+      // If zero fill is specified, padding goes after sign and before digits.
+      if (zero || (fill === "0" && align === "=")) zero = true, fill = "0", align = "=";
+
+      // Compute the prefix and suffix.
+      // For SI-prefix, the suffix is lazily computed.
+      var prefix = symbol === "$" ? currencyPrefix : symbol === "#" && /[boxX]/.test(type) ? "0" + type.toLowerCase() : "",
+          suffix = symbol === "$" ? currencySuffix : /[%p]/.test(type) ? percent : "";
+
+      // What format function should we use?
+      // Is this an integer type?
+      // Can this type generate exponential notation?
+      var formatType = formatTypes[type],
+          maybeSuffix = /[defgprs%]/.test(type);
+
+      // Set the default precision if not specified,
+      // or clamp the specified precision to the supported range.
+      // For significant precision, it must be in [1, 21].
+      // For fixed precision, it must be in [0, 20].
+      precision = precision === undefined ? 6
+          : /[gprs]/.test(type) ? Math.max(1, Math.min(21, precision))
+          : Math.max(0, Math.min(20, precision));
+
+      function format(value) {
+        var valuePrefix = prefix,
+            valueSuffix = suffix,
+            i, n, c;
+
+        if (type === "c") {
+          valueSuffix = formatType(value) + valueSuffix;
+          value = "";
+        } else {
+          value = +value;
+
+          // Determine the sign. -0 is not less than 0, but 1 / -0 is!
+          var valueNegative = value < 0 || 1 / value < 0;
+
+          // Perform the initial formatting.
+          value = isNaN(value) ? nan : formatType(Math.abs(value), precision);
+
+          // Trim insignificant zeros.
+          if (trim) value = formatTrim(value);
+
+          // If a negative value rounds to zero after formatting, and no explicit positive sign is requested, hide the sign.
+          if (valueNegative && +value === 0 && sign !== "+") valueNegative = false;
+
+          // Compute the prefix and suffix.
+          valuePrefix = (valueNegative ? (sign === "(" ? sign : minus) : sign === "-" || sign === "(" ? "" : sign) + valuePrefix;
+          valueSuffix = (type === "s" ? prefixes[8 + prefixExponent / 3] : "") + valueSuffix + (valueNegative && sign === "(" ? ")" : "");
+
+          // Break the formatted value into the integer “value” part that can be
+          // grouped, and fractional or exponential “suffix” part that is not.
+          if (maybeSuffix) {
+            i = -1, n = value.length;
+            while (++i < n) {
+              if (c = value.charCodeAt(i), 48 > c || c > 57) {
+                valueSuffix = (c === 46 ? decimal + value.slice(i + 1) : value.slice(i)) + valueSuffix;
+                value = value.slice(0, i);
+                break;
+              }
+            }
+          }
+        }
+
+        // If the fill character is not "0", grouping is applied before padding.
+        if (comma && !zero) value = group(value, Infinity);
+
+        // Compute the padding.
+        var length = valuePrefix.length + value.length + valueSuffix.length,
+            padding = length < width ? new Array(width - length + 1).join(fill) : "";
+
+        // If the fill character is "0", grouping is applied after padding.
+        if (comma && zero) value = group(padding + value, padding.length ? width - valueSuffix.length : Infinity), padding = "";
+
+        // Reconstruct the final output based on the desired alignment.
+        switch (align) {
+          case "<": value = valuePrefix + value + valueSuffix + padding; break;
+          case "=": value = valuePrefix + padding + value + valueSuffix; break;
+          case "^": value = padding.slice(0, length = padding.length >> 1) + valuePrefix + value + valueSuffix + padding.slice(length); break;
+          default: value = padding + valuePrefix + value + valueSuffix; break;
+        }
+
+        return numerals(value);
+      }
+
+      format.toString = function() {
+        return specifier + "";
+      };
+
+      return format;
+    }
+
+    function formatPrefix(specifier, value) {
+      var f = newFormat((specifier = formatSpecifier(specifier), specifier.type = "f", specifier)),
+          e = Math.max(-8, Math.min(8, Math.floor(exponent(value) / 3))) * 3,
+          k = Math.pow(10, -e),
+          prefix = prefixes[8 + e / 3];
+      return function(value) {
+        return f(k * value) + prefix;
+      };
+    }
+
+    return {
+      format: newFormat,
+      formatPrefix: formatPrefix
+    };
+  }
+
+  var locale$1;
+  var format;
+  var formatPrefix;
+
+  defaultLocale$1({
+    thousands: ",",
+    grouping: [3],
+    currency: ["$", ""]
+  });
+
+  function defaultLocale$1(definition) {
+    locale$1 = formatLocale$1(definition);
+    format = locale$1.format;
+    formatPrefix = locale$1.formatPrefix;
+    return locale$1;
+  }
+
+  function precisionFixed(step) {
+    return Math.max(0, -exponent(Math.abs(step)));
+  }
+
+  function precisionPrefix(step, value) {
+    return Math.max(0, Math.max(-8, Math.min(8, Math.floor(exponent(value) / 3))) * 3 - exponent(Math.abs(step)));
+  }
+
+  function precisionRound(step, max) {
+    step = Math.abs(step), max = Math.abs(max) - step;
+    return Math.max(0, exponent(max) - exponent(step)) + 1;
+  }
+
+  function tickFormat(start, stop, count, specifier) {
+    var step = tickStep(start, stop, count),
+        precision;
+    specifier = formatSpecifier(specifier == null ? ",f" : specifier);
+    switch (specifier.type) {
+      case "s": {
+        var value = Math.max(Math.abs(start), Math.abs(stop));
+        if (specifier.precision == null && !isNaN(precision = precisionPrefix(step, value))) specifier.precision = precision;
+        return formatPrefix(specifier, value);
+      }
+      case "":
+      case "e":
+      case "g":
+      case "p":
+      case "r": {
+        if (specifier.precision == null && !isNaN(precision = precisionRound(step, Math.max(Math.abs(start), Math.abs(stop))))) specifier.precision = precision - (specifier.type === "e");
+        break;
+      }
+      case "f":
+      case "%": {
+        if (specifier.precision == null && !isNaN(precision = precisionFixed(step))) specifier.precision = precision - (specifier.type === "%") * 2;
+        break;
+      }
+    }
+    return format(specifier);
+  }
+
+  function linearish(scale) {
+    var domain = scale.domain;
+
+    scale.ticks = function(count) {
+      var d = domain();
+      return ticks(d[0], d[d.length - 1], count == null ? 10 : count);
+    };
+
+    scale.tickFormat = function(count, specifier) {
+      var d = domain();
+      return tickFormat(d[0], d[d.length - 1], count == null ? 10 : count, specifier);
+    };
+
+    scale.nice = function(count) {
+      if (count == null) count = 10;
+
+      var d = domain();
+      var i0 = 0;
+      var i1 = d.length - 1;
+      var start = d[i0];
+      var stop = d[i1];
+      var prestep;
+      var step;
+      var maxIter = 10;
+
+      if (stop < start) {
+        step = start, start = stop, stop = step;
+        step = i0, i0 = i1, i1 = step;
+      }
+      
+      while (maxIter-- > 0) {
+        step = tickIncrement(start, stop, count);
+        if (step === prestep) {
+          d[i0] = start;
+          d[i1] = stop;
+          return domain(d);
+        } else if (step > 0) {
+          start = Math.floor(start / step) * step;
+          stop = Math.ceil(stop / step) * step;
+        } else if (step < 0) {
+          start = Math.ceil(start * step) / step;
+          stop = Math.floor(stop * step) / step;
+        } else {
+          break;
+        }
+        prestep = step;
+      }
+
+      return scale;
+    };
+
+    return scale;
+  }
+
+  function linear() {
+    var scale = continuous();
+
+    scale.copy = function() {
+      return copy(scale, linear());
+    };
+
+    initRange.apply(scale, arguments);
+
+    return linearish(scale);
+  }
+
+  var t0$1 = new Date,
+      t1$1 = new Date;
+
+  function newInterval$1(floori, offseti, count, field) {
+
+    function interval(date) {
+      return floori(date = arguments.length === 0 ? new Date : new Date(+date)), date;
+    }
+
+    interval.floor = function(date) {
+      return floori(date = new Date(+date)), date;
+    };
+
+    interval.ceil = function(date) {
+      return floori(date = new Date(date - 1)), offseti(date, 1), floori(date), date;
+    };
+
+    interval.round = function(date) {
+      var d0 = interval(date),
+          d1 = interval.ceil(date);
+      return date - d0 < d1 - date ? d0 : d1;
+    };
+
+    interval.offset = function(date, step) {
+      return offseti(date = new Date(+date), step == null ? 1 : Math.floor(step)), date;
+    };
+
+    interval.range = function(start, stop, step) {
+      var range = [], previous;
+      start = interval.ceil(start);
+      step = step == null ? 1 : Math.floor(step);
+      if (!(start < stop) || !(step > 0)) return range; // also handles Invalid Date
+      do range.push(previous = new Date(+start)), offseti(start, step), floori(start);
+      while (previous < start && start < stop);
+      return range;
+    };
+
+    interval.filter = function(test) {
+      return newInterval$1(function(date) {
+        if (date >= date) while (floori(date), !test(date)) date.setTime(date - 1);
+      }, function(date, step) {
+        if (date >= date) {
+          if (step < 0) while (++step <= 0) {
+            while (offseti(date, -1), !test(date)) {} // eslint-disable-line no-empty
+          } else while (--step >= 0) {
+            while (offseti(date, +1), !test(date)) {} // eslint-disable-line no-empty
+          }
+        }
+      });
+    };
+
+    if (count) {
+      interval.count = function(start, end) {
+        t0$1.setTime(+start), t1$1.setTime(+end);
+        floori(t0$1), floori(t1$1);
+        return Math.floor(count(t0$1, t1$1));
+      };
+
+      interval.every = function(step) {
+        step = Math.floor(step);
+        return !isFinite(step) || !(step > 0) ? null
+            : !(step > 1) ? interval
+            : interval.filter(field
+                ? function(d) { return field(d) % step === 0; }
+                : function(d) { return interval.count(0, d) % step === 0; });
+      };
+    }
+
+    return interval;
+  }
+
+  var millisecond$1 = newInterval$1(function() {
+    // noop
+  }, function(date, step) {
+    date.setTime(+date + step);
+  }, function(start, end) {
+    return end - start;
+  });
+
+  // An optimized implementation for this simple case.
+  millisecond$1.every = function(k) {
+    k = Math.floor(k);
+    if (!isFinite(k) || !(k > 0)) return null;
+    if (!(k > 1)) return millisecond$1;
+    return newInterval$1(function(date) {
+      date.setTime(Math.floor(date / k) * k);
+    }, function(date, step) {
+      date.setTime(+date + step * k);
+    }, function(start, end) {
+      return (end - start) / k;
+    });
+  };
+  millisecond$1.range;
+
+  const durationSecond$1 = 1000;
+  const durationMinute$1 = durationSecond$1 * 60;
+  const durationHour$1 = durationMinute$1 * 60;
+  const durationDay$1 = durationHour$1 * 24;
+  const durationWeek$1 = durationDay$1 * 7;
+
+  var second$1 = newInterval$1(function(date) {
+    date.setTime(date - date.getMilliseconds());
+  }, function(date, step) {
+    date.setTime(+date + step * durationSecond$1);
+  }, function(start, end) {
+    return (end - start) / durationSecond$1;
+  }, function(date) {
+    return date.getUTCSeconds();
+  });
+  second$1.range;
+
+  var minute$1 = newInterval$1(function(date) {
+    date.setTime(date - date.getMilliseconds() - date.getSeconds() * durationSecond$1);
+  }, function(date, step) {
+    date.setTime(+date + step * durationMinute$1);
+  }, function(start, end) {
+    return (end - start) / durationMinute$1;
+  }, function(date) {
+    return date.getMinutes();
+  });
+  minute$1.range;
+
+  var hour$1 = newInterval$1(function(date) {
+    date.setTime(date - date.getMilliseconds() - date.getSeconds() * durationSecond$1 - date.getMinutes() * durationMinute$1);
+  }, function(date, step) {
+    date.setTime(+date + step * durationHour$1);
+  }, function(start, end) {
+    return (end - start) / durationHour$1;
+  }, function(date) {
+    return date.getHours();
+  });
+  hour$1.range;
+
+  var day$1 = newInterval$1(
+    date => date.setHours(0, 0, 0, 0),
+    (date, step) => date.setDate(date.getDate() + step),
+    (start, end) => (end - start - (end.getTimezoneOffset() - start.getTimezoneOffset()) * durationMinute$1) / durationDay$1,
+    date => date.getDate() - 1
+  );
+  day$1.range;
+
+  function weekday$1(i) {
+    return newInterval$1(function(date) {
+      date.setDate(date.getDate() - (date.getDay() + 7 - i) % 7);
+      date.setHours(0, 0, 0, 0);
+    }, function(date, step) {
+      date.setDate(date.getDate() + step * 7);
+    }, function(start, end) {
+      return (end - start - (end.getTimezoneOffset() - start.getTimezoneOffset()) * durationMinute$1) / durationWeek$1;
+    });
+  }
+
+  var sunday$1 = weekday$1(0);
+  var monday$1 = weekday$1(1);
+  var tuesday$1 = weekday$1(2);
+  var wednesday$1 = weekday$1(3);
+  var thursday$1 = weekday$1(4);
+  var friday$1 = weekday$1(5);
+  var saturday$1 = weekday$1(6);
+
+  sunday$1.range;
+  monday$1.range;
+  tuesday$1.range;
+  wednesday$1.range;
+  thursday$1.range;
+  friday$1.range;
+  saturday$1.range;
+
+  var month$1 = newInterval$1(function(date) {
+    date.setDate(1);
+    date.setHours(0, 0, 0, 0);
+  }, function(date, step) {
+    date.setMonth(date.getMonth() + step);
+  }, function(start, end) {
+    return end.getMonth() - start.getMonth() + (end.getFullYear() - start.getFullYear()) * 12;
+  }, function(date) {
+    return date.getMonth();
+  });
+  month$1.range;
+
+  var year$1 = newInterval$1(function(date) {
+    date.setMonth(0, 1);
+    date.setHours(0, 0, 0, 0);
+  }, function(date, step) {
+    date.setFullYear(date.getFullYear() + step);
+  }, function(start, end) {
+    return end.getFullYear() - start.getFullYear();
+  }, function(date) {
+    return date.getFullYear();
+  });
+
+  // An optimized implementation for this simple case.
+  year$1.every = function(k) {
+    return !isFinite(k = Math.floor(k)) || !(k > 0) ? null : newInterval$1(function(date) {
+      date.setFullYear(Math.floor(date.getFullYear() / k) * k);
+      date.setMonth(0, 1);
+      date.setHours(0, 0, 0, 0);
+    }, function(date, step) {
+      date.setFullYear(date.getFullYear() + step * k);
+    });
+  };
+  year$1.range;
+
+  var utcMinute$1 = newInterval$1(function(date) {
+    date.setUTCSeconds(0, 0);
+  }, function(date, step) {
+    date.setTime(+date + step * durationMinute$1);
+  }, function(start, end) {
+    return (end - start) / durationMinute$1;
+  }, function(date) {
+    return date.getUTCMinutes();
+  });
+  utcMinute$1.range;
+
+  var utcHour$1 = newInterval$1(function(date) {
+    date.setUTCMinutes(0, 0, 0);
+  }, function(date, step) {
+    date.setTime(+date + step * durationHour$1);
+  }, function(start, end) {
+    return (end - start) / durationHour$1;
+  }, function(date) {
+    return date.getUTCHours();
+  });
+  utcHour$1.range;
+
+  var utcDay$1 = newInterval$1(function(date) {
+    date.setUTCHours(0, 0, 0, 0);
+  }, function(date, step) {
+    date.setUTCDate(date.getUTCDate() + step);
+  }, function(start, end) {
+    return (end - start) / durationDay$1;
+  }, function(date) {
+    return date.getUTCDate() - 1;
+  });
+  utcDay$1.range;
+
+  function utcWeekday$1(i) {
+    return newInterval$1(function(date) {
+      date.setUTCDate(date.getUTCDate() - (date.getUTCDay() + 7 - i) % 7);
+      date.setUTCHours(0, 0, 0, 0);
+    }, function(date, step) {
+      date.setUTCDate(date.getUTCDate() + step * 7);
+    }, function(start, end) {
+      return (end - start) / durationWeek$1;
+    });
+  }
+
+  var utcSunday$1 = utcWeekday$1(0);
+  var utcMonday$1 = utcWeekday$1(1);
+  var utcTuesday$1 = utcWeekday$1(2);
+  var utcWednesday$1 = utcWeekday$1(3);
+  var utcThursday$1 = utcWeekday$1(4);
+  var utcFriday$1 = utcWeekday$1(5);
+  var utcSaturday$1 = utcWeekday$1(6);
+
+  utcSunday$1.range;
+  utcMonday$1.range;
+  utcTuesday$1.range;
+  utcWednesday$1.range;
+  utcThursday$1.range;
+  utcFriday$1.range;
+  utcSaturday$1.range;
+
+  var utcMonth$1 = newInterval$1(function(date) {
+    date.setUTCDate(1);
+    date.setUTCHours(0, 0, 0, 0);
+  }, function(date, step) {
+    date.setUTCMonth(date.getUTCMonth() + step);
+  }, function(start, end) {
+    return end.getUTCMonth() - start.getUTCMonth() + (end.getUTCFullYear() - start.getUTCFullYear()) * 12;
+  }, function(date) {
+    return date.getUTCMonth();
+  });
+  utcMonth$1.range;
+
+  var utcYear$1 = newInterval$1(function(date) {
+    date.setUTCMonth(0, 1);
+    date.setUTCHours(0, 0, 0, 0);
+  }, function(date, step) {
+    date.setUTCFullYear(date.getUTCFullYear() + step);
+  }, function(start, end) {
+    return end.getUTCFullYear() - start.getUTCFullYear();
+  }, function(date) {
+    return date.getUTCFullYear();
+  });
+
+  // An optimized implementation for this simple case.
+  utcYear$1.every = function(k) {
+    return !isFinite(k = Math.floor(k)) || !(k > 0) ? null : newInterval$1(function(date) {
+      date.setUTCFullYear(Math.floor(date.getUTCFullYear() / k) * k);
+      date.setUTCMonth(0, 1);
+      date.setUTCHours(0, 0, 0, 0);
+    }, function(date, step) {
+      date.setUTCFullYear(date.getUTCFullYear() + step * k);
+    });
+  };
+  utcYear$1.range;
+
+  var t0 = new Date,
+      t1 = new Date;
+
+  function newInterval(floori, offseti, count, field) {
+
+    function interval(date) {
+      return floori(date = arguments.length === 0 ? new Date : new Date(+date)), date;
+    }
+
+    interval.floor = function(date) {
+      return floori(date = new Date(+date)), date;
+    };
+
+    interval.ceil = function(date) {
+      return floori(date = new Date(date - 1)), offseti(date, 1), floori(date), date;
+    };
+
+    interval.round = function(date) {
+      var d0 = interval(date),
+          d1 = interval.ceil(date);
+      return date - d0 < d1 - date ? d0 : d1;
+    };
+
+    interval.offset = function(date, step) {
+      return offseti(date = new Date(+date), step == null ? 1 : Math.floor(step)), date;
+    };
+
+    interval.range = function(start, stop, step) {
+      var range = [], previous;
+      start = interval.ceil(start);
+      step = step == null ? 1 : Math.floor(step);
+      if (!(start < stop) || !(step > 0)) return range; // also handles Invalid Date
+      do range.push(previous = new Date(+start)), offseti(start, step), floori(start);
+      while (previous < start && start < stop);
+      return range;
+    };
+
+    interval.filter = function(test) {
+      return newInterval(function(date) {
+        if (date >= date) while (floori(date), !test(date)) date.setTime(date - 1);
+      }, function(date, step) {
+        if (date >= date) {
+          if (step < 0) while (++step <= 0) {
+            while (offseti(date, -1), !test(date)) {} // eslint-disable-line no-empty
+          } else while (--step >= 0) {
+            while (offseti(date, +1), !test(date)) {} // eslint-disable-line no-empty
+          }
+        }
+      });
+    };
+
+    if (count) {
+      interval.count = function(start, end) {
+        t0.setTime(+start), t1.setTime(+end);
+        floori(t0), floori(t1);
+        return Math.floor(count(t0, t1));
+      };
+
+      interval.every = function(step) {
+        step = Math.floor(step);
+        return !isFinite(step) || !(step > 0) ? null
+            : !(step > 1) ? interval
+            : interval.filter(field
+                ? function(d) { return field(d) % step === 0; }
+                : function(d) { return interval.count(0, d) % step === 0; });
+      };
+    }
+
+    return interval;
+  }
+
+  var millisecond = newInterval(function() {
+    // noop
+  }, function(date, step) {
+    date.setTime(+date + step);
+  }, function(start, end) {
+    return end - start;
+  });
+
+  // An optimized implementation for this simple case.
+  millisecond.every = function(k) {
+    k = Math.floor(k);
+    if (!isFinite(k) || !(k > 0)) return null;
+    if (!(k > 1)) return millisecond;
+    return newInterval(function(date) {
+      date.setTime(Math.floor(date / k) * k);
+    }, function(date, step) {
+      date.setTime(+date + step * k);
+    }, function(start, end) {
+      return (end - start) / k;
+    });
+  };
+  millisecond.range;
+
+  var durationSecond = 1e3;
+  var durationMinute = 6e4;
+  var durationHour = 36e5;
+  var durationDay = 864e5;
+  var durationWeek = 6048e5;
+
+  var second = newInterval(function(date) {
+    date.setTime(date - date.getMilliseconds());
+  }, function(date, step) {
+    date.setTime(+date + step * durationSecond);
+  }, function(start, end) {
+    return (end - start) / durationSecond;
+  }, function(date) {
+    return date.getUTCSeconds();
+  });
+  second.range;
+
+  var minute = newInterval(function(date) {
+    date.setTime(date - date.getMilliseconds() - date.getSeconds() * durationSecond);
+  }, function(date, step) {
+    date.setTime(+date + step * durationMinute);
+  }, function(start, end) {
+    return (end - start) / durationMinute;
+  }, function(date) {
+    return date.getMinutes();
+  });
+  minute.range;
+
+  var hour = newInterval(function(date) {
+    date.setTime(date - date.getMilliseconds() - date.getSeconds() * durationSecond - date.getMinutes() * durationMinute);
+  }, function(date, step) {
+    date.setTime(+date + step * durationHour);
+  }, function(start, end) {
+    return (end - start) / durationHour;
+  }, function(date) {
+    return date.getHours();
+  });
+  hour.range;
+
+  var day = newInterval(function(date) {
+    date.setHours(0, 0, 0, 0);
+  }, function(date, step) {
+    date.setDate(date.getDate() + step);
+  }, function(start, end) {
+    return (end - start - (end.getTimezoneOffset() - start.getTimezoneOffset()) * durationMinute) / durationDay;
+  }, function(date) {
+    return date.getDate() - 1;
+  });
+  day.range;
+
+  function weekday(i) {
+    return newInterval(function(date) {
+      date.setDate(date.getDate() - (date.getDay() + 7 - i) % 7);
+      date.setHours(0, 0, 0, 0);
+    }, function(date, step) {
+      date.setDate(date.getDate() + step * 7);
+    }, function(start, end) {
+      return (end - start - (end.getTimezoneOffset() - start.getTimezoneOffset()) * durationMinute) / durationWeek;
+    });
+  }
+
+  var sunday = weekday(0);
+  var monday = weekday(1);
+  var tuesday = weekday(2);
+  var wednesday = weekday(3);
+  var thursday = weekday(4);
+  var friday = weekday(5);
+  var saturday = weekday(6);
+
+  sunday.range;
+  monday.range;
+  tuesday.range;
+  wednesday.range;
+  thursday.range;
+  friday.range;
+  saturday.range;
+
+  var month = newInterval(function(date) {
+    date.setDate(1);
+    date.setHours(0, 0, 0, 0);
+  }, function(date, step) {
+    date.setMonth(date.getMonth() + step);
+  }, function(start, end) {
+    return end.getMonth() - start.getMonth() + (end.getFullYear() - start.getFullYear()) * 12;
+  }, function(date) {
+    return date.getMonth();
+  });
+  month.range;
+
+  var year = newInterval(function(date) {
+    date.setMonth(0, 1);
+    date.setHours(0, 0, 0, 0);
+  }, function(date, step) {
+    date.setFullYear(date.getFullYear() + step);
+  }, function(start, end) {
+    return end.getFullYear() - start.getFullYear();
+  }, function(date) {
+    return date.getFullYear();
+  });
+
+  // An optimized implementation for this simple case.
+  year.every = function(k) {
+    return !isFinite(k = Math.floor(k)) || !(k > 0) ? null : newInterval(function(date) {
+      date.setFullYear(Math.floor(date.getFullYear() / k) * k);
+      date.setMonth(0, 1);
+      date.setHours(0, 0, 0, 0);
+    }, function(date, step) {
+      date.setFullYear(date.getFullYear() + step * k);
+    });
+  };
+  year.range;
+
+  var utcMinute = newInterval(function(date) {
+    date.setUTCSeconds(0, 0);
+  }, function(date, step) {
+    date.setTime(+date + step * durationMinute);
+  }, function(start, end) {
+    return (end - start) / durationMinute;
+  }, function(date) {
+    return date.getUTCMinutes();
+  });
+  utcMinute.range;
+
+  var utcHour = newInterval(function(date) {
+    date.setUTCMinutes(0, 0, 0);
+  }, function(date, step) {
+    date.setTime(+date + step * durationHour);
+  }, function(start, end) {
+    return (end - start) / durationHour;
+  }, function(date) {
+    return date.getUTCHours();
+  });
+  utcHour.range;
+
+  var utcDay = newInterval(function(date) {
+    date.setUTCHours(0, 0, 0, 0);
+  }, function(date, step) {
+    date.setUTCDate(date.getUTCDate() + step);
+  }, function(start, end) {
+    return (end - start) / durationDay;
+  }, function(date) {
+    return date.getUTCDate() - 1;
+  });
+  utcDay.range;
+
+  function utcWeekday(i) {
+    return newInterval(function(date) {
+      date.setUTCDate(date.getUTCDate() - (date.getUTCDay() + 7 - i) % 7);
+      date.setUTCHours(0, 0, 0, 0);
+    }, function(date, step) {
+      date.setUTCDate(date.getUTCDate() + step * 7);
+    }, function(start, end) {
+      return (end - start) / durationWeek;
+    });
+  }
+
+  var utcSunday = utcWeekday(0);
+  var utcMonday = utcWeekday(1);
+  var utcTuesday = utcWeekday(2);
+  var utcWednesday = utcWeekday(3);
+  var utcThursday = utcWeekday(4);
+  var utcFriday = utcWeekday(5);
+  var utcSaturday = utcWeekday(6);
+
+  utcSunday.range;
+  utcMonday.range;
+  utcTuesday.range;
+  utcWednesday.range;
+  utcThursday.range;
+  utcFriday.range;
+  utcSaturday.range;
+
+  var utcMonth = newInterval(function(date) {
+    date.setUTCDate(1);
+    date.setUTCHours(0, 0, 0, 0);
+  }, function(date, step) {
+    date.setUTCMonth(date.getUTCMonth() + step);
+  }, function(start, end) {
+    return end.getUTCMonth() - start.getUTCMonth() + (end.getUTCFullYear() - start.getUTCFullYear()) * 12;
+  }, function(date) {
+    return date.getUTCMonth();
+  });
+  utcMonth.range;
+
+  var utcYear = newInterval(function(date) {
+    date.setUTCMonth(0, 1);
+    date.setUTCHours(0, 0, 0, 0);
+  }, function(date, step) {
+    date.setUTCFullYear(date.getUTCFullYear() + step);
+  }, function(start, end) {
+    return end.getUTCFullYear() - start.getUTCFullYear();
+  }, function(date) {
+    return date.getUTCFullYear();
+  });
+
+  // An optimized implementation for this simple case.
+  utcYear.every = function(k) {
+    return !isFinite(k = Math.floor(k)) || !(k > 0) ? null : newInterval(function(date) {
+      date.setUTCFullYear(Math.floor(date.getUTCFullYear() / k) * k);
+      date.setUTCMonth(0, 1);
+      date.setUTCHours(0, 0, 0, 0);
+    }, function(date, step) {
+      date.setUTCFullYear(date.getUTCFullYear() + step * k);
+    });
+  };
+  utcYear.range;
+
+  function localDate(d) {
+    if (0 <= d.y && d.y < 100) {
+      var date = new Date(-1, d.m, d.d, d.H, d.M, d.S, d.L);
+      date.setFullYear(d.y);
+      return date;
+    }
+    return new Date(d.y, d.m, d.d, d.H, d.M, d.S, d.L);
+  }
+
+  function utcDate(d) {
+    if (0 <= d.y && d.y < 100) {
+      var date = new Date(Date.UTC(-1, d.m, d.d, d.H, d.M, d.S, d.L));
+      date.setUTCFullYear(d.y);
+      return date;
+    }
+    return new Date(Date.UTC(d.y, d.m, d.d, d.H, d.M, d.S, d.L));
+  }
+
+  function newDate(y, m, d) {
+    return {y: y, m: m, d: d, H: 0, M: 0, S: 0, L: 0};
+  }
+
+  function formatLocale(locale) {
+    var locale_dateTime = locale.dateTime,
+        locale_date = locale.date,
+        locale_time = locale.time,
+        locale_periods = locale.periods,
+        locale_weekdays = locale.days,
+        locale_shortWeekdays = locale.shortDays,
+        locale_months = locale.months,
+        locale_shortMonths = locale.shortMonths;
+
+    var periodRe = formatRe(locale_periods),
+        periodLookup = formatLookup(locale_periods),
+        weekdayRe = formatRe(locale_weekdays),
+        weekdayLookup = formatLookup(locale_weekdays),
+        shortWeekdayRe = formatRe(locale_shortWeekdays),
+        shortWeekdayLookup = formatLookup(locale_shortWeekdays),
+        monthRe = formatRe(locale_months),
+        monthLookup = formatLookup(locale_months),
+        shortMonthRe = formatRe(locale_shortMonths),
+        shortMonthLookup = formatLookup(locale_shortMonths);
+
+    var formats = {
+      "a": formatShortWeekday,
+      "A": formatWeekday,
+      "b": formatShortMonth,
+      "B": formatMonth,
+      "c": null,
+      "d": formatDayOfMonth,
+      "e": formatDayOfMonth,
+      "f": formatMicroseconds,
+      "g": formatYearISO,
+      "G": formatFullYearISO,
+      "H": formatHour24,
+      "I": formatHour12,
+      "j": formatDayOfYear,
+      "L": formatMilliseconds,
+      "m": formatMonthNumber,
+      "M": formatMinutes,
+      "p": formatPeriod,
+      "q": formatQuarter,
+      "Q": formatUnixTimestamp,
+      "s": formatUnixTimestampSeconds,
+      "S": formatSeconds,
+      "u": formatWeekdayNumberMonday,
+      "U": formatWeekNumberSunday,
+      "V": formatWeekNumberISO,
+      "w": formatWeekdayNumberSunday,
+      "W": formatWeekNumberMonday,
+      "x": null,
+      "X": null,
+      "y": formatYear,
+      "Y": formatFullYear,
+      "Z": formatZone,
+      "%": formatLiteralPercent
+    };
+
+    var utcFormats = {
+      "a": formatUTCShortWeekday,
+      "A": formatUTCWeekday,
+      "b": formatUTCShortMonth,
+      "B": formatUTCMonth,
+      "c": null,
+      "d": formatUTCDayOfMonth,
+      "e": formatUTCDayOfMonth,
+      "f": formatUTCMicroseconds,
+      "g": formatUTCYearISO,
+      "G": formatUTCFullYearISO,
+      "H": formatUTCHour24,
+      "I": formatUTCHour12,
+      "j": formatUTCDayOfYear,
+      "L": formatUTCMilliseconds,
+      "m": formatUTCMonthNumber,
+      "M": formatUTCMinutes,
+      "p": formatUTCPeriod,
+      "q": formatUTCQuarter,
+      "Q": formatUnixTimestamp,
+      "s": formatUnixTimestampSeconds,
+      "S": formatUTCSeconds,
+      "u": formatUTCWeekdayNumberMonday,
+      "U": formatUTCWeekNumberSunday,
+      "V": formatUTCWeekNumberISO,
+      "w": formatUTCWeekdayNumberSunday,
+      "W": formatUTCWeekNumberMonday,
+      "x": null,
+      "X": null,
+      "y": formatUTCYear,
+      "Y": formatUTCFullYear,
+      "Z": formatUTCZone,
+      "%": formatLiteralPercent
+    };
+
+    var parses = {
+      "a": parseShortWeekday,
+      "A": parseWeekday,
+      "b": parseShortMonth,
+      "B": parseMonth,
+      "c": parseLocaleDateTime,
+      "d": parseDayOfMonth,
+      "e": parseDayOfMonth,
+      "f": parseMicroseconds,
+      "g": parseYear,
+      "G": parseFullYear,
+      "H": parseHour24,
+      "I": parseHour24,
+      "j": parseDayOfYear,
+      "L": parseMilliseconds,
+      "m": parseMonthNumber,
+      "M": parseMinutes,
+      "p": parsePeriod,
+      "q": parseQuarter,
+      "Q": parseUnixTimestamp,
+      "s": parseUnixTimestampSeconds,
+      "S": parseSeconds,
+      "u": parseWeekdayNumberMonday,
+      "U": parseWeekNumberSunday,
+      "V": parseWeekNumberISO,
+      "w": parseWeekdayNumberSunday,
+      "W": parseWeekNumberMonday,
+      "x": parseLocaleDate,
+      "X": parseLocaleTime,
+      "y": parseYear,
+      "Y": parseFullYear,
+      "Z": parseZone,
+      "%": parseLiteralPercent
+    };
+
+    // These recursive directive definitions must be deferred.
+    formats.x = newFormat(locale_date, formats);
+    formats.X = newFormat(locale_time, formats);
+    formats.c = newFormat(locale_dateTime, formats);
+    utcFormats.x = newFormat(locale_date, utcFormats);
+    utcFormats.X = newFormat(locale_time, utcFormats);
+    utcFormats.c = newFormat(locale_dateTime, utcFormats);
+
+    function newFormat(specifier, formats) {
+      return function(date) {
+        var string = [],
+            i = -1,
+            j = 0,
+            n = specifier.length,
+            c,
+            pad,
+            format;
+
+        if (!(date instanceof Date)) date = new Date(+date);
+
+        while (++i < n) {
+          if (specifier.charCodeAt(i) === 37) {
+            string.push(specifier.slice(j, i));
+            if ((pad = pads[c = specifier.charAt(++i)]) != null) c = specifier.charAt(++i);
+            else pad = c === "e" ? " " : "0";
+            if (format = formats[c]) c = format(date, pad);
+            string.push(c);
+            j = i + 1;
+          }
+        }
+
+        string.push(specifier.slice(j, i));
+        return string.join("");
+      };
+    }
+
+    function newParse(specifier, Z) {
+      return function(string) {
+        var d = newDate(1900, undefined, 1),
+            i = parseSpecifier(d, specifier, string += "", 0),
+            week, day$1;
+        if (i != string.length) return null;
+
+        // If a UNIX timestamp is specified, return it.
+        if ("Q" in d) return new Date(d.Q);
+        if ("s" in d) return new Date(d.s * 1000 + ("L" in d ? d.L : 0));
+
+        // If this is utcParse, never use the local timezone.
+        if (Z && !("Z" in d)) d.Z = 0;
+
+        // The am-pm flag is 0 for AM, and 1 for PM.
+        if ("p" in d) d.H = d.H % 12 + d.p * 12;
+
+        // If the month was not specified, inherit from the quarter.
+        if (d.m === undefined) d.m = "q" in d ? d.q : 0;
+
+        // Convert day-of-week and week-of-year to day-of-year.
+        if ("V" in d) {
+          if (d.V < 1 || d.V > 53) return null;
+          if (!("w" in d)) d.w = 1;
+          if ("Z" in d) {
+            week = utcDate(newDate(d.y, 0, 1)), day$1 = week.getUTCDay();
+            week = day$1 > 4 || day$1 === 0 ? utcMonday.ceil(week) : utcMonday(week);
+            week = utcDay.offset(week, (d.V - 1) * 7);
+            d.y = week.getUTCFullYear();
+            d.m = week.getUTCMonth();
+            d.d = week.getUTCDate() + (d.w + 6) % 7;
+          } else {
+            week = localDate(newDate(d.y, 0, 1)), day$1 = week.getDay();
+            week = day$1 > 4 || day$1 === 0 ? monday.ceil(week) : monday(week);
+            week = day.offset(week, (d.V - 1) * 7);
+            d.y = week.getFullYear();
+            d.m = week.getMonth();
+            d.d = week.getDate() + (d.w + 6) % 7;
+          }
+        } else if ("W" in d || "U" in d) {
+          if (!("w" in d)) d.w = "u" in d ? d.u % 7 : "W" in d ? 1 : 0;
+          day$1 = "Z" in d ? utcDate(newDate(d.y, 0, 1)).getUTCDay() : localDate(newDate(d.y, 0, 1)).getDay();
+          d.m = 0;
+          d.d = "W" in d ? (d.w + 6) % 7 + d.W * 7 - (day$1 + 5) % 7 : d.w + d.U * 7 - (day$1 + 6) % 7;
+        }
+
+        // If a time zone is specified, all fields are interpreted as UTC and then
+        // offset according to the specified time zone.
+        if ("Z" in d) {
+          d.H += d.Z / 100 | 0;
+          d.M += d.Z % 100;
+          return utcDate(d);
+        }
+
+        // Otherwise, all fields are in local time.
+        return localDate(d);
+      };
+    }
+
+    function parseSpecifier(d, specifier, string, j) {
+      var i = 0,
+          n = specifier.length,
+          m = string.length,
+          c,
+          parse;
+
+      while (i < n) {
+        if (j >= m) return -1;
+        c = specifier.charCodeAt(i++);
+        if (c === 37) {
+          c = specifier.charAt(i++);
+          parse = parses[c in pads ? specifier.charAt(i++) : c];
+          if (!parse || ((j = parse(d, string, j)) < 0)) return -1;
+        } else if (c != string.charCodeAt(j++)) {
+          return -1;
+        }
+      }
+
+      return j;
+    }
+
+    function parsePeriod(d, string, i) {
+      var n = periodRe.exec(string.slice(i));
+      return n ? (d.p = periodLookup[n[0].toLowerCase()], i + n[0].length) : -1;
+    }
+
+    function parseShortWeekday(d, string, i) {
+      var n = shortWeekdayRe.exec(string.slice(i));
+      return n ? (d.w = shortWeekdayLookup[n[0].toLowerCase()], i + n[0].length) : -1;
+    }
+
+    function parseWeekday(d, string, i) {
+      var n = weekdayRe.exec(string.slice(i));
+      return n ? (d.w = weekdayLookup[n[0].toLowerCase()], i + n[0].length) : -1;
+    }
+
+    function parseShortMonth(d, string, i) {
+      var n = shortMonthRe.exec(string.slice(i));
+      return n ? (d.m = shortMonthLookup[n[0].toLowerCase()], i + n[0].length) : -1;
+    }
+
+    function parseMonth(d, string, i) {
+      var n = monthRe.exec(string.slice(i));
+      return n ? (d.m = monthLookup[n[0].toLowerCase()], i + n[0].length) : -1;
+    }
+
+    function parseLocaleDateTime(d, string, i) {
+      return parseSpecifier(d, locale_dateTime, string, i);
+    }
+
+    function parseLocaleDate(d, string, i) {
+      return parseSpecifier(d, locale_date, string, i);
+    }
+
+    function parseLocaleTime(d, string, i) {
+      return parseSpecifier(d, locale_time, string, i);
+    }
+
+    function formatShortWeekday(d) {
+      return locale_shortWeekdays[d.getDay()];
+    }
+
+    function formatWeekday(d) {
+      return locale_weekdays[d.getDay()];
+    }
+
+    function formatShortMonth(d) {
+      return locale_shortMonths[d.getMonth()];
+    }
+
+    function formatMonth(d) {
+      return locale_months[d.getMonth()];
+    }
+
+    function formatPeriod(d) {
+      return locale_periods[+(d.getHours() >= 12)];
+    }
+
+    function formatQuarter(d) {
+      return 1 + ~~(d.getMonth() / 3);
+    }
+
+    function formatUTCShortWeekday(d) {
+      return locale_shortWeekdays[d.getUTCDay()];
+    }
+
+    function formatUTCWeekday(d) {
+      return locale_weekdays[d.getUTCDay()];
+    }
+
+    function formatUTCShortMonth(d) {
+      return locale_shortMonths[d.getUTCMonth()];
+    }
+
+    function formatUTCMonth(d) {
+      return locale_months[d.getUTCMonth()];
+    }
+
+    function formatUTCPeriod(d) {
+      return locale_periods[+(d.getUTCHours() >= 12)];
+    }
+
+    function formatUTCQuarter(d) {
+      return 1 + ~~(d.getUTCMonth() / 3);
+    }
+
+    return {
+      format: function(specifier) {
+        var f = newFormat(specifier += "", formats);
+        f.toString = function() { return specifier; };
+        return f;
+      },
+      parse: function(specifier) {
+        var p = newParse(specifier += "", false);
+        p.toString = function() { return specifier; };
+        return p;
+      },
+      utcFormat: function(specifier) {
+        var f = newFormat(specifier += "", utcFormats);
+        f.toString = function() { return specifier; };
+        return f;
+      },
+      utcParse: function(specifier) {
+        var p = newParse(specifier += "", true);
+        p.toString = function() { return specifier; };
+        return p;
+      }
+    };
+  }
+
+  var pads = {"-": "", "_": " ", "0": "0"},
+      numberRe = /^\s*\d+/, // note: ignores next directive
+      percentRe = /^%/,
+      requoteRe = /[\\^$*+?|[\]().{}]/g;
+
+  function pad(value, fill, width) {
+    var sign = value < 0 ? "-" : "",
+        string = (sign ? -value : value) + "",
+        length = string.length;
+    return sign + (length < width ? new Array(width - length + 1).join(fill) + string : string);
+  }
+
+  function requote(s) {
+    return s.replace(requoteRe, "\\$&");
+  }
+
+  function formatRe(names) {
+    return new RegExp("^(?:" + names.map(requote).join("|") + ")", "i");
+  }
+
+  function formatLookup(names) {
+    var map = {}, i = -1, n = names.length;
+    while (++i < n) map[names[i].toLowerCase()] = i;
+    return map;
+  }
+
+  function parseWeekdayNumberSunday(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 1));
+    return n ? (d.w = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseWeekdayNumberMonday(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 1));
+    return n ? (d.u = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseWeekNumberSunday(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 2));
+    return n ? (d.U = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseWeekNumberISO(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 2));
+    return n ? (d.V = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseWeekNumberMonday(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 2));
+    return n ? (d.W = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseFullYear(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 4));
+    return n ? (d.y = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseYear(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 2));
+    return n ? (d.y = +n[0] + (+n[0] > 68 ? 1900 : 2000), i + n[0].length) : -1;
+  }
+
+  function parseZone(d, string, i) {
+    var n = /^(Z)|([+-]\d\d)(?::?(\d\d))?/.exec(string.slice(i, i + 6));
+    return n ? (d.Z = n[1] ? 0 : -(n[2] + (n[3] || "00")), i + n[0].length) : -1;
+  }
+
+  function parseQuarter(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 1));
+    return n ? (d.q = n[0] * 3 - 3, i + n[0].length) : -1;
+  }
+
+  function parseMonthNumber(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 2));
+    return n ? (d.m = n[0] - 1, i + n[0].length) : -1;
+  }
+
+  function parseDayOfMonth(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 2));
+    return n ? (d.d = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseDayOfYear(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 3));
+    return n ? (d.m = 0, d.d = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseHour24(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 2));
+    return n ? (d.H = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseMinutes(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 2));
+    return n ? (d.M = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseSeconds(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 2));
+    return n ? (d.S = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseMilliseconds(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 3));
+    return n ? (d.L = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseMicroseconds(d, string, i) {
+    var n = numberRe.exec(string.slice(i, i + 6));
+    return n ? (d.L = Math.floor(n[0] / 1000), i + n[0].length) : -1;
+  }
+
+  function parseLiteralPercent(d, string, i) {
+    var n = percentRe.exec(string.slice(i, i + 1));
+    return n ? i + n[0].length : -1;
+  }
+
+  function parseUnixTimestamp(d, string, i) {
+    var n = numberRe.exec(string.slice(i));
+    return n ? (d.Q = +n[0], i + n[0].length) : -1;
+  }
+
+  function parseUnixTimestampSeconds(d, string, i) {
+    var n = numberRe.exec(string.slice(i));
+    return n ? (d.s = +n[0], i + n[0].length) : -1;
+  }
+
+  function formatDayOfMonth(d, p) {
+    return pad(d.getDate(), p, 2);
+  }
+
+  function formatHour24(d, p) {
+    return pad(d.getHours(), p, 2);
+  }
+
+  function formatHour12(d, p) {
+    return pad(d.getHours() % 12 || 12, p, 2);
+  }
+
+  function formatDayOfYear(d, p) {
+    return pad(1 + day.count(year(d), d), p, 3);
+  }
+
+  function formatMilliseconds(d, p) {
+    return pad(d.getMilliseconds(), p, 3);
+  }
+
+  function formatMicroseconds(d, p) {
+    return formatMilliseconds(d, p) + "000";
+  }
+
+  function formatMonthNumber(d, p) {
+    return pad(d.getMonth() + 1, p, 2);
+  }
+
+  function formatMinutes(d, p) {
+    return pad(d.getMinutes(), p, 2);
+  }
+
+  function formatSeconds(d, p) {
+    return pad(d.getSeconds(), p, 2);
+  }
+
+  function formatWeekdayNumberMonday(d) {
+    var day = d.getDay();
+    return day === 0 ? 7 : day;
+  }
+
+  function formatWeekNumberSunday(d, p) {
+    return pad(sunday.count(year(d) - 1, d), p, 2);
+  }
+
+  function dISO(d) {
+    var day = d.getDay();
+    return (day >= 4 || day === 0) ? thursday(d) : thursday.ceil(d);
+  }
+
+  function formatWeekNumberISO(d, p) {
+    d = dISO(d);
+    return pad(thursday.count(year(d), d) + (year(d).getDay() === 4), p, 2);
+  }
+
+  function formatWeekdayNumberSunday(d) {
+    return d.getDay();
+  }
+
+  function formatWeekNumberMonday(d, p) {
+    return pad(monday.count(year(d) - 1, d), p, 2);
+  }
+
+  function formatYear(d, p) {
+    return pad(d.getFullYear() % 100, p, 2);
+  }
+
+  function formatYearISO(d, p) {
+    d = dISO(d);
+    return pad(d.getFullYear() % 100, p, 2);
+  }
+
+  function formatFullYear(d, p) {
+    return pad(d.getFullYear() % 10000, p, 4);
+  }
+
+  function formatFullYearISO(d, p) {
+    var day = d.getDay();
+    d = (day >= 4 || day === 0) ? thursday(d) : thursday.ceil(d);
+    return pad(d.getFullYear() % 10000, p, 4);
+  }
+
+  function formatZone(d) {
+    var z = d.getTimezoneOffset();
+    return (z > 0 ? "-" : (z *= -1, "+"))
+        + pad(z / 60 | 0, "0", 2)
+        + pad(z % 60, "0", 2);
+  }
+
+  function formatUTCDayOfMonth(d, p) {
+    return pad(d.getUTCDate(), p, 2);
+  }
+
+  function formatUTCHour24(d, p) {
+    return pad(d.getUTCHours(), p, 2);
+  }
+
+  function formatUTCHour12(d, p) {
+    return pad(d.getUTCHours() % 12 || 12, p, 2);
+  }
+
+  function formatUTCDayOfYear(d, p) {
+    return pad(1 + utcDay.count(utcYear(d), d), p, 3);
+  }
+
+  function formatUTCMilliseconds(d, p) {
+    return pad(d.getUTCMilliseconds(), p, 3);
+  }
+
+  function formatUTCMicroseconds(d, p) {
+    return formatUTCMilliseconds(d, p) + "000";
+  }
+
+  function formatUTCMonthNumber(d, p) {
+    return pad(d.getUTCMonth() + 1, p, 2);
+  }
+
+  function formatUTCMinutes(d, p) {
+    return pad(d.getUTCMinutes(), p, 2);
+  }
+
+  function formatUTCSeconds(d, p) {
+    return pad(d.getUTCSeconds(), p, 2);
+  }
+
+  function formatUTCWeekdayNumberMonday(d) {
+    var dow = d.getUTCDay();
+    return dow === 0 ? 7 : dow;
+  }
+
+  function formatUTCWeekNumberSunday(d, p) {
+    return pad(utcSunday.count(utcYear(d) - 1, d), p, 2);
+  }
+
+  function UTCdISO(d) {
+    var day = d.getUTCDay();
+    return (day >= 4 || day === 0) ? utcThursday(d) : utcThursday.ceil(d);
+  }
+
+  function formatUTCWeekNumberISO(d, p) {
+    d = UTCdISO(d);
+    return pad(utcThursday.count(utcYear(d), d) + (utcYear(d).getUTCDay() === 4), p, 2);
+  }
+
+  function formatUTCWeekdayNumberSunday(d) {
+    return d.getUTCDay();
+  }
+
+  function formatUTCWeekNumberMonday(d, p) {
+    return pad(utcMonday.count(utcYear(d) - 1, d), p, 2);
+  }
+
+  function formatUTCYear(d, p) {
+    return pad(d.getUTCFullYear() % 100, p, 2);
+  }
+
+  function formatUTCYearISO(d, p) {
+    d = UTCdISO(d);
+    return pad(d.getUTCFullYear() % 100, p, 2);
+  }
+
+  function formatUTCFullYear(d, p) {
+    return pad(d.getUTCFullYear() % 10000, p, 4);
+  }
+
+  function formatUTCFullYearISO(d, p) {
+    var day = d.getUTCDay();
+    d = (day >= 4 || day === 0) ? utcThursday(d) : utcThursday.ceil(d);
+    return pad(d.getUTCFullYear() % 10000, p, 4);
+  }
+
+  function formatUTCZone() {
+    return "+0000";
+  }
+
+  function formatLiteralPercent() {
+    return "%";
+  }
+
+  function formatUnixTimestamp(d) {
+    return +d;
+  }
+
+  function formatUnixTimestampSeconds(d) {
+    return Math.floor(+d / 1000);
+  }
+
+  var locale;
+  var utcFormat;
+  var utcParse;
+
+  defaultLocale({
+    dateTime: "%x, %X",
+    date: "%-m/%-d/%Y",
+    time: "%-I:%M:%S %p",
+    periods: ["AM", "PM"],
+    days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    shortDays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    shortMonths: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+  });
+
+  function defaultLocale(definition) {
+    locale = formatLocale(definition);
+    locale.format;
+    locale.parse;
+    utcFormat = locale.utcFormat;
+    utcParse = locale.utcParse;
+    return locale;
+  }
+
+  var isoSpecifier = "%Y-%m-%dT%H:%M:%S.%LZ";
+
+  function formatIsoNative(date) {
+    return date.toISOString();
+  }
+
+  Date.prototype.toISOString
+      ? formatIsoNative
+      : utcFormat(isoSpecifier);
+
+  function parseIsoNative(string) {
+    var date = new Date(string);
+    return isNaN(date) ? null : date;
+  }
+
+  +new Date("2000-01-01T00:00:00.000Z")
+      ? parseIsoNative
+      : utcParse(isoSpecifier);
+
+  var noop = {value: function() {}};
+
+  function dispatch() {
+    for (var i = 0, n = arguments.length, _ = {}, t; i < n; ++i) {
+      if (!(t = arguments[i] + "") || (t in _) || /[\s.]/.test(t)) throw new Error("illegal type: " + t);
+      _[t] = [];
+    }
+    return new Dispatch(_);
+  }
+
+  function Dispatch(_) {
+    this._ = _;
+  }
+
+  function parseTypenames$1(typenames, types) {
+    return typenames.trim().split(/^|\s+/).map(function(t) {
+      var name = "", i = t.indexOf(".");
+      if (i >= 0) name = t.slice(i + 1), t = t.slice(0, i);
+      if (t && !types.hasOwnProperty(t)) throw new Error("unknown type: " + t);
+      return {type: t, name: name};
+    });
+  }
+
+  Dispatch.prototype = dispatch.prototype = {
+    constructor: Dispatch,
+    on: function(typename, callback) {
+      var _ = this._,
+          T = parseTypenames$1(typename + "", _),
+          t,
+          i = -1,
+          n = T.length;
+
+      // If no callback was specified, return the callback of the given type and name.
+      if (arguments.length < 2) {
+        while (++i < n) if ((t = (typename = T[i]).type) && (t = get(_[t], typename.name))) return t;
+        return;
+      }
+
+      // If a type was specified, set the callback for the given type and name.
+      // Otherwise, if a null callback was specified, remove callbacks of the given name.
+      if (callback != null && typeof callback !== "function") throw new Error("invalid callback: " + callback);
+      while (++i < n) {
+        if (t = (typename = T[i]).type) _[t] = set(_[t], typename.name, callback);
+        else if (callback == null) for (t in _) _[t] = set(_[t], typename.name, null);
+      }
+
+      return this;
+    },
+    copy: function() {
+      var copy = {}, _ = this._;
+      for (var t in _) copy[t] = _[t].slice();
+      return new Dispatch(copy);
+    },
+    call: function(type, that) {
+      if ((n = arguments.length - 2) > 0) for (var args = new Array(n), i = 0, n, t; i < n; ++i) args[i] = arguments[i + 2];
+      if (!this._.hasOwnProperty(type)) throw new Error("unknown type: " + type);
+      for (t = this._[type], i = 0, n = t.length; i < n; ++i) t[i].value.apply(that, args);
+    },
+    apply: function(type, that, args) {
+      if (!this._.hasOwnProperty(type)) throw new Error("unknown type: " + type);
+      for (var t = this._[type], i = 0, n = t.length; i < n; ++i) t[i].value.apply(that, args);
+    }
+  };
+
+  function get(type, name) {
+    for (var i = 0, n = type.length, c; i < n; ++i) {
+      if ((c = type[i]).name === name) {
+        return c.value;
+      }
+    }
+  }
+
+  function set(type, name, callback) {
+    for (var i = 0, n = type.length; i < n; ++i) {
+      if (type[i].name === name) {
+        type[i] = noop, type = type.slice(0, i).concat(type.slice(i + 1));
+        break;
+      }
+    }
+    if (callback != null) type.push({name: name, value: callback});
+    return type;
+  }
+
+  var xhtml = "http://www.w3.org/1999/xhtml";
+
+  var namespaces = {
+    svg: "http://www.w3.org/2000/svg",
+    xhtml: xhtml,
+    xlink: "http://www.w3.org/1999/xlink",
+    xml: "http://www.w3.org/XML/1998/namespace",
+    xmlns: "http://www.w3.org/2000/xmlns/"
+  };
+
+  function namespace(name) {
+    var prefix = name += "", i = prefix.indexOf(":");
+    if (i >= 0 && (prefix = name.slice(0, i)) !== "xmlns") name = name.slice(i + 1);
+    return namespaces.hasOwnProperty(prefix) ? {space: namespaces[prefix], local: name} : name;
+  }
+
+  function creatorInherit(name) {
+    return function() {
+      var document = this.ownerDocument,
+          uri = this.namespaceURI;
+      return uri === xhtml && document.documentElement.namespaceURI === xhtml
+          ? document.createElement(name)
+          : document.createElementNS(uri, name);
+    };
+  }
+
+  function creatorFixed(fullname) {
+    return function() {
+      return this.ownerDocument.createElementNS(fullname.space, fullname.local);
+    };
+  }
+
+  function creator(name) {
+    var fullname = namespace(name);
+    return (fullname.local
+        ? creatorFixed
+        : creatorInherit)(fullname);
+  }
+
+  function none() {}
+
+  function selector(selector) {
+    return selector == null ? none : function() {
+      return this.querySelector(selector);
+    };
+  }
+
+  function selection_select(select) {
+    if (typeof select !== "function") select = selector(select);
+
+    for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
+      for (var group = groups[j], n = group.length, subgroup = subgroups[j] = new Array(n), node, subnode, i = 0; i < n; ++i) {
+        if ((node = group[i]) && (subnode = select.call(node, node.__data__, i, group))) {
+          if ("__data__" in node) subnode.__data__ = node.__data__;
+          subgroup[i] = subnode;
+        }
+      }
+    }
+
+    return new Selection(subgroups, this._parents);
+  }
+
+  function empty() {
+    return [];
+  }
+
+  function selectorAll(selector) {
+    return selector == null ? empty : function() {
+      return this.querySelectorAll(selector);
+    };
+  }
+
+  function selection_selectAll(select) {
+    if (typeof select !== "function") select = selectorAll(select);
+
+    for (var groups = this._groups, m = groups.length, subgroups = [], parents = [], j = 0; j < m; ++j) {
+      for (var group = groups[j], n = group.length, node, i = 0; i < n; ++i) {
+        if (node = group[i]) {
+          subgroups.push(select.call(node, node.__data__, i, group));
+          parents.push(node);
+        }
+      }
+    }
+
+    return new Selection(subgroups, parents);
+  }
+
+  function matcher(selector) {
+    return function() {
+      return this.matches(selector);
+    };
+  }
+
+  function selection_filter(match) {
+    if (typeof match !== "function") match = matcher(match);
+
+    for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
+      for (var group = groups[j], n = group.length, subgroup = subgroups[j] = [], node, i = 0; i < n; ++i) {
+        if ((node = group[i]) && match.call(node, node.__data__, i, group)) {
+          subgroup.push(node);
+        }
+      }
+    }
+
+    return new Selection(subgroups, this._parents);
+  }
+
+  function sparse(update) {
+    return new Array(update.length);
+  }
+
+  function selection_enter() {
+    return new Selection(this._enter || this._groups.map(sparse), this._parents);
+  }
+
+  function EnterNode(parent, datum) {
+    this.ownerDocument = parent.ownerDocument;
+    this.namespaceURI = parent.namespaceURI;
+    this._next = null;
+    this._parent = parent;
+    this.__data__ = datum;
+  }
+
+  EnterNode.prototype = {
+    constructor: EnterNode,
+    appendChild: function(child) { return this._parent.insertBefore(child, this._next); },
+    insertBefore: function(child, next) { return this._parent.insertBefore(child, next); },
+    querySelector: function(selector) { return this._parent.querySelector(selector); },
+    querySelectorAll: function(selector) { return this._parent.querySelectorAll(selector); }
+  };
+
+  function constant$1(x) {
+    return function() {
+      return x;
+    };
+  }
+
+  var keyPrefix = "$"; // Protect against keys like “__proto__”.
+
+  function bindIndex(parent, group, enter, update, exit, data) {
+    var i = 0,
+        node,
+        groupLength = group.length,
+        dataLength = data.length;
+
+    // Put any non-null nodes that fit into update.
+    // Put any null nodes into enter.
+    // Put any remaining data into enter.
+    for (; i < dataLength; ++i) {
+      if (node = group[i]) {
+        node.__data__ = data[i];
+        update[i] = node;
+      } else {
+        enter[i] = new EnterNode(parent, data[i]);
+      }
+    }
+
+    // Put any non-null nodes that don’t fit into exit.
+    for (; i < groupLength; ++i) {
+      if (node = group[i]) {
+        exit[i] = node;
+      }
+    }
+  }
+
+  function bindKey(parent, group, enter, update, exit, data, key) {
+    var i,
+        node,
+        nodeByKeyValue = {},
+        groupLength = group.length,
+        dataLength = data.length,
+        keyValues = new Array(groupLength),
+        keyValue;
+
+    // Compute the key for each node.
+    // If multiple nodes have the same key, the duplicates are added to exit.
+    for (i = 0; i < groupLength; ++i) {
+      if (node = group[i]) {
+        keyValues[i] = keyValue = keyPrefix + key.call(node, node.__data__, i, group);
+        if (keyValue in nodeByKeyValue) {
+          exit[i] = node;
+        } else {
+          nodeByKeyValue[keyValue] = node;
+        }
+      }
+    }
+
+    // Compute the key for each datum.
+    // If there a node associated with this key, join and add it to update.
+    // If there is not (or the key is a duplicate), add it to enter.
+    for (i = 0; i < dataLength; ++i) {
+      keyValue = keyPrefix + key.call(parent, data[i], i, data);
+      if (node = nodeByKeyValue[keyValue]) {
+        update[i] = node;
+        node.__data__ = data[i];
+        nodeByKeyValue[keyValue] = null;
+      } else {
+        enter[i] = new EnterNode(parent, data[i]);
+      }
+    }
+
+    // Add any remaining nodes that were not bound to data to exit.
+    for (i = 0; i < groupLength; ++i) {
+      if ((node = group[i]) && (nodeByKeyValue[keyValues[i]] === node)) {
+        exit[i] = node;
+      }
+    }
+  }
+
+  function selection_data(value, key) {
+    if (!value) {
+      data = new Array(this.size()), j = -1;
+      this.each(function(d) { data[++j] = d; });
+      return data;
+    }
+
+    var bind = key ? bindKey : bindIndex,
+        parents = this._parents,
+        groups = this._groups;
+
+    if (typeof value !== "function") value = constant$1(value);
+
+    for (var m = groups.length, update = new Array(m), enter = new Array(m), exit = new Array(m), j = 0; j < m; ++j) {
+      var parent = parents[j],
+          group = groups[j],
+          groupLength = group.length,
+          data = value.call(parent, parent && parent.__data__, j, parents),
+          dataLength = data.length,
+          enterGroup = enter[j] = new Array(dataLength),
+          updateGroup = update[j] = new Array(dataLength),
+          exitGroup = exit[j] = new Array(groupLength);
+
+      bind(parent, group, enterGroup, updateGroup, exitGroup, data, key);
+
+      // Now connect the enter nodes to their following update node, such that
+      // appendChild can insert the materialized enter node before this node,
+      // rather than at the end of the parent node.
+      for (var i0 = 0, i1 = 0, previous, next; i0 < dataLength; ++i0) {
+        if (previous = enterGroup[i0]) {
+          if (i0 >= i1) i1 = i0 + 1;
+          while (!(next = updateGroup[i1]) && ++i1 < dataLength);
+          previous._next = next || null;
+        }
+      }
+    }
+
+    update = new Selection(update, parents);
+    update._enter = enter;
+    update._exit = exit;
+    return update;
+  }
+
+  function selection_exit() {
+    return new Selection(this._exit || this._groups.map(sparse), this._parents);
+  }
+
+  function selection_join(onenter, onupdate, onexit) {
+    var enter = this.enter(), update = this, exit = this.exit();
+    enter = typeof onenter === "function" ? onenter(enter) : enter.append(onenter + "");
+    if (onupdate != null) update = onupdate(update);
+    if (onexit == null) exit.remove(); else onexit(exit);
+    return enter && update ? enter.merge(update).order() : update;
+  }
+
+  function selection_merge(selection) {
+
+    for (var groups0 = this._groups, groups1 = selection._groups, m0 = groups0.length, m1 = groups1.length, m = Math.min(m0, m1), merges = new Array(m0), j = 0; j < m; ++j) {
+      for (var group0 = groups0[j], group1 = groups1[j], n = group0.length, merge = merges[j] = new Array(n), node, i = 0; i < n; ++i) {
+        if (node = group0[i] || group1[i]) {
+          merge[i] = node;
+        }
+      }
+    }
+
+    for (; j < m0; ++j) {
+      merges[j] = groups0[j];
+    }
+
+    return new Selection(merges, this._parents);
+  }
+
+  function selection_order() {
+
+    for (var groups = this._groups, j = -1, m = groups.length; ++j < m;) {
+      for (var group = groups[j], i = group.length - 1, next = group[i], node; --i >= 0;) {
+        if (node = group[i]) {
+          if (next && node.compareDocumentPosition(next) ^ 4) next.parentNode.insertBefore(node, next);
+          next = node;
+        }
+      }
+    }
+
+    return this;
+  }
+
+  function selection_sort(compare) {
+    if (!compare) compare = ascending;
+
+    function compareNode(a, b) {
+      return a && b ? compare(a.__data__, b.__data__) : !a - !b;
+    }
+
+    for (var groups = this._groups, m = groups.length, sortgroups = new Array(m), j = 0; j < m; ++j) {
+      for (var group = groups[j], n = group.length, sortgroup = sortgroups[j] = new Array(n), node, i = 0; i < n; ++i) {
+        if (node = group[i]) {
+          sortgroup[i] = node;
+        }
+      }
+      sortgroup.sort(compareNode);
+    }
+
+    return new Selection(sortgroups, this._parents).order();
+  }
+
+  function ascending(a, b) {
+    return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
+  }
+
+  function selection_call() {
+    var callback = arguments[0];
+    arguments[0] = this;
+    callback.apply(null, arguments);
+    return this;
+  }
+
+  function selection_nodes() {
+    var nodes = new Array(this.size()), i = -1;
+    this.each(function() { nodes[++i] = this; });
+    return nodes;
+  }
+
+  function selection_node() {
+
+    for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
+      for (var group = groups[j], i = 0, n = group.length; i < n; ++i) {
+        var node = group[i];
+        if (node) return node;
+      }
+    }
+
+    return null;
+  }
+
+  function selection_size() {
+    var size = 0;
+    this.each(function() { ++size; });
+    return size;
+  }
+
+  function selection_empty() {
+    return !this.node();
+  }
+
+  function selection_each(callback) {
+
+    for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
+      for (var group = groups[j], i = 0, n = group.length, node; i < n; ++i) {
+        if (node = group[i]) callback.call(node, node.__data__, i, group);
+      }
+    }
+
+    return this;
+  }
+
+  function attrRemove(name) {
+    return function() {
+      this.removeAttribute(name);
+    };
+  }
+
+  function attrRemoveNS(fullname) {
+    return function() {
+      this.removeAttributeNS(fullname.space, fullname.local);
+    };
+  }
+
+  function attrConstant(name, value) {
+    return function() {
+      this.setAttribute(name, value);
+    };
+  }
+
+  function attrConstantNS(fullname, value) {
+    return function() {
+      this.setAttributeNS(fullname.space, fullname.local, value);
+    };
+  }
+
+  function attrFunction(name, value) {
+    return function() {
+      var v = value.apply(this, arguments);
+      if (v == null) this.removeAttribute(name);
+      else this.setAttribute(name, v);
+    };
+  }
+
+  function attrFunctionNS(fullname, value) {
+    return function() {
+      var v = value.apply(this, arguments);
+      if (v == null) this.removeAttributeNS(fullname.space, fullname.local);
+      else this.setAttributeNS(fullname.space, fullname.local, v);
+    };
+  }
+
+  function selection_attr(name, value) {
+    var fullname = namespace(name);
+
+    if (arguments.length < 2) {
+      var node = this.node();
+      return fullname.local
+          ? node.getAttributeNS(fullname.space, fullname.local)
+          : node.getAttribute(fullname);
+    }
+
+    return this.each((value == null
+        ? (fullname.local ? attrRemoveNS : attrRemove) : (typeof value === "function"
+        ? (fullname.local ? attrFunctionNS : attrFunction)
+        : (fullname.local ? attrConstantNS : attrConstant)))(fullname, value));
+  }
+
+  function defaultView(node) {
+    return (node.ownerDocument && node.ownerDocument.defaultView) // node is a Node
+        || (node.document && node) // node is a Window
+        || node.defaultView; // node is a Document
+  }
+
+  function styleRemove(name) {
+    return function() {
+      this.style.removeProperty(name);
+    };
+  }
+
+  function styleConstant(name, value, priority) {
+    return function() {
+      this.style.setProperty(name, value, priority);
+    };
+  }
+
+  function styleFunction(name, value, priority) {
+    return function() {
+      var v = value.apply(this, arguments);
+      if (v == null) this.style.removeProperty(name);
+      else this.style.setProperty(name, v, priority);
+    };
+  }
+
+  function selection_style(name, value, priority) {
+    return arguments.length > 1
+        ? this.each((value == null
+              ? styleRemove : typeof value === "function"
+              ? styleFunction
+              : styleConstant)(name, value, priority == null ? "" : priority))
+        : styleValue(this.node(), name);
+  }
+
+  function styleValue(node, name) {
+    return node.style.getPropertyValue(name)
+        || defaultView(node).getComputedStyle(node, null).getPropertyValue(name);
+  }
+
+  function propertyRemove(name) {
+    return function() {
+      delete this[name];
+    };
+  }
+
+  function propertyConstant(name, value) {
+    return function() {
+      this[name] = value;
+    };
+  }
+
+  function propertyFunction(name, value) {
+    return function() {
+      var v = value.apply(this, arguments);
+      if (v == null) delete this[name];
+      else this[name] = v;
+    };
+  }
+
+  function selection_property(name, value) {
+    return arguments.length > 1
+        ? this.each((value == null
+            ? propertyRemove : typeof value === "function"
+            ? propertyFunction
+            : propertyConstant)(name, value))
+        : this.node()[name];
+  }
+
+  function classArray(string) {
+    return string.trim().split(/^|\s+/);
+  }
+
+  function classList(node) {
+    return node.classList || new ClassList(node);
+  }
+
+  function ClassList(node) {
+    this._node = node;
+    this._names = classArray(node.getAttribute("class") || "");
+  }
+
+  ClassList.prototype = {
+    add: function(name) {
+      var i = this._names.indexOf(name);
+      if (i < 0) {
+        this._names.push(name);
+        this._node.setAttribute("class", this._names.join(" "));
+      }
+    },
+    remove: function(name) {
+      var i = this._names.indexOf(name);
+      if (i >= 0) {
+        this._names.splice(i, 1);
+        this._node.setAttribute("class", this._names.join(" "));
+      }
+    },
+    contains: function(name) {
+      return this._names.indexOf(name) >= 0;
+    }
+  };
+
+  function classedAdd(node, names) {
+    var list = classList(node), i = -1, n = names.length;
+    while (++i < n) list.add(names[i]);
+  }
+
+  function classedRemove(node, names) {
+    var list = classList(node), i = -1, n = names.length;
+    while (++i < n) list.remove(names[i]);
+  }
+
+  function classedTrue(names) {
+    return function() {
+      classedAdd(this, names);
+    };
+  }
+
+  function classedFalse(names) {
+    return function() {
+      classedRemove(this, names);
+    };
+  }
+
+  function classedFunction(names, value) {
+    return function() {
+      (value.apply(this, arguments) ? classedAdd : classedRemove)(this, names);
+    };
+  }
+
+  function selection_classed(name, value) {
+    var names = classArray(name + "");
+
+    if (arguments.length < 2) {
+      var list = classList(this.node()), i = -1, n = names.length;
+      while (++i < n) if (!list.contains(names[i])) return false;
+      return true;
+    }
+
+    return this.each((typeof value === "function"
+        ? classedFunction : value
+        ? classedTrue
+        : classedFalse)(names, value));
+  }
+
+  function textRemove() {
+    this.textContent = "";
+  }
+
+  function textConstant(value) {
+    return function() {
+      this.textContent = value;
+    };
+  }
+
+  function textFunction(value) {
+    return function() {
+      var v = value.apply(this, arguments);
+      this.textContent = v == null ? "" : v;
+    };
+  }
+
+  function selection_text(value) {
+    return arguments.length
+        ? this.each(value == null
+            ? textRemove : (typeof value === "function"
+            ? textFunction
+            : textConstant)(value))
+        : this.node().textContent;
+  }
+
+  function htmlRemove() {
+    this.innerHTML = "";
+  }
+
+  function htmlConstant(value) {
+    return function() {
+      this.innerHTML = value;
+    };
+  }
+
+  function htmlFunction(value) {
+    return function() {
+      var v = value.apply(this, arguments);
+      this.innerHTML = v == null ? "" : v;
+    };
+  }
+
+  function selection_html(value) {
+    return arguments.length
+        ? this.each(value == null
+            ? htmlRemove : (typeof value === "function"
+            ? htmlFunction
+            : htmlConstant)(value))
+        : this.node().innerHTML;
+  }
+
+  function raise() {
+    if (this.nextSibling) this.parentNode.appendChild(this);
+  }
+
+  function selection_raise() {
+    return this.each(raise);
+  }
+
+  function lower() {
+    if (this.previousSibling) this.parentNode.insertBefore(this, this.parentNode.firstChild);
+  }
+
+  function selection_lower() {
+    return this.each(lower);
+  }
+
+  function selection_append(name) {
+    var create = typeof name === "function" ? name : creator(name);
+    return this.select(function() {
+      return this.appendChild(create.apply(this, arguments));
+    });
+  }
+
+  function constantNull() {
+    return null;
+  }
+
+  function selection_insert(name, before) {
+    var create = typeof name === "function" ? name : creator(name),
+        select = before == null ? constantNull : typeof before === "function" ? before : selector(before);
+    return this.select(function() {
+      return this.insertBefore(create.apply(this, arguments), select.apply(this, arguments) || null);
+    });
+  }
+
+  function remove() {
+    var parent = this.parentNode;
+    if (parent) parent.removeChild(this);
+  }
+
+  function selection_remove() {
+    return this.each(remove);
+  }
+
+  function selection_cloneShallow() {
+    var clone = this.cloneNode(false), parent = this.parentNode;
+    return parent ? parent.insertBefore(clone, this.nextSibling) : clone;
+  }
+
+  function selection_cloneDeep() {
+    var clone = this.cloneNode(true), parent = this.parentNode;
+    return parent ? parent.insertBefore(clone, this.nextSibling) : clone;
+  }
+
+  function selection_clone(deep) {
+    return this.select(deep ? selection_cloneDeep : selection_cloneShallow);
+  }
+
+  function selection_datum(value) {
+    return arguments.length
+        ? this.property("__data__", value)
+        : this.node().__data__;
+  }
+
+  var filterEvents = {};
+
+  var event = null;
+
+  if (typeof document !== "undefined") {
+    var element = document.documentElement;
+    if (!("onmouseenter" in element)) {
+      filterEvents = {mouseenter: "mouseover", mouseleave: "mouseout"};
+    }
+  }
+
+  function filterContextListener(listener, index, group) {
+    listener = contextListener(listener, index, group);
+    return function(event) {
+      var related = event.relatedTarget;
+      if (!related || (related !== this && !(related.compareDocumentPosition(this) & 8))) {
+        listener.call(this, event);
+      }
+    };
+  }
+
+  function contextListener(listener, index, group) {
+    return function(event1) {
+      var event0 = event; // Events can be reentrant (e.g., focus).
+      event = event1;
+      try {
+        listener.call(this, this.__data__, index, group);
+      } finally {
+        event = event0;
+      }
+    };
+  }
+
+  function parseTypenames(typenames) {
+    return typenames.trim().split(/^|\s+/).map(function(t) {
+      var name = "", i = t.indexOf(".");
+      if (i >= 0) name = t.slice(i + 1), t = t.slice(0, i);
+      return {type: t, name: name};
+    });
+  }
+
+  function onRemove(typename) {
+    return function() {
+      var on = this.__on;
+      if (!on) return;
+      for (var j = 0, i = -1, m = on.length, o; j < m; ++j) {
+        if (o = on[j], (!typename.type || o.type === typename.type) && o.name === typename.name) {
+          this.removeEventListener(o.type, o.listener, o.capture);
+        } else {
+          on[++i] = o;
+        }
+      }
+      if (++i) on.length = i;
+      else delete this.__on;
+    };
+  }
+
+  function onAdd(typename, value, capture) {
+    var wrap = filterEvents.hasOwnProperty(typename.type) ? filterContextListener : contextListener;
+    return function(d, i, group) {
+      var on = this.__on, o, listener = wrap(value, i, group);
+      if (on) for (var j = 0, m = on.length; j < m; ++j) {
+        if ((o = on[j]).type === typename.type && o.name === typename.name) {
+          this.removeEventListener(o.type, o.listener, o.capture);
+          this.addEventListener(o.type, o.listener = listener, o.capture = capture);
+          o.value = value;
+          return;
+        }
+      }
+      this.addEventListener(typename.type, listener, capture);
+      o = {type: typename.type, name: typename.name, value: value, listener: listener, capture: capture};
+      if (!on) this.__on = [o];
+      else on.push(o);
+    };
+  }
+
+  function selection_on(typename, value, capture) {
+    var typenames = parseTypenames(typename + ""), i, n = typenames.length, t;
+
+    if (arguments.length < 2) {
+      var on = this.node().__on;
+      if (on) for (var j = 0, m = on.length, o; j < m; ++j) {
+        for (i = 0, o = on[j]; i < n; ++i) {
+          if ((t = typenames[i]).type === o.type && t.name === o.name) {
+            return o.value;
+          }
+        }
+      }
+      return;
+    }
+
+    on = value ? onAdd : onRemove;
+    if (capture == null) capture = false;
+    for (i = 0; i < n; ++i) this.each(on(typenames[i], value, capture));
+    return this;
+  }
+
+  function customEvent(event1, listener, that, args) {
+    var event0 = event;
+    event1.sourceEvent = event;
+    event = event1;
+    try {
+      return listener.apply(that, args);
+    } finally {
+      event = event0;
+    }
+  }
+
+  function dispatchEvent(node, type, params) {
+    var window = defaultView(node),
+        event = window.CustomEvent;
+
+    if (typeof event === "function") {
+      event = new event(type, params);
+    } else {
+      event = window.document.createEvent("Event");
+      if (params) event.initEvent(type, params.bubbles, params.cancelable), event.detail = params.detail;
+      else event.initEvent(type, false, false);
+    }
+
+    node.dispatchEvent(event);
+  }
+
+  function dispatchConstant(type, params) {
+    return function() {
+      return dispatchEvent(this, type, params);
+    };
+  }
+
+  function dispatchFunction(type, params) {
+    return function() {
+      return dispatchEvent(this, type, params.apply(this, arguments));
+    };
+  }
+
+  function selection_dispatch(type, params) {
+    return this.each((typeof params === "function"
+        ? dispatchFunction
+        : dispatchConstant)(type, params));
+  }
+
+  var root = [null];
+
+  function Selection(groups, parents) {
+    this._groups = groups;
+    this._parents = parents;
+  }
+
+  Selection.prototype = {
+    constructor: Selection,
+    select: selection_select,
+    selectAll: selection_selectAll,
+    filter: selection_filter,
+    data: selection_data,
+    enter: selection_enter,
+    exit: selection_exit,
+    join: selection_join,
+    merge: selection_merge,
+    order: selection_order,
+    sort: selection_sort,
+    call: selection_call,
+    nodes: selection_nodes,
+    node: selection_node,
+    size: selection_size,
+    empty: selection_empty,
+    each: selection_each,
+    attr: selection_attr,
+    style: selection_style,
+    property: selection_property,
+    classed: selection_classed,
+    text: selection_text,
+    html: selection_html,
+    raise: selection_raise,
+    lower: selection_lower,
+    append: selection_append,
+    insert: selection_insert,
+    remove: selection_remove,
+    clone: selection_clone,
+    datum: selection_datum,
+    on: selection_on,
+    dispatch: selection_dispatch
+  };
+
+  function select(selector) {
+    return typeof selector === "string"
+        ? new Selection([[document.querySelector(selector)]], [document.documentElement])
+        : new Selection([[selector]], root);
+  }
+
+  var nextId = 0;
+
+  function Local() {
+    this._ = "@" + (++nextId).toString(36);
+  }
+
+  Local.prototype = {
+    constructor: Local,
+    get: function(node) {
+      var id = this._;
+      while (!(id in node)) if (!(node = node.parentNode)) return;
+      return node[id];
+    },
+    set: function(node, value) {
+      return node[this._] = value;
+    },
+    remove: function(node) {
+      return this._ in node && delete node[this._];
+    },
+    toString: function() {
+      return this._;
+    }
+  };
+
+  function sourceEvent() {
+    var current = event, source;
+    while (source = current.sourceEvent) current = source;
+    return current;
+  }
+
+  function point(node, event) {
+    var svg = node.ownerSVGElement || node;
+
+    if (svg.createSVGPoint) {
+      var point = svg.createSVGPoint();
+      point.x = event.clientX, point.y = event.clientY;
+      point = point.matrixTransform(node.getScreenCTM().inverse());
+      return [point.x, point.y];
+    }
+
+    var rect = node.getBoundingClientRect();
+    return [event.clientX - rect.left - node.clientLeft, event.clientY - rect.top - node.clientTop];
+  }
+
+  function mouse(node) {
+    var event = sourceEvent();
+    if (event.changedTouches) event = event.changedTouches[0];
+    return point(node, event);
+  }
+
+  function touch(node, touches, identifier) {
+    if (arguments.length < 3) identifier = touches, touches = sourceEvent().changedTouches;
+
+    for (var i = 0, n = touches ? touches.length : 0, touch; i < n; ++i) {
+      if ((touch = touches[i]).identifier === identifier) {
+        return point(node, touch);
+      }
+    }
+
+    return null;
+  }
+
+  function nopropagation() {
+    event.stopImmediatePropagation();
+  }
+
+  function noevent() {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  }
+
+  function nodrag(view) {
+    var root = view.document.documentElement,
+        selection = select(view).on("dragstart.drag", noevent, true);
+    if ("onselectstart" in root) {
+      selection.on("selectstart.drag", noevent, true);
+    } else {
+      root.__noselect = root.style.MozUserSelect;
+      root.style.MozUserSelect = "none";
+    }
+  }
+
+  function yesdrag(view, noclick) {
+    var root = view.document.documentElement,
+        selection = select(view).on("dragstart.drag", null);
+    if (noclick) {
+      selection.on("click.drag", noevent, true);
+      setTimeout(function() { selection.on("click.drag", null); }, 0);
+    }
+    if ("onselectstart" in root) {
+      selection.on("selectstart.drag", null);
+    } else {
+      root.style.MozUserSelect = root.__noselect;
+      delete root.__noselect;
+    }
+  }
+
+  function constant(x) {
+    return function() {
+      return x;
+    };
+  }
+
+  function DragEvent(target, type, subject, id, active, x, y, dx, dy, dispatch) {
+    this.target = target;
+    this.type = type;
+    this.subject = subject;
+    this.identifier = id;
+    this.active = active;
+    this.x = x;
+    this.y = y;
+    this.dx = dx;
+    this.dy = dy;
+    this._ = dispatch;
+  }
+
+  DragEvent.prototype.on = function() {
+    var value = this._.on.apply(this._, arguments);
+    return value === this._ ? this : value;
+  };
+
+  // Ignore right-click, since that should open the context menu.
+  function defaultFilter() {
+    return !event.ctrlKey && !event.button;
+  }
+
+  function defaultContainer() {
+    return this.parentNode;
+  }
+
+  function defaultSubject(d) {
+    return d == null ? {x: event.x, y: event.y} : d;
+  }
+
+  function defaultTouchable() {
+    return navigator.maxTouchPoints || ("ontouchstart" in this);
+  }
+
+  function drag() {
+    var filter = defaultFilter,
+        container = defaultContainer,
+        subject = defaultSubject,
+        touchable = defaultTouchable,
+        gestures = {},
+        listeners = dispatch("start", "drag", "end"),
+        active = 0,
+        mousedownx,
+        mousedowny,
+        mousemoving,
+        touchending,
+        clickDistance2 = 0;
+
+    function drag(selection) {
+      selection
+          .on("mousedown.drag", mousedowned)
+        .filter(touchable)
+          .on("touchstart.drag", touchstarted)
+          .on("touchmove.drag", touchmoved)
+          .on("touchend.drag touchcancel.drag", touchended)
+          .style("touch-action", "none")
+          .style("-webkit-tap-highlight-color", "rgba(0,0,0,0)");
+    }
+
+    function mousedowned() {
+      if (touchending || !filter.apply(this, arguments)) return;
+      var gesture = beforestart("mouse", container.apply(this, arguments), mouse, this, arguments);
+      if (!gesture) return;
+      select(event.view).on("mousemove.drag", mousemoved, true).on("mouseup.drag", mouseupped, true);
+      nodrag(event.view);
+      nopropagation();
+      mousemoving = false;
+      mousedownx = event.clientX;
+      mousedowny = event.clientY;
+      gesture("start");
+    }
+
+    function mousemoved() {
+      noevent();
+      if (!mousemoving) {
+        var dx = event.clientX - mousedownx, dy = event.clientY - mousedowny;
+        mousemoving = dx * dx + dy * dy > clickDistance2;
+      }
+      gestures.mouse("drag");
+    }
+
+    function mouseupped() {
+      select(event.view).on("mousemove.drag mouseup.drag", null);
+      yesdrag(event.view, mousemoving);
+      noevent();
+      gestures.mouse("end");
+    }
+
+    function touchstarted() {
+      if (!filter.apply(this, arguments)) return;
+      var touches = event.changedTouches,
+          c = container.apply(this, arguments),
+          n = touches.length, i, gesture;
+
+      for (i = 0; i < n; ++i) {
+        if (gesture = beforestart(touches[i].identifier, c, touch, this, arguments)) {
+          nopropagation();
+          gesture("start");
+        }
+      }
+    }
+
+    function touchmoved() {
+      var touches = event.changedTouches,
+          n = touches.length, i, gesture;
+
+      for (i = 0; i < n; ++i) {
+        if (gesture = gestures[touches[i].identifier]) {
+          noevent();
+          gesture("drag");
+        }
+      }
+    }
+
+    function touchended() {
+      var touches = event.changedTouches,
+          n = touches.length, i, gesture;
+
+      if (touchending) clearTimeout(touchending);
+      touchending = setTimeout(function() { touchending = null; }, 500); // Ghost clicks are delayed!
+      for (i = 0; i < n; ++i) {
+        if (gesture = gestures[touches[i].identifier]) {
+          nopropagation();
+          gesture("end");
+        }
+      }
+    }
+
+    function beforestart(id, container, point, that, args) {
+      var p = point(container, id), s, dx, dy,
+          sublisteners = listeners.copy();
+
+      if (!customEvent(new DragEvent(drag, "beforestart", s, id, active, p[0], p[1], 0, 0, sublisteners), function() {
+        if ((event.subject = s = subject.apply(that, args)) == null) return false;
+        dx = s.x - p[0] || 0;
+        dy = s.y - p[1] || 0;
+        return true;
+      })) return;
+
+      return function gesture(type) {
+        var p0 = p, n;
+        switch (type) {
+          case "start": gestures[id] = gesture, n = active++; break;
+          case "end": delete gestures[id], --active; // nobreak
+          case "drag": p = point(container, id), n = active; break;
+        }
+        customEvent(new DragEvent(drag, type, s, id, n, p[0] + dx, p[1] + dy, p[0] - p0[0], p[1] - p0[1], sublisteners), sublisteners.apply, sublisteners, [type, that, args]);
+      };
+    }
+
+    drag.filter = function(_) {
+      return arguments.length ? (filter = typeof _ === "function" ? _ : constant(!!_), drag) : filter;
+    };
+
+    drag.container = function(_) {
+      return arguments.length ? (container = typeof _ === "function" ? _ : constant(_), drag) : container;
+    };
+
+    drag.subject = function(_) {
+      return arguments.length ? (subject = typeof _ === "function" ? _ : constant(_), drag) : subject;
+    };
+
+    drag.touchable = function(_) {
+      return arguments.length ? (touchable = typeof _ === "function" ? _ : constant(!!_), drag) : touchable;
+    };
+
+    drag.on = function() {
+      var value = listeners.on.apply(listeners, arguments);
+      return value === listeners ? drag : value;
+    };
+
+    drag.clickDistance = function(_) {
+      return arguments.length ? (clickDistance2 = (_ = +_) * _, drag) : Math.sqrt(clickDistance2);
+    };
+
+    return drag;
+  }
+
+  // Copyright 2018 The Distill Template Authors
+
+  const T$2 = Template('d-slider', `
+<style>
+  :host {
+    position: relative;
+    display: inline-block;
+  }
+
+  :host(:focus) {
+    outline: none;
+  }
+
+  .background {
+    padding: 9px 0;
+    color: white;
+    position: relative;
+  }
+
+  .track {
+    height: 3px;
+    width: 100%;
+    border-radius: 2px;
+    background-color: hsla(0, 0%, 0%, 0.2);
+  }
+
+  .track-fill {
+    position: absolute;
+    top: 9px;
+    height: 3px;
+    border-radius: 4px;
+    background-color: hsl(24, 100%, 50%);
+  }
+
+  .knob-container {
+    position: absolute;
+    top: 10px;
+  }
+
+  .knob {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    width: 13px;
+    height: 13px;
+    background-color: hsl(24, 100%, 50%);
+    border-radius: 50%;
+    transition-property: transform;
+    transition-duration: 0.18s;
+    transition-timing-function: ease;
+  }
+  .mousedown .knob {
+    transform: scale(1.5);
+  }
+
+  .knob-highlight {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    width: 13px;
+    height: 13px;
+    background-color: hsla(0, 0%, 0%, 0.1);
+    border-radius: 50%;
+    transition-property: transform;
+    transition-duration: 0.18s;
+    transition-timing-function: ease;
+  }
+
+  .focus .knob-highlight {
+    transform: scale(2);
+  }
+
+  .ticks {
+    position: absolute;
+    top: 16px;
+    height: 4px;
+    width: 100%;
+    z-index: -1;
+  }
+
+  .ticks .tick {
+    position: absolute;
+    height: 100%;
+    border-left: 1px solid hsla(0, 0%, 0%, 0.2);
+  }
+
+</style>
+
+  <div class='background'>
+    <div class='track'></div>
+    <div class='track-fill'></div>
+    <div class='knob-container'>
+      <div class='knob-highlight'></div>
+      <div class='knob'></div>
+    </div>
+    <div class='ticks'></div>
+  </div>
+`);
+
+  // ARIA
+  // If the slider has a visible label, it is referenced by aria-labelledby on the slider element. Otherwise, the slider element has a label provided by aria-label.
+  // If the slider is vertically oriented, it has aria-orientation set to vertical. The default value of aria-orientation for a slider is horizontal.
+
+  const keyCodes = {
+    left: 37,
+    up: 38,
+    right: 39,
+    down: 40,
+    pageUp: 33,
+    pageDown: 34,
+    end: 35,
+    home: 36
+  };
+
+  class Slider extends T$2(HTMLElement) {
+
+
+    connectedCallback() {
+      this.connected = true;
+      this.setAttribute('role', 'slider');
+      // Makes the element tab-able.
+      if (!this.hasAttribute('tabindex')) { this.setAttribute('tabindex', 0); }
+
+      // Keeps track of keyboard vs. mouse interactions for focus rings
+      this.mouseEvent = false;
+
+      // Handles to shadow DOM elements
+      this.knob = this.root.querySelector('.knob-container');
+      this.background = this.root.querySelector('.background');
+      this.trackFill = this.root.querySelector('.track-fill');
+      this.track = this.root.querySelector('.track');
+
+      // Default values for attributes
+      this.min = this.min ? this.min : 0;
+      this.max = this.max ? this.max : 100;
+      this.scale = linear().domain([this.min, this.max]).range([0, 1]).clamp(true);
+
+      this.origin = this.origin !== undefined ? this.origin : this.min;
+      this.step = this.step ? this.step : 1;
+      this.update(this.value ? this.value : 0);
+
+      this.ticks = this.ticks ? this.ticks : false;
+      this.renderTicks();
+
+      this.drag = drag()
+        .container(this.background)
+        .on('start', () => {
+          this.mouseEvent = true;
+          this.background.classList.add('mousedown');
+          this.changeValue = this.value;
+          this.dragUpdate();
+        })
+        .on('drag', () => {
+          this.dragUpdate();
+        })
+        .on('end', () => {
+          this.mouseEvent = false;
+          this.background.classList.remove('mousedown');
+          this.dragUpdate();
+          if (this.changeValue !== this.value) this.dispatchChange();
+          this.changeValue = this.value;
+        });
+      this.drag(select(this.background));
+
+      this.addEventListener('focusin', () => {
+        if(!this.mouseEvent) {
+          this.background.classList.add('focus');
+        }
+      });
+      this.addEventListener('focusout', () => {
+        this.background.classList.remove('focus');
+      });
+      this.addEventListener('keydown', this.onKeyDown);
+
+    }
+
+    static get observedAttributes() {return ['min', 'max', 'value', 'step', 'ticks', 'origin', 'tickValues', 'tickLabels']; }
+
+    attributeChangedCallback(attr, oldValue, newValue) {
+      if (isNaN(newValue) || newValue === undefined || newValue === null) return;
+      if (attr == 'min') {
+        this.min = +newValue;
+        this.setAttribute('aria-valuemin', this.min);
+      }
+      if (attr == 'max') {
+        this.max = +newValue;
+        this.setAttribute('aria-valuemax', this.max);
+      }
+      if (attr == 'value') {
+        this.update(+newValue);
+      }
+      if (attr == 'origin') {
+        this.origin = +newValue;
+        // this.update(this.value);
+      }
+      if (attr == 'step') {
+        if (newValue > 0) {
+          this.step = +newValue;
+        }
+      }
+      if (attr == 'ticks') {
+        this.ticks = (newValue === '' ? true : newValue);
+      }
+    }
+
+    onKeyDown(event) {
+      this.changeValue = this.value;
+      let stopPropagation = false;
+      switch (event.keyCode) {
+      case keyCodes.left:
+      case keyCodes.down:
+        this.update(this.value - this.step);
+        stopPropagation = true;
+        break;
+      case keyCodes.right:
+      case keyCodes.up:
+        this.update(this.value + this.step);
+        stopPropagation = true;
+        break;
+      case keyCodes.pageUp:
+        this.update(this.value + this.step * 10);
+        stopPropagation = true;
+        break;
+
+      case keyCodes.pageDown:
+        this.update(this.value + this.step * 10);
+        stopPropagation = true;
+        break;
+      case keyCodes.home:
+        this.update(this.min);
+        stopPropagation = true;
+        break;
+      case keyCodes.end:
+        this.update(this.max);
+        stopPropagation = true;
+        break;
+      }
+      if (stopPropagation) {
+        this.background.classList.add('focus');
+        event.preventDefault();
+        event.stopPropagation();
+        if (this.changeValue !== this.value) this.dispatchChange();
+      }
+    }
+
+    validateValueRange(min, max, value) {
+      return Math.max(Math.min(max, value), min);
+    }
+
+    quantizeValue(value, step) {
+      return Math.round(value / step) * step;
+    }
+
+    dragUpdate() {
+      const bbox = this.background.getBoundingClientRect();
+      const x = event.x;
+      const width = bbox.width;
+      this.update(this.scale.invert(x / width));
+    }
+
+    update(value) {
+      let v = value;
+      if (this.step !== 'any') {
+        v = this.quantizeValue(value, this.step);
+      }
+      v = this.validateValueRange(this.min, this.max, v);
+      if (this.connected) {
+        this.knob.style.left = this.scale(v) * 100 + '%';
+        this.trackFill.style.width = this.scale(this.min + Math.abs(v - this.origin)) * 100 + '%';
+        this.trackFill.style.left = this.scale(Math.min(v, this.origin)) * 100 + '%';
+      }
+      if (this.value !== v) {
+        this.value = v;
+        this.setAttribute('aria-valuenow', this.value);
+        this.dispatchInput();
+      }
+    }
+
+    // Dispatches only on a committed change (basically only on mouseup).
+    dispatchChange() {
+      const e = new Event('change');
+      this.dispatchEvent(e, {});
+    }
+
+    // Dispatches on each value change.
+    dispatchInput() {
+      const e = new Event('input');
+      this.dispatchEvent(e, {});
+    }
+
+    renderTicks() {
+      const ticksContainer = this.root.querySelector('.ticks');
+      if (this.ticks !== false) {
+        let tickData = [];
+        if (this.ticks > 0) {
+          tickData = this.scale.ticks(this.ticks);
+        } else if (this.step === 'any') {
+          tickData = this.scale.ticks();
+        } else {
+          tickData = range(this.min, this.max + 1e-6, this.step);
+        }
+        tickData.forEach(d => {
+          const tick = document.createElement('div');
+          tick.classList.add('tick');
+          tick.style.left = this.scale(d) * 100 + '%';
+          ticksContainer.appendChild(tick);
+        });
+      } else {
+        ticksContainer.style.display = 'none';
+      }
+    }
+  }
+
+  var logo = "<svg viewBox=\"-607 419 64 64\">\n  <path d=\"M-573.4,478.9c-8,0-14.6-6.4-14.6-14.5s14.6-25.9,14.6-40.8c0,14.9,14.6,32.8,14.6,40.8S-565.4,478.9-573.4,478.9z\"/>\n</svg>\n";
+
+  const headerTemplate = `
+<style>
+distill-header {
+  position: relative;
+  height: 60px;
+  background-color: hsl(200, 60%, 15%);
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 2;
+  color: rgba(0, 0, 0, 0.8);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+}
+distill-header .content {
+  height: 70px;
+  grid-column: page;
+}
+distill-header a {
+  font-size: 16px;
+  height: 60px;
+  line-height: 60px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 22px 0;
+}
+distill-header a:hover {
+  color: rgba(255, 255, 255, 1);
+}
+distill-header svg {
+  width: 24px;
+  position: relative;
+  top: 4px;
+  margin-right: 2px;
+}
+@media(min-width: 1080px) {
+  distill-header {
+    height: 70px;
+  }
+  distill-header a {
+    height: 70px;
+    line-height: 70px;
+    padding: 28px 0;
+  }
+  distill-header .logo {
+  }
+}
+distill-header svg path {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.8);
+  stroke-width: 3px;
+}
+distill-header .logo {
+  font-size: 17px;
+  font-weight: 200;
+}
+distill-header .nav {
+  float: right;
+  font-weight: 300;
+}
+distill-header .nav a {
+  font-size: 12px;
+  margin-left: 24px;
+  text-transform: uppercase;
+}
+</style>
+<div class="content">
+  <nav class="nav">
+    <a href="https://github.com/mathadoor/TransformerExposition" target="_blank">GITHUB</a>
+    <a href="/prize/">VIDEO</a>
+  </nav>
+</div>
+`;
+
+  // Copyright 2018 The Distill Template Authors
+
+  const T$1 = Template('distill-header', headerTemplate, false);
+
+  class DistillHeader extends T$1(HTMLElement) {
+
+  }
+
+  // Copyright 2018 The Distill Template Authors
+
+  const styles = `
+<style>
+  distill-appendix {
+    contain: layout style;
+  }
+
+  distill-appendix .citation {
+    font-size: 11px;
+    line-height: 15px;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    padding-left: 18px;
+    border: 1px solid rgba(0,0,0,0.1);
+    background: rgba(0, 0, 0, 0.02);
+    padding: 10px 18px;
+    border-radius: 3px;
+    color: rgba(150, 150, 150, 1);
+    overflow: hidden;
+    margin-top: -12px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  distill-appendix > * {
+    grid-column: text;
+  }
+</style>
+`;
+
+  function appendixTemplate(frontMatter) {
+    let html = styles;
+
+    if (typeof frontMatter.githubUrl !== 'undefined') {
+      html += `
+    <h3 id="updates-and-corrections">Updates and Corrections</h3>
+    <p>`;
+      if (frontMatter.githubCompareUpdatesUrl) {
+        html += `<a href="${frontMatter.githubCompareUpdatesUrl}">View all changes</a> to this article since it was first published.`;
+      }
+      html += `
+    If you see mistakes or want to suggest changes, please <a href="${frontMatter.githubUrl + '/issues/new'}">create an issue on GitHub</a>. </p>
+    `;
+    }
+
+    const journal = frontMatter.journal;
+    if (typeof journal !== 'undefined' && journal.title === 'Distill') {
+      html += `
+    <h3 id="reuse">Reuse</h3>
+    <p>Diagrams and text are licensed under Creative Commons Attribution <a href="https://creativecommons.org/licenses/by/4.0/">CC-BY 4.0</a> with the <a class="github" href="${frontMatter.githubUrl}">source available on GitHub</a>, unless noted otherwise. The figures that have been reused from other sources don’t fall under this license and can be recognized by a note in their caption: “Figure from …”.</p>
+    `;
+    }
+
+    if (typeof frontMatter.publishedDate !== 'undefined') {
+      html += `
+    <h3 id="citation">Citation</h3>
+    <p>For attribution in academic contexts, please cite this work as</p>
+    <pre class="citation short">${frontMatter.concatenatedAuthors}, "${frontMatter.title}", Distill, ${frontMatter.publishedYear}.</pre>
+    <p>BibTeX citation</p>
+    <pre class="citation long">${serializeFrontmatterToBibtex(frontMatter)}</pre>
+    `;
+    }
+
+    return html;
+  }
+
+  class DistillAppendix extends HTMLElement {
+
+    static get is() { return 'distill-appendix'; }
+
+    set frontMatter(frontMatter) {
+      this.innerHTML = appendixTemplate(frontMatter);
+    }
+
+  }
+
+  const footerTemplate = `
+<style>
+
+:host {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 300;
+  padding: 2rem 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: hsl(180, 5%, 15%); /*hsl(200, 60%, 15%);*/
+  text-align: left;
+  contain: content;
+}
+
+.footer-container .logo svg {
+  width: 24px;
+  position: relative;
+  top: 4px;
+  margin-right: 2px;
+}
+
+.footer-container .logo svg path {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.8);
+  stroke-width: 3px;
+}
+
+.footer-container .logo {
+  font-size: 17px;
+  font-weight: 200;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  margin-right: 6px;
+}
+
+.footer-container {
+  grid-column: text;
+}
+
+.footer-container .nav {
+  font-size: 0.9em;
+  margin-top: 1.5em;
+}
+
+.footer-container .nav a {
+  color: rgba(255, 255, 255, 0.8);
+  margin-right: 6px;
+  text-decoration: none;
+}
+
+</style>
+
+<div class='footer-container'>
+
+  <a href="/" class="logo">
+    ${logo}
+    Distill
+  </a> is dedicated to clear explanations of machine learning
+
+  <div class="nav">
+    <a href="https://distill.pub/about/">About</a>
+    <a href="https://distill.pub/journal/">Submit</a>
+    <a href="https://distill.pub/prize/">Prize</a>
+    <a href="https://distill.pub/archive/">Archive</a>
+    <a href="https://distill.pub/rss.xml">RSS</a>
+    <a href="https://github.com/distillpub">GitHub</a>
+    <a href="https://twitter.com/distillpub">Twitter</a>
+    &nbsp;&nbsp;&nbsp;&nbsp; ISSN 2476-0757
+  </div>
+
+</div>
+
+`;
+
+  // Copyright 2018 The Distill Template Authors
+
+  const T = Template('distill-footer', footerTemplate);
+
+  class DistillFooter extends T(HTMLElement) {
+
+  }
+
+  // Copyright 2018 The Distill Template Authors
+
+  let templateIsLoading = false;
+  let runlevel = 0;
+  const initialize = function() {
+    if (window.distill.runlevel < 1) {
+      throw new Error("Insufficient Runlevel for Distill Template!");
+    }
+
+    /* 1. Flag that we're being loaded */
+    if ("distill" in window && window.distill.templateIsLoading) {
+      throw new Error(
+        "Runlevel 1: Distill Template is getting loaded more than once, aborting!"
+      );
+    } else {
+      window.distill.templateIsLoading = true;
+      console.debug("Runlevel 1: Distill Template has started loading.");
+    }
+
+    /* 2. Add styles if they weren't added during prerendering */
+    makeStyleTag(document);
+    console.debug("Runlevel 1: Static Distill styles have been added.");
+    console.debug("Runlevel 1->2.");
+    window.distill.runlevel += 1;
+
+    /* 3. Register Controller listener functions */
+    /* Needs to happen before components to their connected callbacks have a controller to talk to. */
+    for (const [functionName, callback] of Object.entries(Controller.listeners)) {
+      if (typeof callback === "function") {
+        document.addEventListener(functionName, callback);
+      } else {
+        console.error("Runlevel 2: Controller listeners need to be functions!");
+      }
+    }
+    console.debug("Runlevel 2: We can now listen to controller events.");
+    console.debug("Runlevel 2->3.");
+    window.distill.runlevel += 1;
+
+    /* 4. Register components */
+    const components = [
+      Abstract, Appendix, Article, Bibliography, Byline, Cite, CitationList, Code,
+      Footnote, FootnoteList, FrontMatter, HoverBox, Title, DMath, References, TOC, Figure,
+      Slider, Interstitial
+    ];
+
+    const distillComponents = [DistillHeader, DistillAppendix, DistillFooter];
+
+    if (window.distill.runlevel < 2) {
+      throw new Error("Insufficient Runlevel for adding custom elements!");
+    }
+    const allComponents = components.concat(distillComponents);
+    for (const component of allComponents) {
+      console.debug("Runlevel 2: Registering custom element: " + component.is);
+      customElements.define(component.is, component);
+    }
+
+    console.debug(
+      "Runlevel 3: Distill Template finished registering custom elements."
+    );
+    console.debug("Runlevel 3->4.");
+    window.distill.runlevel += 1;
+
+    // If template was added after DOMContentLoaded we may have missed that event.
+    // Controller will check for that case, so trigger the event explicitly:
+    if (domContentLoaded()) {
+      Controller.listeners.DOMContentLoaded();
+    }
+
+    console.debug("Runlevel 4: Distill Template initialisation complete.");
+    window.distill.templateIsLoading = false;
+    window.distill.templateHasLoaded = true;
+  };
+
+  window.distill = { runlevel, initialize, templateIsLoading };
+
+  /* 0. Check browser feature support; synchronously polyfill if needed */
+  if (Polyfills.browserSupportsAllFeatures()) {
+    console.debug("Runlevel 0: No need for polyfills.");
+    console.debug("Runlevel 0->1.");
+    window.distill.runlevel += 1;
+    window.distill.initialize();
+  } else {
+    console.debug("Runlevel 0: Distill Template is loading polyfills.");
+    Polyfills.load(window.distill.initialize);
+  }
+
+}));
 //# sourceMappingURL=template.v2.js.map
