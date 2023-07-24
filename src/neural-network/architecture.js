@@ -42,7 +42,7 @@ const targetPlaceHolderText = ["Target", "sentence", "will", "appear", "here", "
 const translationPlaceHolderText = ["Translation", "will", "appear", "here", "..."]
 const outputPlaceHolderText = ["Translation", "will", "appear", "here", "..."]
 
-const api_url = "http://127.0.0.1:5000/one-predict";
+const api_url = "http://35.183.0.159:8080/one-predict";
 const api_options = {
   method: 'POST',
   headers: {
@@ -72,7 +72,7 @@ class Architecture extends React.Component {
         outputText : translationPlaceHolderText,
         translation : outputPlaceHolderText,
         counter : 0,
-      } // <- Need to assign the element id to control which element is active
+      }
       this.fixedProps = {
         color : '#053061',
         y_gap : 18,
@@ -116,6 +116,7 @@ class Architecture extends React.Component {
         return response.json(); // This returns a promise
       })
       .then(data => {
+
         this.setState((prevState) => {
           const newState = {...prevState};
           newState.translation = ["<sos>", ...data.translation]; // set data from API to state
