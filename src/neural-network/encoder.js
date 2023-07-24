@@ -3,7 +3,6 @@ import LinearLayer from "./toolbox/linear-layer";
 import Minimize from "./toolbox/minimize";
 import Arrow from "./arrow";
 
-
 // Baseline
 const baseline_x = 50;
 
@@ -90,8 +89,7 @@ function Encoder(props) {
       showText : true,
       transform : `rotate(90, ${leftDatum + MSA_x * width / 100}, ${y})`,
       annotation: <>
-        <rect x={rightDatum + 10} y={0} width="125" height="100" fill="white"/>
-        <image href="./assets/multi_headed_attention.jpg" x={rightDatum + 10} y={0} width="135" height="135" />
+        <image href="./assets/multi_headed_attention.jpg" x={id !== 4 ? rightDatum + 10: leftDatum - 145} y={0} width="135" height="135" />
       </>,
       showAnnotation: activeComp === `${id}-1`,
       onClick: () => {setComps(`${id}-1`)},
@@ -120,8 +118,7 @@ function Encoder(props) {
       onClick: () => {setComps(`${id}-2`)},
       transform : `rotate(90, ${leftDatum + LN1_x * width / 100}, ${y})`,
       annotation: <>
-        <rect x={rightDatum + 10} y={0} width="125" height="100" fill="white"/>
-        <image href="./assets/layer_normalization.jpg" x={rightDatum + 10} y={0} width="125" height="100" />
+        <image href="./assets/layer_normalization.jpg" x={id !== 4 ? rightDatum + 10: leftDatum - 110} y={0} width="100" height="100" />
       </>,
       showAnnotation: activeComp === `${id}-2`,
       textProps : {
@@ -149,8 +146,7 @@ function Encoder(props) {
       onClick: () => {setComps(`${id}-4`)},
       transform : `rotate(90, ${leftDatum + ff_x * width / 100}, ${y})`,
       annotation: <>
-        <rect x={rightDatum + 10} y={0} width="125" height="100" fill="white"/>
-        <image href="./assets/feedforward.jpg" x={rightDatum + 10} y={0} width="125" height="100" />
+        <image href="./assets/feedforward.jpg" x={id !== 4 ? rightDatum + 10: leftDatum - 135} y={0} width="135" height="135" />
       </>,
       showAnnotation: activeComp === `${id}-4`,
       textProps : {
@@ -179,8 +175,7 @@ function Encoder(props) {
       onClick: () => {setComps(`${id}-5`)},
       transform : `rotate(90, ${leftDatum + LN2_x * width / 100}, ${y})`,
       annotation: <>
-        <rect x={rightDatum + 10} y={0} width="125" height="100" fill="white"/>
-        <image href="./assets/layer_normalization.jpg" x={rightDatum + 10} y={0} width="125" height="100" />
+        <image href="./assets/layer_normalization.jpg" x={id !== 4 ? rightDatum + 10: leftDatum - 110} y={0} width="100" height="100" />
       </>,
       showAnnotation: activeComp === `${id}-5`,
       textProps : {
@@ -244,7 +239,7 @@ function Encoder(props) {
                 c0,6.8,5.5,12.3,12.2,12.2h67.3v67.3C232.8,331.4,238.3,336.9,245.1,336.9z" stroke={"#ffffff"}/>
           </g>
         </svg>}
-      {(activeComp === `${id}-3` || activeComp === `${id}-6`)  && <image href="./assets/residual_connection.jpg" x={rightDatum + 10} y={0} width="75" height="50" />}
+      {(activeComp === `${id}-3` || activeComp === `${id}-6`)  && <image href="./assets/residual_connection.jpg" x={rightDatum + 10} y={0} width="75" height="75" />}
       {active && <Minimize width={4.5} height={4.5} x={rightDatum - 7} y = {topDatum + 2} onClick={closeComps} fill={fill} />}
       {active && <Arrow id={'IN-MSA'} points={arrowPoints['IN-MSA']} />}
       {active && <Arrow id={'IN-ADD1'} points={arrowPoints['IN-ADD1']} />}

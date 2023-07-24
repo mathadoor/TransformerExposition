@@ -13,5 +13,20 @@
 // limitations under the License.
 
 import configs from "./rollup.config.common";
+import { terser } from 'rollup-plugin-terser';
+import replace from "rollup-plugin-replace";
+
+// Enable minification (compression) of the JavaScript code
+configs.forEach(config => config.plugins.push(terser()));
+
+// Set the mode to production
+configs[2].plugins = configs[2].plugins.map(plugin => {
+  if (plugin.name === 'replace') {
+    return replace({
+      'process.env.NODE_ENV': JSON.stringify('production')
+    });
+  }
+  return plugin;
+});
 
 export default configs;

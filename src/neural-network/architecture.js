@@ -30,7 +30,7 @@ const baseOutputWidth = 12;
 const controllerWidth = 6;
 const controllerHeight = 10;
 
-const y_gap = 15;
+const y_gap = 5;
 const coder_x_gap = 5;
 const emb_x_gap = 2;
 const out_x_gap = 2;
@@ -425,7 +425,7 @@ class Architecture extends React.Component {
             </svg>
           {/*<div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: '100%'}}>*/}
 
-            <Input {...this.computeProps(0)} />
+          {this.state.activeElement === -1 && <Input {...this.computeProps(0)} />}
 
             <Output {...this.computeProps(10)}/>
 
