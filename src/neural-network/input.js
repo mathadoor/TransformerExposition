@@ -37,7 +37,8 @@ function Input(props) {
       top:`${y - height / 4}%`,
       boxSizing: "border-box",
       fontSize: "14px",
-      filter: isBlurred ? "blur(5px)" : "none"
+      filter: isBlurred ? "blur(5px)" : "none",
+      zIndex:0,
     }),
     menu: () => ({
         position: "relative",

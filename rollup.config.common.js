@@ -94,7 +94,7 @@ const reactConfig={
       include: ["**/*.txt", "**/*.svg", "**/*.html", "**/*.css", "**/*.base64"]
     }),
     replace({
-      'process.env.NODE_ENV': JSON.stringify( 'development' )
+      'process.env.NODE_ENV': JSON.stringify( 'production' )
     }),
   ]
 };
