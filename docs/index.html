@@ -25,9 +25,9 @@
   <distill-header></distill-header>
   <d-front-matter>
     <script id='distill-front-matter' type="text/json">{
-    "title": "Transformer Explainer - IN PROGRESS",
+    "title": "Transformer Explainer",
     "description": "The website serves to explain the architectural components of the transformers through interactive visualization.",
-    "published": "June 22, 2023",
+    "published": "July 31, 2023",
     "authors": [
       {
         "author":"Harpreet Matharoo",
@@ -44,29 +44,104 @@
   </d-front-matter>
 
   <d-title>
-
-    <p>Learn how transformer architecture revolutions language modeling!</p>
+<!--Sub title of the website-->
+    <p>Learn how transformer architecture works for language translation.</p>
 <!--    <d-cite key="mercier2011humans"></d-cite>-->
   </d-title>
   <div id='arch'></div>
-  <script src="bundle.js"></script>
-  <d-byline></d-byline>
+  <figure style="width:50%; position:relative; left: 25%">
+    <script src="bundle.js"></script>
+    <figcaption style="text-align: center; margin-left: 10%; width: 80%;">Interactive visualization of transformer architecture<d-footnote> Icons by <a href="https://www.svgrepo.com" target="_blank">SVG Repo</a> </d-footnote> .</figcaption>
+  </figure>
+  <d-byline>Abc</d-byline>
   <d-article>
 <!--    <a class="marker" href="#section-1" id="section-1"><span>1</span></a>-->
     <h2>Introduction</h2>
-    <p>Provide an introduction of transformer and what this visualization is about.</p>
-    <h2>Overall Architecture</h2>
-    <p>Describe the overall architecture here including how encoder-decoder works.</p>
-    <h2>Architectural Components</h2>
-    <p>Here describe the specifics of the components at level 2</p>
-    <h3>Input</h3>
-    <p>Describe the input embeddings here</p>
-    <h3>Encoder/Decoder Components</h3>
-    <p>Describe the components of the encoder-decoder</p>
-    <h4>Multi-headed Self-Attention</h4>
-    <h4>Position Wise MLP layers</h4>
-    <h3>Output</h3>
-    <p>Describe how the output is generated</p>
+    <p>
+        Recent years have seen significant advancements in artificial intelligence, which birthed systems capable of performing
+      similar to humans in language related tasks<d-cite bibtex-key="zhao2023survey"></d-cite>. Such advancements were made
+      possible due to the introduction of the transformer architecture. Before transformer, the language modeling tasks were
+      performed using different variants of recurrent neural networks(RNNs). However, the inherent structure of RNNs placed
+      limitations on its expressivity and training speed<d-cite bibtex-key="pascanu2013difficulty"></d-cite>. As such, these
+      models failed to learn meaningful concepts for more complex tasks such as language translations. The transformer
+      architecture lifted these limitations and enabled training models of unprecedented scale and abilities<d-cite bibtex-key="wei2022emergent"></d-cite>.
+      Consequently, the research output has increased exponentially.
+    </p>
+
+    <p>
+      While this exponential increment in the research output is attractive, maintaining this pace of research becomes challenging
+      as proportionally equal amount of research debt is added. Such debt lengthens the lead time to meaningful participation
+      by the aspiring researchers and stilfes further progress<d-cite bibtex-key="olah2017research"></d-cite>. Interactive
+      visualization has shown great promise in shortening this lead time and facilitating a deeper understanding of the
+      subject<d-cite bibtex-key="hohman2020communicating"></d-cite>. To this end, this article exposes the inner workings
+      of the transformer architecture for language translation via an interactive visualization. The seminal encoder-decoder
+      architecture<d-cite bibtex-key="vaswani2017attention"></d-cite> is chosen as it is often the starting point from
+      which the newcomers to the language modeling began. The rest of the article details different parts of the visualization.
+    </p>
+    <h2>Using the Visualization</h2>
+    <p>
+      As noted earlier, the exposition in this article refers to the encoder-decoder variant of the transformer architecture.
+      The technical contents of the visualization assumes familiarity with deep learning concepts. An unfamiliar reader is
+      urged to review the material listed in the <a href="#suggPreq">suggested pre-requisites</a> section.
+      Now, there are three types of visual components in the visualization. Their description are as follows:
+      <ol>
+    <li><b>Input Selector</b>: The component is located at the top-corner of the architecture. The user can select a component
+    from the drop-down menu or enter a sentence of their own interest.
+      <d-figure id="overall-arch">
+        <figure style="width:50%; position:relative; left: 25%">
+          <img src="./assets/input_gif.gif" alt="Trulli" style="width:100%">
+          <figcaption style="text-align: center; margin-left: 10%; width: 80%;">Fig. 1 - Input Selection.</figcaption>
+        </figure>
+      </d-figure>
+    </li>
+    <li><b>Explorable</b>: The explorable components are the ones that can be clicked on to reveal their internal structure.
+      The subcomponents can be further clicked on to reveal a description of its underlying operations. In total, there are 9
+      explorable components - input and output embeddings, encoders, decoders, and output layer.
+      <d-figure id="overall-arch">
+        <figure style="width:80%; position:relative; left: 10%">
+          <img src="./assets/explorable.gif" alt="Trulli" style="width:100%">
+          <figcaption style="text-align: center; margin-left: 10%; width: 80%;"> Fig. 2 - Interaction with input embedding component.</figcaption>
+        </figure>
+      </d-figure>
+    </li>
+    <li><b>Controller</b>: The controller is the unique component that lets the user step through the translation process. Note the target sentence
+      is one token behind as it is used in conjunction with the encoding of the source sentence, to predict the next token in the sequence.
+      <d-figure id="overall-arch">
+        <figure style="width:120%; position:relative; left: -10%">
+          <img src="./assets/controller_gif.gif" alt="Trulli" style="width:100%">
+          <figcaption style="text-align: center; margin-left: 10%; width: 80%;"> Fig. 3 - Stepping through the translation using the controller..</figcaption>
+        </figure>
+      </d-figure>
+    </li>
+
+    </li>
+  </ol>
+    </p>
+
+    <h2 id="suggPreq">Suggested Pre-requisites</h2>
+    <ol>
+      <li><b><a href="https://www.youtube.com/watch?v=i_LwzRVP7bg&t=29s&ab_channel=freeCodeCamp.org" target="_blank">Machine Learning for everybody</a> by Freecodecamp.org</b></li>
+      <li><b><a href="http://playground.tensorflow.org/" target="_blank">Tensorflow Playground</a> a sandbox environment to play with neural networks.</b></li>
+      <li><b><a href="https://www.youtube.com/watch?v=aircAruvnKk&list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi" target="_blank">Neural Networks by 3Blue1Brown</a> for an intuitive explanation of how neural networks work.</b></li>
+      <li><b><a href="https://www.coursera.org/specializations/deep-learning" target="_blank">Deep Learning Specialization by Deeplearning.ai</a> for learning to implement neural networks and train them.</b></li>
+      <li><b><a href="http://karpathy.github.io/2015/05/21/rnn-effectiveness/" target="_blank">The Unreasonable Effectiveness of Recurrent Neural Networks by Andrej Karpathy</a> for developing an intuitive understanding of how RNNs work.</b></li>
+      <li><b><a href="https://colah.github.io/posts/2015-08-Understanding-LSTMs/" target="_blank">Understanding LSTM Networks by Chris Olah</a> for understanding how LSTM networks work.</b></li>
+      <li><b><a href="https://jalammar.github.io/visualizing-neural-machine-translation-mechanics-of-seq2seq-models-with-attention/" target="_blank">Visualizing A Neural Machine Translation Model by Jay Alammar</a> for understanding how attention mechanism helps with the aligning neural machine translation.</b></li>
+      <li><b><a href="https://jalammar.github.io/illustrated-transformer/" target="_blank">The Illustrated Transformer by Jay Alammar</a> supplemental material for developing an intuitive understanding of the transformer architecture.</b></li>
+
+    </ol>
+<!--    As noted earlier, the article presents the encoder-decoder architecture.-->
+<!--    <p>Describe the overall architecture here including how encoder-decoder works.</p>-->
+<!--    <h2>Architectural Components</h2>-->
+<!--    <p>Here describe the specifics of the components at level 2</p>-->
+<!--    <h3>Input</h3>-->
+<!--    <p>Describe the input embeddings here</p>-->
+<!--    <h3>Encoder/Decoder Components</h3>-->
+<!--    <p>Describe the components of the encoder-decoder</p>-->
+<!--    <h4>Multi-headed Self-Attention</h4>-->
+<!--    <h4>Position Wise MLP layers</h4>-->
+<!--    <h3>Output</h3>-->
+<!--    <p>Describe how the output is generated</p>-->
 
 <!--    <p>This is the first paragraph of the article. Test a long&thinsp;&mdash;&thinsp;dash &#45;&#45; here it is.</p>-->
 <!--    <p>Test for owner's possessive. Test for "quoting a passage." And another sentence. Or two. Some flopping fins; for-->
@@ -164,8 +239,7 @@
 
   <d-appendix>
 
-    <h3>Bibliography</h3>
-    <p>Bibliography goes here.</p>
+
 <!--    <p>Some text describing who did what.</p>-->
 <!--    <h3>Reviewers</h3>-->
 <!--    <p>Some text with links describing who reviewed the article.</p>-->
