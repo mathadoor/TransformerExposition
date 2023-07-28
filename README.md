@@ -29,6 +29,12 @@ Activate the environment using the following command:
 conda activate transformerExposition
 ```
 
+Download the translation dataset by running the following commands
+```
+python spacy -m en_core_web_sm
+python spacy -m de_core_news_sm
+```
+
 Also, update the api_url variable in src/neural-network/architecture.js to point to the local server as
 ```https://localhost:8080/one-predict```
 
