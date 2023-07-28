@@ -1,5 +1,5 @@
-import logo from '../assets/distill-logo.svg';
-import github from '../../assets/icons/github.svg';
+
+// Code sourced from https://github.com/distillpub/template.git
 
 export const headerTemplate = `
 <style>

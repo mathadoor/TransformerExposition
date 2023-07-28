@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+// /*Code sourced from https://github.com/distillpub/template.git*/
 import base from './styles-base.css';
 import layout from './styles-layout.css';
 import print from './styles-print.css';

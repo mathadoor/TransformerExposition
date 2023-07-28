@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Code sourced from https://github.com/distillpub/template.git
 export default function(dom, data) {
 
   var fnTags = [].slice.apply(dom.querySelectorAll('dt-fn'));

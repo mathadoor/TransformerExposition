@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// Code sourced from https://github.com/distillpub/template.git
 
 /*
   Try to only reorder things that MAY be user defined.

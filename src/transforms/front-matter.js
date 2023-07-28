@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Code sourced from https://github.com/distillpub/template.git
 import ymlParse from 'js-yaml';
 
 export default function(dom, data) {
@@ -50,6 +51,6 @@ export default function(dom, data) {
     }
     return a;
   });
-  
+
 
 }

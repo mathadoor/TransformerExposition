@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Code sourced from https://github.com/distillpub/template.git
 import { footerTemplate } from '../distill-components/distill-footer-template';
 
 export default function(dom) {

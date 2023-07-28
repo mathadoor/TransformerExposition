@@ -13,6 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+<!--base code sourced from https://github.com/distillpub/template.git-->
 <!doctype html>
 
 <head>
@@ -53,7 +54,6 @@
     <script src="bundle.js"></script>
     <figcaption style="text-align: center; margin-left: 10%; width: 80%;">Interactive visualization of transformer architecture<d-footnote> Icons by <a href="https://www.svgrepo.com" target="_blank">SVG Repo</a> </d-footnote> .</figcaption>
   </figure>
-  <d-byline>Abc</d-byline>
   <d-article>
 <!--    <a class="marker" href="#section-1" id="section-1"><span>1</span></a>-->
     <h2>Introduction</h2>
@@ -130,119 +130,10 @@
       <li><b><a href="https://jalammar.github.io/illustrated-transformer/" target="_blank">The Illustrated Transformer by Jay Alammar</a> supplemental material for developing an intuitive understanding of the transformer architecture.</b></li>
 
     </ol>
-<!--    As noted earlier, the article presents the encoder-decoder architecture.-->
-<!--    <p>Describe the overall architecture here including how encoder-decoder works.</p>-->
-<!--    <h2>Architectural Components</h2>-->
-<!--    <p>Here describe the specifics of the components at level 2</p>-->
-<!--    <h3>Input</h3>-->
-<!--    <p>Describe the input embeddings here</p>-->
-<!--    <h3>Encoder/Decoder Components</h3>-->
-<!--    <p>Describe the components of the encoder-decoder</p>-->
-<!--    <h4>Multi-headed Self-Attention</h4>-->
-<!--    <h4>Position Wise MLP layers</h4>-->
-<!--    <h3>Output</h3>-->
-<!--    <p>Describe how the output is generated</p>-->
-
-<!--    <p>This is the first paragraph of the article. Test a long&thinsp;&mdash;&thinsp;dash &#45;&#45; here it is.</p>-->
-<!--    <p>Test for owner's possessive. Test for "quoting a passage." And another sentence. Or two. Some flopping fins; for-->
-<!--      diving.</p>-->
-<!--    <aside>Some text in an aside, margin notes, etc...</aside>-->
-<!--    <p>Here's a test of an inline equation <d-math>c = a^2 + b^2</d-math>. Also with configurable katex standards just-->
-<!--      using inline '$' signs: $$x^2$$ And then there's a block equation:</p>-->
-<!--    <d-math block>-->
-<!--      c = \pm \sqrt{ \sum_{i=0}^{n}{a^{222} + b^2}}-->
-<!--    </d-math>-->
-<!--    <p>Math can also be quite involved:</p>-->
-<!--    <d-math block>-->
-<!--      \frac{1}{\Bigl(\sqrt{\phi \sqrt{5}}-\phi\Bigr) e^{\frac25 \pi}} = 1+\frac{e^{-2\pi}} {1+\frac{e^{-4\pi}}-->
-<!--      {1+\frac{e^{-6\pi}} {1+\frac{e^{-8\pi}} {1+\cdots} } } }-->
-<!--    </d-math>-->
-<!--    <a class="marker" href="#section-1.1" id="section-1.1"><span>1.1</span></a>-->
-<!--    <h3>Citations</h3>-->
-<!--    <p>-->
-<!--      <d-slider style="width: 200px;"></d-slider>-->
-<!--    </p>-->
-<!--    <p>We can<d-cite bibtex-key="mercier2011humans"></d-cite> also cite <d-cite-->
-<!--        key="gregor2015draw,mercier2011humans,openai2018charter"></d-cite> external publications. <d-cite-->
-<!--        key="dong2014image,dumoulin2016guide,mordvintsev2015inceptionism"></d-cite>. We should also be testing footnotes-->
-<!--      <d-footnote>This will become a hoverable footnote. This will become a hoverable footnote. This will become a-->
-<!--        hoverable footnote. This will become a hoverable footnote. This will become a hoverable footnote. This will-->
-<!--        become a hoverable footnote. This will become a hoverable footnote. This will become a hoverable footnote.-->
-<!--      </d-footnote>. There are multiple footnotes, and they appear in the appendix<d-footnote>Given I have coded them-->
-<!--        right. Also, here's math in a footnote: <d-math>c = \sum_0^i{x}</d-math>. Also, a citation. Box-ception<d-cite-->
-<!--          key='gregor2015draw'></d-cite>!</d-footnote> as well.</p>-->
-<!--    <a class="marker" href="#section-2" id="section-2"><span>2</span></a>-->
-<!--    <h2>Displaying code snippets</h2>-->
-<!--    <p>Some inline javascript:<d-code language="javascript">var x = 25;</d-code>. And here's a javascript code block.-->
-<!--    </p>-->
-<!--    <d-code block language="javascript">-->
-<!--      var x = 25;-->
-<!--      function(x){-->
-<!--      return x * x;-->
-<!--      }-->
-<!--    </d-code>-->
-<!--    <p>We also support python.</p>-->
-<!--    <d-code block language="python">-->
-<!--      # Python 3: Fibonacci series up to n-->
-<!--      def fib(n):-->
-<!--        a, b = 0, 1-->
-<!--      while a < n: print(a, end=' ' ) a, b=b, a+b </d-code>-->
-<!--        <p>And a table</p>-->
-<!--        <table>-->
-<!--          <thead>-->
-<!--            <tr>-->
-<!--              <th>First</th>-->
-<!--              <th>Second</th>-->
-<!--              <th>Third</th>-->
-<!--            </tr>-->
-<!--          </thead>-->
-<!--          <tbody>-->
-<!--            <tr>-->
-<!--              <td>23</td>-->
-<!--              <td>654</td>-->
-<!--              <td>23</td>-->
-<!--            </tr>-->
-<!--            <tr>-->
-<!--              <td>14</td>-->
-<!--              <td>54</td>-->
-<!--              <td>34</td>-->
-<!--            </tr>-->
-<!--            <tr>-->
-<!--              <td>234</td>-->
-<!--              <td>54</td>-->
-<!--              <td>23</td>-->
-<!--            </tr>-->
-<!--          </tbody>-->
-<!--        </table>-->
-<!--        <d-figure id="last-figure"></d-figure>-->
-<!--        <script>-->
-<!--          const figure = document.querySelector("d-figure#last-figure");-->
-<!--          const initTag = document.createElement("span");-->
-<!--          initTag.textContent = "initialized!"-->
-<!--          figure.appendChild(initTag);-->
-<!--          figure.addEventListener("ready", function () {-->
-<!--            const initTag = figure.querySelector("span");-->
-<!--            initTag.textContent = "ready"-->
-<!--          });-->
-<!--          figure.addEventListener("onscreen", function () {-->
-<!--            const initTag = figure.querySelector("span");-->
-<!--            initTag.textContent = "onscreen"-->
-<!--          });-->
-<!--          figure.addEventListener("offscreen", function () {-->
-<!--            const initTag = figure.querySelector("span");-->
-<!--            initTag.textContent = "offscreen!"-->
-<!--          });-->
-<!--        </script>-->
-<!--        <p>That's it for the example article!</p>-->
 
   </d-article>
 
   <d-appendix>
-
-
-<!--    <p>Some text describing who did what.</p>-->
-<!--    <h3>Reviewers</h3>-->
-<!--    <p>Some text with links describing who reviewed the article.</p>-->
 
     <d-bibliography src="bibliography.bib"></d-bibliography>
   </d-appendix>

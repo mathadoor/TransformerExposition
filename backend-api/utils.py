@@ -1,3 +1,7 @@
+"""
+The base code is sourced from https://github.com/aladdinpersson/Machine-Learning-Collection.git
+"""
+
 import torch
 from torch import nn
 import spacy

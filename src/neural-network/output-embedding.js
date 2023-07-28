@@ -188,6 +188,8 @@ function OutputEmbedding(props) {
         <svg id={"1-4"} x={leftDatum + add_x * width / 100 - 3} y={y - 3} onClick={() => setComps(`${id}-4`)} ref={ref} fill="#ffffff" version="1.1" >
           <circle cx={3} cy={3} r={3} fill={fill}/>
           <g  transform={`scale(0.012 0.012)`}>
+
+            {/*SVG Downloaded from https://www.svgrepo.com/svg/113575/plus*/}
             <path d="M418.5,418.5c95.6-95.6,95.6-251.2,0-346.8s-251.2-95.6-346.8,0s-95.6,251.2,0,346.8S322.9,514.1,418.5,418.5z M89,89
                 c86.1-86.1,226.1-86.1,312.2,0s86.1,226.1,0,312.2s-226.1,86.1-312.2,0S3,175.1,89,89z" stroke={"#ffffff"}/>
             <path d="M245.1,336.9c3.4,0,6.4-1.4,8.7-3.6c2.2-2.2,3.6-5.3,3.6-8.7v-67.3h67.3c3.4,0,6.4-1.4,8.7-3.6c2.2-2.2,3.6-5.3,3.6-8.7

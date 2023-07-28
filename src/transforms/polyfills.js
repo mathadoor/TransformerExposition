@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// Code sourced from https://github.com/distillpub/template.git
 
 const webcomponentPath = 'https://distill.pub/third-party/polyfills/webcomponents-lite.js';
 const intersectionObserverPath = 'https://distill.pub/third-party/polyfills/intersection-observer.js';

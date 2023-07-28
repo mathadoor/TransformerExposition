@@ -1,3 +1,5 @@
+
+// Code sourced from https://github.com/distillpub/template.git
 import logo from '../assets/distill-logo.svg';
 
 export const footerTemplate = `

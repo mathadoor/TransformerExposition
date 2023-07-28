@@ -1,3 +1,4 @@
+# Code sourced from https://github.com/distillpub/template.git
 language: node_js
 node_js:
   - "node" # latest version

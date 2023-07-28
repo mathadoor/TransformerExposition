@@ -20,6 +20,7 @@
 // if citation, no bib-list -> add citation-list
 
 // if authors, no byline -> add byline
+// Code sourced from https://github.com/distillpub/template.git
 
 export default function(dom, data) {
   const body = dom.body;

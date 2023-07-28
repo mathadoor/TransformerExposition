@@ -42,7 +42,7 @@ const targetPlaceHolderText = ["Target", "sentence", "will", "appear", "here", "
 const translationPlaceHolderText = ["Translation", "will", "appear", "here", "..."]
 const outputPlaceHolderText = ["Translation", "will", "appear", "here", "..."]
 
-const api_url = "https://35.183.0.159:8080/one-predict";
+const api_url = "https://ec2-35-183-0-159.ca-central-1.compute.amazonaws.com:8080/one-predict";
 const api_options = {
   method: 'POST',
   headers: {

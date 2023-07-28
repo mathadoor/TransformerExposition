@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// Code sourced from https://github.com/distillpub/template.git
 
 export function _moveLegacyAffiliationFormatIntoArray(frontMatter) {
   // authors used to have propoerties "affiliation" and "affiliationURL".

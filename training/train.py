@@ -1,4 +1,6 @@
 """
+The base code is sourced from https://github.com/aladdinpersson/Machine-Learning-Collection.git
+
 Seq2Seq using Transformers on the Multi30k
 dataset. In this video I utilize Pytorch
 inbuilt Transformer modules, and have a
