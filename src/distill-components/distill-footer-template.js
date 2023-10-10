@@ -1,6 +1,5 @@
 
 // Code sourced from https://github.com/distillpub/template.git
-import logo from '../assets/distill-logo.svg';
 
 export const footerTemplate = `
 <style>
@@ -56,7 +55,6 @@ export const footerTemplate = `
 <div class='footer-container'>
 
   <a href="/" class="logo">
-    ${logo}
     Distill
   </a> is dedicated to clear explanations of machine learning
 

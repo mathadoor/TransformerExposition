@@ -42,7 +42,7 @@ const targetPlaceHolderText = ["Target", "sentence", "will", "appear", "here", "
 const translationPlaceHolderText = ["Translation", "will", "appear", "here", "..."]
 const outputPlaceHolderText = ["Translation", "will", "appear", "here", "..."]
 
-const api_url = "https://ec2-35-183-0-159.ca-central-1.compute.amazonaws.com:8080/one-predict";
+const api_url = "http://127.0.0.1:8080/predictions/tinytransformer";
 const api_options = {
   method: 'POST',
   headers: {
@@ -93,40 +93,57 @@ class Architecture extends React.Component {
       this.setCounter = this.setCounter.bind(this);
     };
 
-    setCounter(counter){
+    setCounter(offset){
       this.setState((prevState) => {
         if(prevState.selectedText === null){
           return prevState;
         }
         const newState = {...prevState};
-        newState.counter = counter;
-        newState.outputText = prevState.translation.slice(0, counter + 1);
-        newState.targetText = prevState.translation.slice(0, counter);
+        newState.counter = Math.min(Math.max(prevState.counter + offset, 1), prevState.translation.length - 1);
+        newState.outputText = prevState.translation.slice(0, newState.counter + 1);
+        newState.targetText = prevState.translation.slice(0, newState.counter);
         return newState;
       });
     }
 
   setInput(input){
     api_options.body = JSON.stringify({sentence: input.label});
-    fetch(api_url, api_options)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json(); // This returns a promise
-      })
-      .then(data => {
-
-        this.setState((prevState) => {
-          const newState = {...prevState};
-          newState.translation = ["<sos>", ...data.translation]; // set data from API to state
-          newState.selectedText = input.label;
-          return newState;
-        });
-      })
-      .catch(error => {
-        console.error('There has been a problem with your fetch operation:', error);
+    console.log(input)
+    if (input.value !== input.label){
+      this.setState((prevState) => {
+        const newState = {...prevState};
+        newState.translation = ["<sos>", ...input.value.split(" "), "<eos>"]; // set data from API to state
+        newState.counter = 1;
+        newState.outputText = newState.translation.slice(0, 2);
+        newState.targetText = newState.translation.slice(0, 1);
+        newState.selectedText = input.label;
+        return newState;
       });
+    }
+    else{
+      fetch(api_url, api_options)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json(); // This returns a promise
+        })
+        .then(data => {
+
+          this.setState((prevState) => {
+            const newState = {...prevState};
+            newState.translation = ["<sos>", ...data.translation]; // set data from API to state
+            newState.counter = 1;
+            newState.outputText = newState.translation.slice(0, 2);
+            newState.targetText = newState.translation.slice(0, 1);
+            newState.selectedText = input.label;
+            return newState;
+          });
+        })
+        .catch(error => {
+          console.error('There has been a problem with your fetch operation:', error);
+        });
+    }
   }
 
     resetState(state){

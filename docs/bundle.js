@@ -26944,7 +26944,7 @@
 	var targetPlaceHolderText = ["Target", "sentence", "will", "appear", "here", "..."];
 	var translationPlaceHolderText = ["Translation", "will", "appear", "here", "..."];
 	var outputPlaceHolderText = ["Translation", "will", "appear", "here", "..."];
-	var api_url = "https://35.183.0.159:8080/one-predict";
+	var api_url = "http://127.0.0.1:8080/predictions/tinytransformer";
 	var api_options = {
 	  method: 'POST',
 	  headers: {

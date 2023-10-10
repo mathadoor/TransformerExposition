@@ -187,7 +187,7 @@ function InputEmbedding(props) {
   }
 
   return (
-    <svg id={id} style={{ cursor: 'pointer' }}>
+    <svg id={id} style={{ cursor: 'pointer' }} >
       <LinearLayer {...thisProps} />
       {active && <LinearLayer {...tokenizerProps} />}
       {active && <LinearLayer {...embeddingProps} />}

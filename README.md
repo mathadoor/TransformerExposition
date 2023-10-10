@@ -3,9 +3,7 @@ A repository to create a visual interactive tutorial for transformer. The archit
 on the [Attention is all you need](https://arxiv.org/abs/1706.03762) paper. 
 
 ## Accessing On Web
-The visualization can be accessed at this [link](https://mathadoor.github.io/TransformerExposition/). 
-Currently, the visualization back-end is hosted with a self-signed certificate. Thus, to be able to step through the translation, 
-please accept the certificate by going to the following link: https://ec2-35-183-0-159.ca-central-1.compute.amazonaws.com:8080/one-predict
+The visualization can be accessed at this [link](https://mathadoor.github.io/TransformerExposition/).
 
 ## Running Locally
 ### Pre-requisites
@@ -36,7 +34,7 @@ python spacy -m de_core_news_sm
 ```
 
 Also, update the api_url variable in src/neural-network/architecture.js to point to the local server as
-```https://localhost:8080/one-predict```
+http://127.0.0.1:8080/predictions/tinytransformer
 
 ### Running the visualization
 To run the visualization, you will need to run the following command:

@@ -52,7 +52,11 @@
   <div id='arch'></div>
   <figure style="width:50%; position:relative; left: 25%">
     <script src="bundle.js"></script>
-    <figcaption style="text-align: center; margin-left: 10%; width: 80%;">Interactive visualization of transformer architecture<d-footnote> Icons by <a href="https://www.svgrepo.com" target="_blank">SVG Repo</a> </d-footnote> .</figcaption>
+    <figcaption style="text-align: center; margin-left: 10%; width: 80%;">Interactive visualization of transformer architecture<d-footnote> Icons by
+      <a href="https://www.svgrepo.com" target="_blank">SVG Repo</a>.</d-footnote> For custom input, please download the
+      repo and run the torch server as instructed in the <a href="https://github.com/mathadoor/TransformerExposition" target="_blank">
+        readme</a> file. For more information on how to use the visualization, read the <a href="#UsingViz">Using the
+        Visualization</a> section.</figcaption>
   </figure>
   <d-article>
 <!--    <a class="marker" href="#section-1" id="section-1"><span>1</span></a>-->
@@ -78,15 +82,17 @@
       architecture<d-cite bibtex-key="vaswani2017attention"></d-cite> is chosen as it is often the starting point from
       which the newcomers to the language modeling began. The rest of the article details different parts of the visualization.
     </p>
-    <h2>Using the Visualization</h2>
+    <h2 id="UsingViz">Using the Visualization</h2>
     <p>
       As noted earlier, the exposition in this article refers to the encoder-decoder variant of the transformer architecture.
       The technical contents of the visualization assumes familiarity with deep learning concepts. An unfamiliar reader is
       urged to review the material listed in the <a href="#suggPreq">suggested pre-requisites</a> section.
       Now, there are three types of visual components in the visualization. Their description are as follows:
       <ol>
-    <li><b>Input Selector</b>: The component is located at the top-corner of the architecture. The user can select a component
-    from the drop-down menu or enter a sentence of their own interest.
+    <li><b>Input Selector</b>: The component is located at the top-corner of the architecture. The user can select an input sentence
+    from a pre-defined set of inputs. The component also supports custom inputs. However, the user needs to download the
+      code repo and run the inference harness locally. The instructions for the same are provided in the <a href="https://github.com/mathadoor/TransformerExposition" target="_blank">
+        readme</a> file.
       <d-figure id="overall-arch">
         <figure style="width:50%; position:relative; left: 25%">
           <img src="./assets/input_gif.gif" alt="Trulli" style="width:100%">
